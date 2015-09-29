@@ -1,0 +1,36 @@
+		--------------------------------------
+		3D SCATTERED LIGHT CODE: POINT SOURCES
+		--------------------------------------
+
+This directory contains the source codes for the 3D Cartesian grid. The code is 
+set up to simulate emission from an isotropic point source at the centre of the 
+grid. The density structure is set to be a uniform density sphere discretised into 
+the 3D grid. The code outputs the 3D density grid as an unformatted file. At the 
+end of the simulation the code outputs to the screen the average number of scatterings 
+per Monte Carlo photon packet.
+
+The FORTRAN files are:
+
+	density.f
+	gridset.f
+        iarray.f
+        mcpolar.f
+        ran2.f
+        stokes.f
+        sourceph.f
+        tauint2.f
+
+Include files are:
+
+	grid.txt  
+	photon.txt  
+
+Input parameters are in:
+
+	input.params
+
+The file that compiles the code and creates the executable file 'mcgrid' is:
+
+	Makefile
+
+

@@ -1,0 +1,4 @@
+*.params
+*.o
+noise
+mcgrid
