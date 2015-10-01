@@ -1,12 +1,12 @@
       subroutine taufind1(xp,yp,zp,xmax,ymax,zmax,v,
-     +                    xface,yface,zface,rhokap,
-     +                    tau1,xcell,ycell,zcell,delta)
+     +                    xface,yface,zface,rhokap,smax,
+     +                    tau1,xcell,ycell,zcell,delta,cur)
 
       implicit none
 
       include 'grid.txt'
 
-      integer xcell,ycell,zcell
+      integer xcell,ycell,zcell,cur
       real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
 
       integer celli,cellj,cellk
@@ -64,14 +64,14 @@ c***** calculate smax -- maximum distance photon can travel *******
          tau1=0.
          return
       endif
-       
 c***** integrate through grid
-      dowhile(d.lt.(.999*smax))
+
+      do while(d.lt.(.999*smax))
 
 c***** optical depth to next cell wall is 
 c***** taucell= (distance to cell)*(opacity of current cell)
-         taucell=dcell*rhokap(celli,cellj,cellk)
-
+         taucell=dcell*rhokap(celli,cellj,cellk,cur)
+            
 c***** if taurun+taucell<tau then photon moves distance dcell 
 c***** (i.e. ends up on next cell wall) and update photon position
 c***** and cell.
@@ -84,6 +84,15 @@ c*************** Linear Grid ************************
          celli=int(nxg*xcur/(2.*xmax))+1
          cellj=int(nyg*ycur/(2.*ymax))+1
          cellk=int(nzg*zcur/(2.*zmax))+1
+         
+         if(rhokap(xcell,ycell,zcell,cur).eq.0.)then
+            if(mod(cur,2).eq.0)then
+                  cur=1
+            else
+                  cur=2
+            end if
+          end if
+         
 c****************************************************
 
 c***** find distance to next x, y, and z cell walls.  

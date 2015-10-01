@@ -7,6 +7,7 @@
       real nxp,nyp,nzp,sint,cost,sinp
       real  noise(1:cnt,1:cnt),theta,angle,cosp
       
+
 !      sets vectors in stupid fashion
             xvec(1)=1.
             xvec(2)=0.
@@ -23,9 +24,10 @@
 !     calculates x and y gradients for bump using finite difference method  
       if(xcell.le.1)xcell=2
       if(ycell.le.1)ycell=2
+
       xgrad=noise(int(xcell-1),int(ycell))+noise(int(xcell+1),
      +      int(ycell))
-     
+
       ygrad=noise(int(xcell),int(ycell-1))+noise(int(xcell),
      +      int(ycell+1))
 !      print *, xgrad,ygrad,xcell
@@ -43,7 +45,7 @@
 !    calculate proper theta for fresnel reflec
       theta=newNorm(3)/sqrt(newNorm(1)**2+newNorm(2)**2+newNorm(3)**2)
 
-      angle=angle+90.-(180./3.14)*acos(theta)
+!      angle=angle+90.-(180./3.14)*acos(theta)
 
       cost=-theta      
       sint=sqrt(1.-cost**2)

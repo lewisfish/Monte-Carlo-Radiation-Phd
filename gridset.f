@@ -1,12 +1,13 @@
-      subroutine gridset(xface,yface,zface,rhokap,xmax,ymax,zmax,kappa)
+      subroutine gridset(xface,yface,zface,rhokap,xmax,ymax,zmax,
+     +                  kappa1,kappa2)
 
       implicit none
 
       include 'grid.txt'
 
-      real xmax,ymax,zmax,kappa
+      real xmax,ymax,zmax,kappa1,kappa2
 
-      integer i,j,k
+      integer i,j,k,kflag
       real x,y,z,rho,taueq,taupole
 
       print *, 'Setting up density grid....'
@@ -31,25 +32,37 @@ c**************  Loop through x, y, and z to set up grid density.  ****
            z=zface(k)-zmax+zmax/nzg
 
 c**********************Call density setup subroutine 
-           call density(x,y,z,rho)
-           rhokap(i,j,k)=rho*kappa
-
+           kflag=1
+           call density(x,y,z,rho,kflag,kappa1,kappa2)
+           rhokap(i,j,k,1)=rho
+           kflag=0
+           call density(x,y,z,rho,kflag,kappa1,kappa2)
+           rhokap(i,j,k,2)=rho                    
         end do
        end do
       end do
 
 c****************** Calculate equatorial and polar optical depths ****
-      taueq=0.
-      taupole=0.
+!      taueq=0.
+!      taupole=0.
+!      do i=1,nxg
+!         taueq=taueq+rhokap(i,nyg/2,nzg/2)
+!      enddo
+!      do i=1,nzg
+!         taupole=taupole+rhokap(nxg/2,nyg/2,i)
+!      enddo
+!      taueq=taueq*2.*xmax/nxg
+!      taupole=taupole*2.*zmax/nzg
+!      print *,'taueq = ',taueq,'  taupole = ',taupole
+
+      open(10,file='density1.dat')
+      open(11,file='density2.dat')
       do i=1,nxg
-         taueq=taueq+rhokap(i,nyg/2,nzg/2)
-      enddo
-      do i=1,nzg
-         taupole=taupole+rhokap(nxg/2,nyg/2,i)
-      enddo
-      taueq=taueq*2.*xmax/nxg
-      taupole=taupole*2.*zmax/nzg
-      print *,'taueq = ',taueq,'  taupole = ',taupole
+           write(10,*) (rhokap(i,100,j,1),j=1,nzg)
+           write(11,*) (rhokap(i,100,j,2),j=1,nzg)
+           end do
+      close(10)
+      close(11)
       
 
       return

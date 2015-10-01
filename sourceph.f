@@ -14,28 +14,32 @@
 c***** emit photon isotropically from origin
 !      xp=0.
 !      yp=0.
-      zp=zmax
-      w=0.2
+!      zp=zmax
+!      w=0.2
 
-      do while(xp**2+yp**2 .gt. w**2)
-            xp=2.*ran2(iseed)-1.
-            yp=2.*ran2(iseed)-1.
-      end do
+!      do while(xp**2+yp**2 .gt. w**2)
+!            xp=2.*ran2(iseed)-1.
+!            yp=2.*ran2(iseed)-1.
+!      end do
       
-      cost=2.*ran2(iseed)-1.
-      sint=(1.-cost*cost)
-      if(sint.le.0.)then
-        sint=0.
-      else
-        sint=sqrt(sint)
-      endif
+!      cost=2.*ran2(iseed)-1.
+!      sint=(1.-cost*cost)
+!      if(sint.le.0.)then
+!        sint=0.
+!      else
+!        sint=sqrt(sint)
+!      endif
+      
+!      phi=twopi*ran2(iseed)
+!      cosp=cos(phi)
+!      sinp=sin(phi)
 
 
 c**** emit uniformly across surface
 
-!      zp=zmax
-!      xp=2.*xmax*ran2(iseed)-xmax
-!      yp=2.*ymax*ran2(iseed)-ymax
+      zp=zmax
+      xp=2.*xmax*ran2(iseed)-xmax
+      yp=2.*ymax*ran2(iseed)-ymax
 
       phi=0.
       cosp=1.

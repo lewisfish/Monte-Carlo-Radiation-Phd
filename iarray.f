@@ -2,7 +2,7 @@
 
       include 'grid.txt'
 
-      integer i,j,k
+      integer i,j,k,p
 
 c**** Initialize array values to be zero
 
@@ -19,7 +19,9 @@ c**** Initialize array values to be zero
       do i=1,nxg
          do j=1,nyg
             do k=1,nzg
-               rhokap(i,j,k)=0.
+              do p=1,2
+               rhokap(i,j,k,p)=0.
+               end do
             end do
           end do
       end do

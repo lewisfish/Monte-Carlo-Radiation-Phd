@@ -1,16 +1,16 @@
       subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,
-     +                  xface,yface,zface,rhokap,noise,cnt,d,
-     +                  xcell,ycell,zcell,tflag,iseed,delta,pflag)
+     +               kappa2,xface,yface,zface,rhokap,noise,cnt,d,
+     +                  xcell,ycell,zcell,tflag,iseed,delta,cur)
 
       implicit none
 
       include 'grid.txt'
 
-      integer tflag,iseed,xcell,ycell,zcell,cnt
+      integer tflag,iseed,xcell,ycell,zcell,cnt,cur
       real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
-      real ran2
+      real ran2,kappa2
 
-      integer celli,cellj,cellk,pflag
+      integer celli,cellj,cellk
       real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
       real dx,dy,dz,smax,delta,noise
 
@@ -141,7 +141,7 @@ c***** find distance to next cell wall -- minimum of dx, dy, and dz
 
 c***** optical depth to next cell wall is 
 c***** taucell= (distance to cell)*(opacity of current cell)
-         taucell=dcell*rhokap(celli,cellj,cellk)
+         taucell=dcell*rhokap(celli,cellj,cellk,cur)
 
 c***** if taurun+taucell>tau then scatter at distance d+d1.  
 c***** update photon position and cell.  
@@ -150,7 +150,7 @@ c***** (i.e. ends up on next cell wall) and update photon position
 c***** and cell.
 
          if((taurun+taucell).ge.tau) then
-            d1=(tau-taurun)/rhokap(celli,cellj,cellk)
+            d1=(tau-taurun)/rhokap(celli,cellj,cellk,cur)
             d=d+d1
             taurun=taurun+taucell
             xcur=xcur+d1*nxp
@@ -162,6 +162,8 @@ c*************** Linear Grid ************************
             cellj=int(nyg*ycur/(2.*ymax))+1
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
+
+
 
          else
 
@@ -176,15 +178,18 @@ c*************** Linear Grid ************************
             cellj=int(nyg*ycur/(2.*ymax))+1
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
-
+            
           endif
-
+           
+            if(rhokap(xcell,ycell,zcell,cur).eq.kappa2)then
+                  cur=2
+            end if
       end do
 
 c***** calculate photon final position.  if it escapes envelope then
 c***** set tflag=1.  if photon doesn't escape leave tflag=0 and update 
 c***** photon position.
-      if(pflag.ne.1)then
+
       if((d.ge.(.999*smax))) then
              tflag=1
              if(zcur.gt.2.*zmax*.999)then
@@ -197,8 +202,8 @@ c***** photon position.
          xcell=int(nxg*(xp+xmax)/(2.*xmax))+1
          ycell=int(nyg*(yp+ymax)/(2.*ymax))+1
          zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
+
       endif
-      end if
 
       return
       end
