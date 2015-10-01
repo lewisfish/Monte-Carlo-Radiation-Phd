@@ -6,3 +6,5 @@
 *.dat
 *.gp
 data/
+Makefile
+*.txt
