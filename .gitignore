@@ -1,5 +1,8 @@
 *.params
 *.o
-noise
-mcgrid
+*noise
+*mcgrid
 *~
+*.dat
+*.gp
+data/
