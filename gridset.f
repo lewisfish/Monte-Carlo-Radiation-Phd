@@ -8,8 +8,9 @@
       real xmax,ymax,zmax,kappa1,kappa2
 
       integer i,j,k,kflag
-      real x,y,z,rho,taueq,taupole
+      real x,y,z,rho,taueq1,taupole1,taueq2,taupole2
 
+      print*, ' '
       print *, 'Setting up density grid....'
 
 c**********  Linear Cartesian grid. Set up grid faces ****************
@@ -43,17 +44,24 @@ c**********************Call density setup subroutine
       end do
 
 c****************** Calculate equatorial and polar optical depths ****
-!      taueq=0.
-!      taupole=0.
-!      do i=1,nxg
-!         taueq=taueq+rhokap(i,nyg/2,nzg/2)
-!      enddo
-!      do i=1,nzg
-!         taupole=taupole+rhokap(nxg/2,nyg/2,i)
-!      enddo
-!      taueq=taueq*2.*xmax/nxg
-!      taupole=taupole*2.*zmax/nzg
-!      print *,'taueq = ',taueq,'  taupole = ',taupole
+      taueq1=0.
+      taupole1=0.
+      taueq2=0.
+      taupole2=0.
+      do i=1,nxg
+         taueq1=taueq1+rhokap(i,nyg/2,nzg/2,1)
+         taueq2=taueq2+rhokap(i,nyg/2,nzg/2,2)
+      enddo
+      do i=1,nzg
+         taupole1=taupole1+rhokap(nxg/2,nyg/2,i,1)
+         taupole2=taupole2+rhokap(nxg/2,nyg/2,i,2)
+      enddo
+      taueq1=taueq1*2.*xmax/nxg
+      taupole1=taupole1*2.*zmax/nzg
+      taueq2=taueq2*2.*xmax/nxg
+      taupole2=taupole2*2.*zmax/nzg
+      print *,'taueq1 = ',taueq1,'  taupole1 = ',taupole1
+      print *,'taueq2 = ',taueq2,'  taupole2 = ',taupole2
 
       open(10,file='density1.dat')
       open(11,file='density2.dat')

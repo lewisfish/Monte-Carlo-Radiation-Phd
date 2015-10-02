@@ -7,7 +7,7 @@ FC     =       gfortran -fbounds-check
 # May want to experiment by adding the extra optimization flags to get
 ## better runtime. But then again, maybe not.
 #FFLAGS  =       -O2 $(EXTRA_OPT) -ffloat-store
-FFLAGS  =       -Ofast
+FFLAGS  =        -Ofast       
 LDFLAGS = 
 time_it         = get_cpu_sun
 
@@ -33,8 +33,8 @@ time_it         = get_cpu_sun
 #****************************************************************************
 
 
-OBJSB	=	density.o \
-	     	gridset.o \
+OBJSB =     density.o \
+            gridset.o \
             iarray.o \
             mcpolar.o \
             ran2.o \
@@ -46,7 +46,10 @@ OBJSB	=	density.o \
             peeling.o \
             gridedge.o \
             taufind1.o \
-            writer.f
+            binning.o \
+            fluro.o \
+            force.o \
+            writer.o
 
 mcgrid:	$(OBJSB)
 		$(FC) $(OBJSB) $(LDFLAGS) -o mcgrid

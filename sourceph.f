@@ -42,8 +42,9 @@ c**** emit uniformly across surface
       yp=2.*ymax*ran2(iseed)-ymax
 
       phi=0.
-      cosp=1.
+      cosp=0.
       sinp=0.
+      sint=0.
       cost=-1.
 
 c***** Set photon direction cosines for direction of travel *********

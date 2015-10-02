@@ -1,7 +1,9 @@
       subroutine writer(image,reflc,trans,Nbins,fileplace,flu,deposit,
-     +                  cbinsnum,fluro,cnt)
+     +                  cbinsnum,fluro,cnt,jmean)
       
       implicit none
+      
+      include 'grid.txt'
       
       integer i,j,Nbins,cbinsnum,cnt
       real reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
@@ -27,6 +29,16 @@
             write(62,*) (trans(i,j),j=1,cnt)
       end do
       close(62)
+      
+      open(63,file=fileplace//'jmeanflu.dat')
+      open(64,file=fileplace//'jmean.dat')
+      do i=1,nxg
+            write(63,*) (jmean(i,100,j,2),j=1,nzg)
+            write(64,*) (jmean(i,100,j,1),j=1,nzg)
+      end do
+      close(63)
+      close(64)
+      
 
       open(68,file=fileplace//'deposit.dat')
       open(67,file=fileplace//'fludeposit.dat')
@@ -41,7 +53,7 @@
       open(70,file=fileplace//'flu.dat')
       do i=-(Nbins-1)/2,(Nbins-1)/2 - 1
       
-            write(69,*) (image(j,i),j=-(Nbins-1)/2,(Nbins-1)/2 -  1)
+            write(69,*) (image(i,j),j=-(Nbins-1)/2,(Nbins-1)/2 -  1)
             write(70,*) (flu(i,j),j=-(Nbins-1)/2,(Nbins-1)/2 - 1)
       end do
       

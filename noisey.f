@@ -25,12 +25,10 @@
       if(xcell.le.1)xcell=2
       if(ycell.le.1)ycell=2
 
-      xgrad=noise(int(xcell-1),int(ycell))+noise(int(xcell+1),
-     +      int(ycell))
+      xgrad=noise(xcell-1,ycell)+noise(xcell+1,ycell)
 
-      ygrad=noise(int(xcell),int(ycell-1))+noise(int(xcell),
-     +      int(ycell+1))
-!      print *, xgrad,ygrad,xcell
+      ygrad=noise(xcell,ycell-1)+noise(xcell,ycell+1)
+
       if(xgrad.lt.1.E-8)then
             newNorm=norm + ygrad*yvec
       elseif(ygrad.lt.1.E-8)then
@@ -42,6 +40,8 @@
             newNorm=norm + xgrad*xvec + ygrad*yvec
       end if
 
+
+
 !    calculate proper theta for fresnel reflec
       theta=newNorm(3)/sqrt(newNorm(1)**2+newNorm(2)**2+newNorm(3)**2)
 
@@ -49,6 +49,8 @@
 
       cost=-theta      
       sint=sqrt(1.-cost**2)
+      sinp=0.
+      cosp=0.
 
       nxp=sint*cosp  
       nyp=sint*sinp

@@ -1,6 +1,6 @@
-      subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,
-     +               kappa2,xface,yface,zface,rhokap,noise,cnt,d,
-     +                  xcell,ycell,zcell,tflag,iseed,delta,cur)
+      subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
+     +    flucount,kappa2,xface,yface,zface,rhokap,noise,cnt,d,tau
+     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean)
 
       implicit none
 
@@ -10,7 +10,7 @@
       real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
       real ran2,kappa2
 
-      integer celli,cellj,cellk
+      integer celli,cellj,cellk,flucount,forceflag
       real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
       real dx,dy,dz,smax,delta,noise
 
@@ -18,7 +18,9 @@ c***** tflag=0 means photon is in envelope
       tflag=0
 
 c**** generate random optical depth tau
-      tau=-alog(ran2(iseed))
+      if(forceflag.eq.0)then
+      tau=-log(ran2(iseed))
+      end if
 
 c***** set the cumulative distance and optical depth (d and taurun) 
 c***** along the photon path to zero.  set the current photon coordinates.
@@ -33,6 +35,9 @@ c***** bottom corner of the grid.
       celli=xcell
       cellj=ycell
       cellk=zcell
+      
+      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
+     +             ,kappa2)
 
 c***** calculate smax -- maximum distance photon can travel
       if(nxp.gt.0.) then
@@ -156,7 +161,8 @@ c***** and cell.
             xcur=xcur+d1*nxp
             ycur=ycur+d1*nyp
             zcur=zcur+d1*nzp
-
+            !path length estimator
+            jmean(celli,cellj,cellk,cur)=jmean(celli,cellj,cellk,cur)+d1
 c*************** Linear Grid ************************
             celli=int(nxg*xcur/(2.*xmax))+1
             cellj=int(nyg*ycur/(2.*ymax))+1
@@ -172,7 +178,8 @@ c****************************************************
             xcur=xcur+dcell*nxp
             ycur=ycur+dcell*nyp
             zcur=zcur+dcell*nzp
-
+            !path length estimator 
+        jmean(celli,cellj,cellk,cur)=jmean(celli,cellj,cellk,cur)+dcell
 c*************** Linear Grid ************************
             celli=int(nxg*xcur/(2.*xmax))+1
             cellj=int(nyg*ycur/(2.*ymax))+1
@@ -181,9 +188,8 @@ c****************************************************
             
           endif
            
-            if(rhokap(xcell,ycell,zcell,cur).eq.kappa2)then
-                  cur=2
-            end if
+            call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
+     +                   ,kappa2)
       end do
 
 c***** calculate photon final position.  if it escapes envelope then
