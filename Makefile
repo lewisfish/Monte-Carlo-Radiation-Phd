@@ -1,15 +1,16 @@
 #*************** Makefile created by Mike Wolff ****************************
 
 #******************************** G77/Linux Fortran ************************
-FC     =       gfortran -fbounds-check
+FC     =       mpifort -g
 #EXTRA_OPT =     -mpentium -malign-double -fforce-mem -fforce-addr \
 #                -ffast-math -funroll-all-loops
+#debug flags                 -g -fcheck=all -fbounds-check
 # May want to experiment by adding the extra optimization flags to get
 ## better runtime. But then again, maybe not.
 #FFLAGS  =       -O2 $(EXTRA_OPT) -ffloat-store
-FFLAGS  =        -Ofast       
-LDFLAGS = 
-time_it         = get_cpu_sun
+#FFLAGS  =        -Ofast       
+#LDFLAGS = 
+#time_it         = get_cpu_sun
 
 #******************************** PGI Fortran ************************
 #FC      =       pgf77
@@ -44,11 +45,11 @@ OBJSB =     density.o \
             fresnel.o \
             tauint2.o \
             peeling.o \
-            gridedge.o \
             taufind1.o \
             binning.o \
             fluro.o \
             force.o \
+            reduce.o \
             writer.o
 
 mcgrid:	$(OBJSB)
