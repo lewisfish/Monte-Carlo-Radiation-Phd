@@ -3,31 +3,38 @@
       implicit none
 
       real x,y,z,rho,kappa1,kappa2
-      integer kflag
-      real w,w2,r,r2
+      integer kflag,i,j
+      real r,r2,pos(1:2,1:2)
 
 c***** calculate some distances for use in setting up density 
 c***** structure. Note that distances are in units of xmax, ymax, and zmax 
 c***** as called from the loop over cells in gridset.f
-!      w2=x*x+y*y
-!      w=sqrt(w2)
-      r2=x*x+y*y+z*z
-      r=sqrt(r2)
+
+      pos(1,1)=-.5
+      pos(1,2)=-.5
+      pos(2,1)=0.
+      pos(2,2)=.6
+!      do i=1,2
+!       do j=1,2
+!      r2=(x+pos(i,j))**2+y*y+(z+pos(i,j))**2
+!      r=sqrt(r2)
 
 c***** Set up optically diffrent sphere within the grid
       if(kflag.eq.1)then
-            if(r.gt..4) then
-                  rho=kappa1
-            else
+            if((y.lt..2.and.y.gt.-.2).and.(z.lt..2.and.z.gt.-.2))then
                   rho=kappa2
-            endif
+            else
+                  rho=kappa1
+            end if
       else
-            if(r.gt..4) then
+            if((y.lt..2.and.y.gt.-.2).and.(z.lt..2.and.z.gt.-.2))then
                   rho=kappa2
             else
                   rho=kappa2
             endif
       end if
+!      end do
+!      end do
       return
       end
 

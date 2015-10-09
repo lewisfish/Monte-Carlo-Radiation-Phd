@@ -11,8 +11,8 @@
       real ran2,kappa2
 
       integer celli,cellj,cellk,flucount,forceflag
-      real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
-      real dx,dy,dz,smax,delta,noise
+      real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur
+      real dx,dy,dz,smax,delta,noise,dsx,dsy,dsz
 
 c***** tflag=0 means photon is in envelope
       tflag=0
@@ -35,9 +35,6 @@ c***** bottom corner of the grid.
       celli=xcell
       cellj=ycell
       cellk=zcell
-      
-      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +             ,kappa2)
 
 c***** calculate smax -- maximum distance photon can travel
       if(nxp.gt.0.) then
@@ -72,6 +69,9 @@ c***** calculate smax -- maximum distance photon can travel
        
 c***** integrate through grid
       do while((taurun.lt.tau).and.(d.lt.(.999*smax)))
+      
+      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
+     +             ,kappa2)
 
 c***** find distance to next x, y, and z cell walls.  
 c***** note that dx is not the x-distance, but the actual distance along 
@@ -188,8 +188,6 @@ c****************************************************
             
           endif
            
-            call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +                   ,kappa2)
       end do
 
 c***** calculate photon final position.  if it escapes envelope then

@@ -1,5 +1,6 @@
-      subroutine writer(image,reflc,trans,Nbins,fileplace,flu,deposit,
-     +                  cbinsnum,fluro,cnt,jmean)
+      subroutine writer(imageGLOBAL,reflc,trans,Nbins,fileplace,
+     +            fluGLOBAL,depositGLOBAL,cbinsnum,fluroglobal
+     +            ,cnt,jmeanGLOBAL)
       
       implicit none
       
@@ -7,12 +8,12 @@
       
       integer i,j,Nbins,cbinsnum,cnt
       real reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
-      real image(-((Nbins-1)/2):((Nbins-1)/2),
+      real imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),
      + -((Nbins-1)/2):((Nbins-1)/2))
-      real flu(-((Nbins-1)/2):((Nbins-1)/2),-((
+      real fluGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((
      +      Nbins-1)/2):((Nbins-1)/2))
-      real deposit(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
-      real fluro(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
+      real depositGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
+      real fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
       character(*) fileplace 
 
      
@@ -33,8 +34,8 @@
       open(63,file=fileplace//'jmeanflu.dat')
       open(64,file=fileplace//'jmean.dat')
       do i=1,nxg
-            write(63,*) (jmean(i,100,j,2),j=1,nzg)
-            write(64,*) (jmean(i,100,j,1),j=1,nzg)
+            write(63,*) (jmeanGLOBAL(i,100,j,2),j=1,nzg)
+            write(64,*) (jmeanGLOBAL(i,100,j,1),j=1,nzg)
       end do
       close(63)
       close(64)
@@ -44,23 +45,31 @@
       open(67,file=fileplace//'fludeposit.dat')
       do i=0,cbinsnum
       
-            write(68,*) (deposit(i,100,j),j=0,cbinsnum)
-            write(67,*) (fluro(i,100,j),j=0,cbinsnum)
+            write(68,*) (depositGLOBAL(i,100,j),j=0,cbinsnum)
+            write(67,*) (fluroGLOBAL(i,100,j),j=0,cbinsnum)
       
       end do
       
+
       open(69,file=fileplace//'image.dat')
       open(70,file=fileplace//'flu.dat')
-      do i=-(Nbins-1)/2,(Nbins-1)/2 - 1
+      do i=-(Nbins-1)/2,(Nbins-1)/2-1
       
-            write(69,*) (image(i,j),j=-(Nbins-1)/2,(Nbins-1)/2 -  1)
-            write(70,*) (flu(i,j),j=-(Nbins-1)/2,(Nbins-1)/2 - 1)
+            write(69,*) (imageGLOBAL(j,i),j=-(Nbins-1)/2,(Nbins-1)/2-1)
+            write(70,*) (fluGLOBAL(j,i),j=-(Nbins-1)/2,(Nbins-1)/2-1)
       end do
+      
+      open(71,file=fileplace//'rawimage.dat')
+      open(72,file=fileplace//'rawfluimage.dat')
+      write(71,*) imageGLOBAL
+      write(72,*) fluGLOBAL
       
       close(67)
       close(68)
       close(69)
       close(70)
+      close(71)
+      close(72)
       
       return
       end

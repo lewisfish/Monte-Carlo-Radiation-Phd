@@ -8,12 +8,11 @@
       include 'photon.txt'
 
       integer xcell,ycell,zcell,nxg,nyg,nzg,iseed
-      real xmax,ymax,zmax,w,twopi
+      real xmax,ymax,zmax,w,twopi,r1,phigauss,zf,xf,temp
       real ran2
 
-c***** emit photon isotropically from origin
-!      xp=0.
-!      yp=0.
+c***** emit photon from a circle on surface
+
 !      zp=zmax
 !      w=0.2
 
@@ -21,7 +20,11 @@ c***** emit photon isotropically from origin
 !            xp=2.*ran2(iseed)-1.
 !            yp=2.*ran2(iseed)-1.
 !      end do
-      
+c***** emit isotropically from a point
+
+!      xp=0.
+!      yp=0.
+
 !      cost=2.*ran2(iseed)-1.
 !      sint=(1.-cost*cost)
 !      if(sint.le.0.)then
@@ -40,14 +43,42 @@ c**** emit uniformly across surface
       zp=zmax
       xp=2.*xmax*ran2(iseed)-xmax
       yp=2.*ymax*ran2(iseed)-ymax
+      
+c**** Collimated Gaussian Beam
 
+!      r1=w*sqrt(-log(ran2(iseed)))
+!      phigauss=twopi*ran2(iseed) 
+!      xp=r1*cos(phigauss)
+!      yp=r1*sin(phigauss)
+      
+c**** Focused Gaussian Beam
+!      zf=1.
+!      r1=w*sqrt(-log(ran2(iseed)))      
+!      phigauss=twopi*ran2(iseed) 
+!      xp=r1*cos(phigauss)
+!      yp=r1*sin(phigauss)
+!      
+!      if(2.*ran2(iseed)-1..lt.0.)then
+!            xf=-1.*w*sqrt(-log(ran2(iseed)))
+!      else
+!            xf=w*sqrt(-log(ran2(iseed)))
+!      end if  
+!      temp=sqrt((xp-xf)**2+zf**2)
+!      sint=(xp-xf)/temp
+!      cost=-zf/temp
+!      cosp=1.
+!      sinp=0.
+
+
+
+c***** Set photon direction cosines for direction of travel *********
+      
       phi=0.
       cosp=0.
       sinp=0.
       sint=0.
       cost=-1.
 
-c***** Set photon direction cosines for direction of travel *********
       nxp=sint*cosp  
       nyp=sint*sinp
       nzp=cost

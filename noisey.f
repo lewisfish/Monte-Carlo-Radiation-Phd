@@ -1,11 +1,11 @@
-      subroutine noisey(xcell,ycell,noise,cnt,angle,nxp,
+      subroutine noisey(xcell,ycell,noise,cnt,nxp,
      +      nyp,nzp,cost,sint,cosp,sinp)
 
       implicit none
       integer cnt,xcell,ycell
       real newNorm(3),Norm(3),xvec(3),yvec(3),xgrad,ygrad
       real nxp,nyp,nzp,sint,cost,sinp
-      real  noise(1:cnt,1:cnt),theta,angle,cosp
+      real  noise(1:cnt,1:cnt),theta,cosp
       
 
 !      sets vectors in stupid fashion
@@ -45,7 +45,6 @@
 !    calculate proper theta for fresnel reflec
       theta=newNorm(3)/sqrt(newNorm(1)**2+newNorm(2)**2+newNorm(3)**2)
 
-!      angle=angle+90.-(180./3.14)*acos(theta)
 
       cost=-theta      
       sint=sqrt(1.-cost**2)

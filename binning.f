@@ -1,15 +1,14 @@
-      subroutine binning(deposit,bflag,xcur,ycur,weight,ddx,fluro,
-     +                  ddy,cbinsnum,zcur,xmax,ymax,zmax,ddz,cur)
+      subroutine binning(deposit,xcur,ycur,weight,ddx,fluro,
+     +                  ddy,cbinsnum,zcur,ddz,cur)
       
       implicit none
       
-      integer bflag,binz,binx,biny,cbinsnum,cur
-      real deposit(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum),xcur,ycur
-      real weight,zcur,xmax,ymax,zmax,ddx,ddy,ddz
+      integer binz,binx,biny,cbinsnum,cur
+      real  deposit(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum),xcur,ycur
+      real weight,zcur,ddx,ddy,ddz
       real fluro(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
       
-      if(bflag.eq.1)then
-            
+      
             binx=floor(xcur/ddx)
             biny=floor(ycur/ddy)
 !            if(binx.gt.cbinsnum)binx=-1
@@ -27,12 +26,5 @@
             else
             fluro(binx,biny,binz)=fluro(binx,biny,binz)+weight 
             end if
-      else
-      !jmean shizz here
-      
-      
-      end if
-      
-      
-      
+
       end subroutine binning
