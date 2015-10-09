@@ -5,3 +5,4 @@
       real xface(nxg+3),yface(nyg+3),zface(nzg+3)
       real rhokap(nxg+3,nyg+3,nzg+3,2)
       real jmean(nxg+3,nyg+3,nzg+3,2)
+      real jmeanGLOBAL(nxg+3,nyg+3,nzg+3,2)
