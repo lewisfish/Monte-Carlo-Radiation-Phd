@@ -1,24 +1,25 @@
       subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa2,xface,yface,zface,rhokap,noise,cnt,d,tau
-     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean)
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
+     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
 
       implicit none
 
       include 'grid.txt'
 
-      integer tflag,iseed,xcell,ycell,zcell,cnt,cur
-      real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
-      real ran2,kappa2
+      integer iseed,xcell,ycell,zcell,cnt,cur
+      logical tflag,tauflag,forceflag
+      real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,phi,dens(8)
+      real ran2,kappa(8),twopi,pi,hgg(8),g2(8),sint,cost,sinp     
 
-      integer celli,cellj,cellk,flucount,forceflag
+      integer celli,cellj,cellk,flucount,i
       real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur
-      real dx,dy,dz,smax,delta,noise,dsx,dsy,dsz
+      real dx,dy,dz,smax,delta,noise,dsx,dsy,dsz,weight
 
 c***** tflag=0 means photon is in envelope
-      tflag=0
-
+      tflag=.FALSE.
 c**** generate random optical depth tau
-      if(forceflag.eq.0)then
+      if(forceflag.eqv..FALSE.)then
       tau=-log(ran2(iseed))
       end if
 
@@ -63,15 +64,16 @@ c***** calculate smax -- maximum distance photon can travel
 
       smax=amin1(dsx,dsy,dsz)
       if(smax.lt.delta) then
-         tflag=1
+         tflag=.TRUE.
          return
       endif
        
 c***** integrate through grid
       do while((taurun.lt.tau).and.(d.lt.(.999*smax)))
       
-      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +             ,kappa2)
+!      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
+!     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi
+!     +                  ,pi,twopi,tauflag)
 
 c***** find distance to next x, y, and z cell walls.  
 c***** note that dx is not the x-distance, but the actual distance along 
@@ -187,15 +189,25 @@ c*************** Linear Grid ************************
 c****************************************************
             
           endif
-           
+!          if(rhokap(xcell,ycell,zcell,cur).ne.kappa(cur))then
+!            do i=1,8
+!                  if(rhokap(xcell,ycell,zcell,cur).eq.kappa(i))then
+!                        if(mod(i,2).eq.0)then
+!                              cur=i/2
+!                        else
+!                              cur=CEILING(real(i)/2.)
+!                        end if
+!                  end if
+!            end do
+!          end if 
       end do
 
 c***** calculate photon final position.  if it escapes envelope then
-c***** set tflag=1.  if photon doesn't escape leave tflag=0 and update 
-c***** photon position.
-
+c***** set tflag=TRUE.  if photon doesn't escape leave tflag=FALSE and update 
+c***** photon position. 
+      
       if((d.ge.(.999*smax))) then
-             tflag=1
+             tflag=.TRUE.
              if(zcur.gt.2.*zmax*.999)then
 !             call noisey(xcur,ycur,noise,cnt)
              end if   
@@ -206,6 +218,10 @@ c***** photon position.
          xcell=int(nxg*(xp+xmax)/(2.*xmax))+1
          ycell=int(nyg*(yp+ymax)/(2.*ymax))+1
          zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
+
+       call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
+     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi
+     +                  ,pi,twopi,tauflag,weight,dens)
 
       endif
 

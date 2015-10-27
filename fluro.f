@@ -1,25 +1,47 @@
       subroutine flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +                   ,kappa2,nxp,nyp,sint,cost,sinp,phi,hgg,g2,pi,
-                         twopi)
+     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi,pi,
+     +                   twopi,tauflag,weight,dens)
       
       implicit none
       
       include 'grid.txt'
     !subroutine to check if photon is in fluro material, then release a fluro photon if appropriate
       integer xcell,ycell,zcell,cur,iseed,flucount
-      real ran2,kappa2,chance
+      logical tauflag
+      real ran2,chance,nxp,nyp,nzp,cost,sint,sinp,phi
+      real pi,twopi,cosp,ran,kappa(8),weight,dens(8)
       
-      chance=0.05
-      
-      if(rhokap(xcell,ycell,zcell,cur).eq.kappa2)then
+      chance=.50
+      ran=ran2(iseed)
+
+      if(rhokap(xcell,ycell,zcell,cur).ne.kappa(cur)*dens(cur))then
             if(cur.eq.1)then
-                  if(ran2(iseed).lt.chance)then
-                        flucount=flucount+1
-                        cur=2
-                        fflag=1
-                    call stokes(nxp,nyp,nzp,sint,cost,sinp,cosp,phi,
-     +                  hgg,g2,pi,twopi,iseed,cur,fflag)
+
+                  flucount=flucount+1
+                  if(ran.le.chance)then
+                        cur=2    !1064nm
+                  elseif(ran.gt.chance.and.ran.le..833)then
+                        cur=3    !900nm
+                  else
+                        cur=4    !1300nm
                   end if
+                        cost=2.*ran2(iseed)-1.
+                        sint=(1.-cost*cost)
+                        if(sint.le.0.)then
+                              sint=0.
+                        else
+                              sint=sqrt(sint)
+                        endif
+
+                        phi=twopi*ran2(iseed)
+                        sinp=sin(phi)
+                        cosp=cos(phi)
+
+                        nxp=sint*cosp
+                        nyp=sint*sinp
+                        nzp=cost
+                        tauflag=.TRUE.
+                        weight=1.
             end if
       end if
       

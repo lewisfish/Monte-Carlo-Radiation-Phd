@@ -1,11 +1,11 @@
       subroutine stokes(nxp,nyp,nzp,sint,cost,sinp,cosp,phi,
-     +                  hgg,g2,pi,twopi,iseed,cur,fflag)
+     +                  hgg,g2,pi,twopi,iseed,cur)
 
       implicit none
 
-      integer iseed,cur,fflag
+      integer iseed,cur
       real nxp,nyp,nzp,sint,cost,sinp,cosp,phi
-      real hgg(2),g2(2),pi,twopi
+      real hgg(8),g2(8),pi,twopi
 
       real costp,sintp,phip
       real bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt,sini2,bott,cosdph
@@ -15,28 +15,6 @@
 
 
 c***** isotropic scattering if g = 0.0 ******************************
-
-      if(fflag.eq.1)then
-
-
-        cost=2.*ran2(iseed)-1.
-        sint=(1.-cost*cost)
-        if(sint.le.0.)then
-          sint=0.
-        else
-          sint=sqrt(sint)
-        endif
-
-        phi=twopi*ran2(iseed)
-        sinp=sin(phi)
-        cosp=cos(phi)
-
-        nxp=sint*cosp
-        nyp=sint*sinp
-        nzp=cost
-        fflag=0
-        end if
-!!!!!!!!!!!!!!!
       if(hgg(cur).eq.0.0) then
         cost=2.*ran2(iseed)-1.
         sint=(1.-cost*cost)
@@ -53,6 +31,7 @@ c***** isotropic scattering if g = 0.0 ******************************
         nxp=sint*cosp
         nyp=sint*sinp
         nzp=cost
+
       else
 
 c***** heyney greenstein scattering ********************************

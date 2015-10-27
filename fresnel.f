@@ -3,11 +3,12 @@
       
       implicit none
       real n1,n2,cost,tir,cost2,sint,f1,f2,ran2,weight
-      integer sflag,tflag,iseed,cnt,xcell,ycell
+      integer iseed,cnt,xcell,ycell
+      logical sflag,tflag
       real reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
      
      
-      if(sflag.gt.0.)then
+      if(sflag.eqv..TRUE.)then
             if(n1.eq.n2)then!equal refrative indices
                   tir=0.
             elseif(abs(cost).ge.1.-1.E-8)then!cost straight down

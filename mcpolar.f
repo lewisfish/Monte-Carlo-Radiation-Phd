@@ -7,16 +7,19 @@
       include 'photon.txt'
 
 c***** Parameter declarations ****************************************
-      integer nphotons,iseed,j,xcell,ycell,zcell,tflag,forceflag
-      integer cnt,io,sflag,Nbins,cur,cbinsnum,i,flucount
+      integer nphotons,iseed,j,xcell,ycell,zcell
+      integer cnt,io,Nbins,cur,cbinsnum,i,flucount
       real*8 nscatt
-      real mus1,mua1,xmax,ymax,zmax,kappa1,albedo,absorb,albedo1
-      real pi,twopi,fourpi,delta,xcur,ycur,zcur,d,kappa2,thetaim,phiim
+      logical tflag,forceflag,sflag,tauflag
+      real mus1,mua1,xmax,ymax,zmax,absorb,dens(8)
+      real pi,twopi,fourpi,delta,xcur,ycur,zcur,d,thetaim,phiim
       real, allocatable :: noise(:,:),reflc(:,:),trans(:,:),image(:,:)
-      real, allocatable :: flu(:,:),deposit(:,:,:),fluro(:,:,:)
-      real ran2,n1,n2,start,finish,weight,terminate,chance,mus2,mua2
-      real albedo2,mua,kappa,ddz,ddx,ddy,hgg(2),g2(2),tau,v(3)
+      real, allocatable :: flu(:,:,:),deposit(:,:,:),fluro(:,:,:,:)
+      real, allocatable :: kappa(:),albedo(:)
+      real ran2,n1,n2,start,finish,weight,terminate,chance
+      real ddz,ddx,ddy,tau,v(3)
       real costim,cospim,sintim,sinpim
+      real mua(8),mus(8),hgg(8),g2(8)
       
 !      !variables for openmpi. GLOBAL indicates final values after mpi reduce
 !      !numproc is number of process being run, id is the indivdual id of each process
@@ -26,18 +29,17 @@ c***** Parameter declarations ****************************************
       real flucountGLOBAL
       integer error,numproc,id
       
-      real, allocatable :: imageGLOBAL(:,:),fluGLOBAL(:,:)
-      real, allocatable :: fluroGLOBAL(:,:,:),depositGLOBAL(:,:,:)
+      real, allocatable :: imageGLOBAL(:,:),fluGLOBAL(:,:,:)
+      real, allocatable :: fluroGLOBAL(:,:,:,:),depositGLOBAL(:,:,:)
       
-      character(len=100) :: filename
+      character(len=100) :: opt_parmas,spec1
       
 !      !set directory for data storage
       character(*),parameter::
      +      fileplace="/home/lewis/phdshizz/grid/data/"
       
-      call get_command_argument(1,filename)
-      
-      print*,filename
+      call get_command_argument(1,opt_parmas)
+!      call get_command_argument(2,spec1)
       
 !      !init mpi
       call MPI_init(error)
@@ -47,22 +49,23 @@ c***** Parameter declarations ****************************************
       call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 
 !!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
-!change flags to logical in place of integer
-!somehow add all array setting to iarray
+!fix up fluro shizz
+!change opt arrays to allocatble 
+!create subroutine for reading files, i.e. noise data.
+!somehow add all array setting to iarray !!!!!!!!!!!can do this by using modules!!!!!!!!!!!!!!!!
+!add in fresnel refections to all surface (for plastic box-interlipid simulation)
 !fix fresnel somehow + bump map
 !add kennys stuff(piece of paper) 
 !add colours/render shizz
 !proper formatting
 !convert real to real*8(or equv)
 !convert to f95
-!parallize-buy books
+!parallize-done but not 100% happy with. change makefile so that mpi is an option.
 
 
 c**** Read in parameters from the file input.params
       open(10,file='input.params',status='old')
           read(10,*) nphotons
-          read(10,*) mua1
-          read(10,*) mus1
           read(10,*) xmax
           read(10,*) ymax
           read(10,*) zmax
@@ -73,8 +76,20 @@ c**** Read in parameters from the file input.params
       ! set seed for rnd generator. id to change seed for each process
       iseed=95648324+id
 
+      call reader(hgg,mua,mus,opt_parmas,cur)
+!      print*,'hgg',hgg
+!      print*,'mua',mua
+!      print*,'mus',mus
+      dens(1)=1.113
+      dens(2)=4.56
+      dens(3)=1.113
+      dens(4)=4.56
+      dens(5)=1.113
+      dens(6)=4.56
+      dens(7)=1.113
+      dens(8)=4.56
 c***** read in noise data
-
+      
       open(13,file=fileplace//'noisesmooth.dat')
       cnt=0
       do
@@ -98,11 +113,6 @@ c***** read in noise data
 
 
 c****** setup up arrays and bin numbers/dimensions
-
-      !!!hgg array!!!
-      
-      hgg(1)=0.9
-      hgg(2)=0.9
  
       Nbins=401
       cbinsnum=200
@@ -117,17 +127,17 @@ c****** setup up arrays and bin numbers/dimensions
       allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((
      +      Nbins-1)/2):((Nbins-1)/2)))
       allocate(flu(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2)
-     +      :((Nbins-1)/2)))
+     +      :((Nbins-1)/2),4))
       allocate(deposit(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum))
-      allocate(fluro(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum))
+      allocate(fluro(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum,4))
 
       allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((
      +      Nbins-1)/2):((Nbins-1)/2)))
       allocate(fluGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2)
-     +      :((Nbins-1)/2)))
+     +      :((Nbins-1)/2),4))
       allocate(depositGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum))
-      allocate(fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum))
-
+      allocate(fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum,4))
+      allocate(kappa(cur),albedo(cur))
 !      ! set arrays to 0.
       image=0.
       flu=0.
@@ -141,19 +151,18 @@ c****** setup up arrays and bin numbers/dimensions
       fluroGLOBAL=0.
       flucountGLOBAL=0.
 
-
 c***** Set up constants, pi and 2*pi  ********************************
       pi=4.*atan(1.)
       twopi=2.*pi
       fourpi=4.*pi
-      sflag=1     ! flag for fresnel subroutine. so that incoming photons are treated diffrently to outgoing ones
+      sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons are treated diffrently to outgoing ones
       iseed=-abs(iseed)  ! Random number seed must be negative for ran2
       flucount=0
       
       
       ! postion image in degrees
-      phiim=45.*pi/180.
-      thetaim=45.*pi/180.
+      phiim=0.*pi/180.
+      thetaim=0.*pi/180.
 
 !     image postion vector
       !angle for vector
@@ -166,38 +175,28 @@ c***** Set up constants, pi and 2*pi  ********************************
       v(1)=sintim*cospim     
       v(2)=sintim*sinpim
       v(3)=costim  
-
-      
-      !fix
-      g2(1)=hgg(1)**2  ! Henyey-Greenstein parameter, hgg^2
-      g2(2)=hgg(2)**2
       
       ! set the terminal value for russian roulette and init weight
       terminate=0.0001
       ! value for russian roulette to increase packet 'energy' by 1/chance      
       chance=0.1
 
-      mus2=5. !from s jacques chapter on fluro. mua2 etc is fluro
-      mua2=.2
-!.1                mua
-!10.               mus
-
-
-!.05                mua chicken
-!.054               mus
-!      mus2=0.04  !nd yag
-!      mua2=1.
 
 
       !set optical properties
-      kappa1=mua1+mus1
-      kappa2=mua2+mus2
-      albedo1=mus1/kappa1
-      albedo2=mus2/kappa2
+      do i=1,cur
+            g2(i)=hgg(i)**2
+            kappa(i)=mua(i)+mus(i)
+            albedo(i)=mus(i)/kappa(i)
+
+      end do
       
       if(id.eq.0)then
             print*, ''      
             print*,'# of photons to run',nphotons*numproc
+            do i=1,cur
+                        write(*,*),mua(i),mus(i)
+            end do
       end if   
       
 c**** Initialize arrays to zero *************************************
@@ -205,7 +204,7 @@ c**** Initialize arrays to zero *************************************
       
 c***** Set up density grid *******************************************
       call gridset(xface,yface,zface,rhokap,xmax,ymax,zmax,
-     +                  kappa1,kappa2,id)
+     +                  kappa,id,cur)
 
 c***** Set small distance for use in optical depth integration routines 
 c***** for roundoff effects when crossing cell walls
@@ -221,7 +220,8 @@ c**** Loop over nph photons from each source *************************
             !set init weight and optical properties of current medium(usually 1)
             weight=1.0
             cur=1
-          if(mod(j,100000).eq.0)then
+            tauflag=.FALSE.
+          if(mod(j,10000).eq.0)then
              print *, j,' scattered photons completed on core:',id
           end if
 
@@ -242,7 +242,7 @@ c**** force photon to interact
 !      call force(xmax,ymax,zmax,cur,tau,iseed,
 !     +                xface,yface,zface,rhokap,nxp,nyp,nzp
 !     +                ,xcell,ycell,zcell,delta,xp,yp,zp)           
-      forceflag=0
+      forceflag=.FALSE.
 
 c***** Generate new normal corresponding to bumpy surface
 !          call noisey(xcell,ycell,noise,cnt,nxp,
@@ -252,41 +252,42 @@ C***** check whether the photon enters medium
 !          call fresnel(n1,n2,cost,sint,sflag,tflag,iseed,
 !     +      reflc,xcell,ycell,cnt,trans,weight)
 
-!            sflag=0
+!            sflag=.FALSE.
 
 c****** Find scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa2,xface,yface,zface,rhokap,noise,cnt,d,tau,
-     +               xcell,ycell,zcell,tflag,iseed,delta,cur,jmean)
-!      forceflag=0
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
+     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     
+c************ Peel off photon into image
+                   call peelingoff(xmax,ymax,zmax,cur,nxp,nyp,nzp
+     +                  ,xface,yface,zface,rhokap,
+     +                  xcell,ycell,zcell,delta,xp,yp,zp,
+     +                  pi,image,Nbins,flu,v,g2,hgg,
+     +                  sintim,costim,sinpim,cospim,tauflag)
+!      forceflag=.FALSE.
 
 
-c******** Photon scatters in grid until it exits (tflag=1) 
-          do while(tflag.eq.0) 
+c******** Photon scatters in grid until it exits (tflag=TRUE) 
+          do while(tflag.eqv..FALSE.) 
             
 c******** Drop weight
 
       ! Select albedo based on current photon wavelength
-            if(cur.eq.1)then
-                  kappa=kappa1
-                  albedo=albedo1
-                  mua=mua1
-            else
-                  kappa=kappa2
-                  albedo=albedo2
-                  mua=mua2
-            end if
-            absorb=weight*(mua/kappa)          
-            weight=weight*albedo
+
+            absorb=weight*(mua(cur)/kappa(cur))          
+            weight=weight*albedo(cur)
 
 c******** Drop weight in appro bin
             call binning(deposit,xcur,ycur,weight,ddx,fluro,
      +                  ddy,cbinsnum,zcur,ddz,cur)
           
 c************ Scatter photon into new direction and update Stokes parameters
+            if(tauflag.eqv..FALSE.)then
             call stokes(nxp,nyp,nzp,sint,cost,sinp,cosp,phi,
      +                  hgg,g2,pi,twopi,iseed,cur)
-     
+            end if
 c************ carry out russian roulette to kill off phototns
             if(weight.le.terminate)then
                   if(ran2(iseed).le.chance)then
@@ -304,8 +305,9 @@ c************ carry out russian roulette to kill off phototns
 
 c************ Find next scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa2,xface,yface,zface,rhokap,noise,cnt,d,tau,
-     +               xcell,ycell,zcell,tflag,iseed,delta,cur,jmean)
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
+     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
      
 
 c************ Peel off photon into image
@@ -313,7 +315,7 @@ c************ Peel off photon into image
      +                  ,xface,yface,zface,rhokap,
      +                  xcell,ycell,zcell,delta,xp,yp,zp,
      +                  pi,image,Nbins,flu,v,g2,hgg,
-     +                  sintim,costim,sinpim,cospim)
+     +                  sintim,costim,sinpim,cospim,tauflag)
          
             xcur=xp+xmax
             ycur=yp+ymax
@@ -333,18 +335,18 @@ c************ Peel off photon into image
 
 
 !      path length reduce     
-      call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*2
+      call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4
      +                ,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
       call MPI_REDUCE(deposit,depositGLOBAL,cbinsnum**3,
      +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-      call MPI_REDUCE(fluro,fluroGLOBAL,cbinsnum**3,
+      call MPI_REDUCE(fluro,fluroGLOBAL,(cbinsnum**3)*4,
      +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
      
 !      images reduce
       call MPI_REDUCE(image,imageGLOBAL,Nbins**2,
      +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-      call MPI_REDUCE(flu,fluGLOBAL,Nbins**2,
+      call MPI_REDUCE(flu,fluGLOBAL,(Nbins**2)*4,
      +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
      
 !     nscatt reduce

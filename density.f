@@ -1,40 +1,34 @@
-      subroutine density(x,y,z,rho,kflag,kappa1,kappa2)
+      subroutine density(x,y,z,rho,kflag,kappa,cur)
 
       implicit none
 
-      real x,y,z,rho,kappa1,kappa2
-      integer kflag,i,j
-      real r,r2,pos(1:2,1:2)
-
+      integer kflag,i,j,cur
+      real x,y,z,rho,kappa(cur)
+      real r,r2
+      
 c***** calculate some distances for use in setting up density 
 c***** structure. Note that distances are in units of xmax, ymax, and zmax 
 c***** as called from the loop over cells in gridset.f
 
-      pos(1,1)=-.5
-      pos(1,2)=-.5
-      pos(2,1)=0.
-      pos(2,2)=.6
-!      do i=1,2
-!       do j=1,2
+
 !      r2=(x+pos(i,j))**2+y*y+(z+pos(i,j))**2
 !      r=sqrt(r2)
 
 c***** Set up optically diffrent sphere within the grid
-      if(kflag.eq.1)then
-            if((y.lt..2.and.y.gt.-.2).and.(z.lt..2.and.z.gt.-.2))then
-                  rho=kappa2
+            if((y.lt..3.and.y.gt.-.3).and.(z.lt.-0.1.and.z.gt.-0.4)
+     +      .and.(x.lt..5.and.x.gt.-.5))then
+                  if(kflag.eq.1)rho=kappa(2)*4.56
+                  if(kflag.eq.2)rho=kappa(4)*4.56
+                  if(kflag.eq.3)rho=kappa(6)*4.56
+                  if(kflag.eq.4)rho=kappa(8)*4.56
             else
-                  rho=kappa1
+            
+                  if(kflag.eq.1)rho=kappa(1)*1.113
+                  if(kflag.eq.2)rho=kappa(3)*1.113
+                  if(kflag.eq.3)rho=kappa(5)*1.113
+                  if(kflag.eq.4)rho=kappa(7)*1.113
             end if
-      else
-            if((y.lt..2.and.y.gt.-.2).and.(z.lt..2.and.z.gt.-.2))then
-                  rho=kappa2
-            else
-                  rho=kappa2
-            endif
-      end if
-!      end do
-!      end do
+
       return
       end
 

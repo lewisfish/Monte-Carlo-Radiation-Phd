@@ -1,14 +1,12 @@
-      program reader
+      subroutine reader(hgg,mua,mus,opt_parmas,cnt)
       
       implicit none
       
-      character(len=100) :: filename,line
-      real, allocatable :: hgg(:),mua(:),mus(:)
+      character(len=100) :: opt_parmas,line
+      real,intent(out) :: hgg(8),mua(8),mus(8)
       integer :: io,cnt,i
       
-      call get_command_argument(1,filename)
-      
-      open(1,file=filename,status='old',iostat=io)
+      open(1,file=opt_parmas,status='old',iostat=io)
       if(io.ne.0)then
             print*, 'File cant be opened!'
             print*, 'Exiting...'
@@ -26,25 +24,22 @@
                   cnt=cnt+1
             end if
       end do
-      open(2,file=filename,iostat=io)
-      cnt=cnt-2
-      allocate(hgg(cnt),mua(cnt),mus(cnt))
+      open(2,file=opt_parmas,status='old',iostat=io)
+
+      cnt=cnt-1
+!      allocate(hgg(cnt),mua(cnt),mua(cnt))
       hgg=0.
       mua=0.
       mus=0.
-
+      i=1
       do while(.true.)
-            i=1
+
             read(2,'(A)', end=99) line
-            print*, line
-            
             call linereader(line,cnt,hgg,mus,mua,i)
-            i=i+1
       end do
 99    continue
       close(2)
 
-      
       contains
       subroutine linereader(line,cnt,hgg,mua,mus,i)
       
@@ -55,9 +50,19 @@
       integer :: cnt,i
       real :: hgg(cnt),mua(cnt),mus(cnt)
       
+      if(scan(line,'hgg').eq.0)then
       cfg_param = adjustl(line(:index(line,'!')-1))
-      read(cfg_param,'(F5.3)') hgg(i),mua(i),mus(i) 
 
-      
+      cfg_param = adjustl(cfg_param(:index(cfg_param,' ')+1))
+      read(cfg_param,'(F5.3)') hgg(i)
+      cfg_param = adjustl(line(index(line,' '):))
+
+      read(cfg_param,'(F5.3)') mus(i)
+      cfg_param = adjustl(cfg_param(index(cfg_param,' '):))
+
+      read(cfg_param,'(F5.3)') mua(i)
+                        i=i+1
+      end if
+
       end subroutine linereader
-      end program reader
+      end subroutine reader
