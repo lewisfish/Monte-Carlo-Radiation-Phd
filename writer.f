@@ -47,7 +47,7 @@
       close(66)
       
 
-      open(67,file=fileplace//'deposit/890.dat')
+      open(67,file=fileplace//'deposit/809.dat')
       open(68,file=fileplace//'deposit/1064.dat')
       open(73,file=fileplace//'deposit/900.dat')
       open(74,file=fileplace//'deposit/1300.dat')

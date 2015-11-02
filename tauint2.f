@@ -1,19 +1,19 @@
       subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
-     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
+     +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
 
       implicit none
 
       include 'grid.txt'
 
       integer iseed,xcell,ycell,zcell,cnt,cur
-      logical tflag,tauflag,forceflag
+      logical tflag,tauflag,forceflag,stretchflag
       real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,phi,dens(8)
       real ran2,kappa(8),twopi,pi,hgg(8),g2(8),sint,cost,sinp     
 
       integer celli,cellj,cellk,flucount,i
-      real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur
+      real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,p,sfact
       real dx,dy,dz,smax,delta,noise,dsx,dsy,dsz,weight
 
 c***** tflag=0 means photon is in envelope
@@ -71,9 +71,6 @@ c***** calculate smax -- maximum distance photon can travel
 c***** integrate through grid
       do while((taurun.lt.tau).and.(d.lt.(.999*smax)))
       
-!      call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-!     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi
-!     +                  ,pi,twopi,tauflag)
 
 c***** find distance to next x, y, and z cell walls.  
 c***** note that dx is not the x-distance, but the actual distance along 
@@ -148,8 +145,12 @@ c***** find distance to next cell wall -- minimum of dx, dy, and dz
 
 c***** optical depth to next cell wall is 
 c***** taucell= (distance to cell)*(opacity of current cell)
+         if(cur.eq.1)then
+         call stretch(sfact,nxp,nyp,nzp,p,stretchflag)
+         taucell=dcell*rhokap(celli,cellj,cellk,cur)*(1.-sfact)         
+         else
          taucell=dcell*rhokap(celli,cellj,cellk,cur)
-
+         end if
 c***** if taurun+taucell>tau then scatter at distance d+d1.  
 c***** update photon position and cell.  
 c***** if taurun+taucell<tau then photon moves distance dcell 
@@ -157,7 +158,12 @@ c***** (i.e. ends up on next cell wall) and update photon position
 c***** and cell.
 
          if((taurun+taucell).ge.tau) then
+            if(cur.eq.1)then
+            call stretch(sfact,nxp,nyp,nzp,p,stretchflag)
+            d1=(tau-taurun)/(rhokap(celli,cellj,cellk,cur)*(1.-sfact))       
+            else
             d1=(tau-taurun)/rhokap(celli,cellj,cellk,cur)
+            end if            
             d=d+d1
             taurun=taurun+taucell
             xcur=xcur+d1*nxp
@@ -170,7 +176,6 @@ c*************** Linear Grid ************************
             cellj=int(nyg*ycur/(2.*ymax))+1
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
-
 
 
          else
@@ -187,7 +192,6 @@ c*************** Linear Grid ************************
             cellj=int(nyg*ycur/(2.*ymax))+1
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
-            
           endif
 !          if(rhokap(xcell,ycell,zcell,cur).ne.kappa(cur))then
 !            do i=1,8

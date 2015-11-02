@@ -31,7 +31,6 @@ c**************  Loop through x, y, and z to set up grid density.  ****
            x=xface(i)-xmax+xmax/nxg
            y=yface(j)-ymax+ymax/nyg
            z=zface(k)-zmax+zmax/nzg
-
 c**********************Call density setup subroutine 
            kflag=1
            call density(x,y,z,rho,kflag,kappa,cur)

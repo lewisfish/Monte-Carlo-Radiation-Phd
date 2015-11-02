@@ -41,7 +41,7 @@
       if(cur.eq.1)then
       
             !calc weighting for this direction to happen
-      hgfact=(1.-g2(cur))/4.*pi*(1.+g2(cur)-2.*hgg(cur)*cosa)**(1.5)
+      hgfact=(1.-g2(cur))/(4.*pi*(1.+g2(cur)-2.*hgg(cur)*cosa)**(1.5))
  
             !calc total weight of peeled off photon
             prob=hgfact*exp(-tau1)
@@ -50,9 +50,9 @@
       else
       
             if(tauflag.eqv..FALSE.)then
-      hgfact=(1.-g2(cur))/4.*pi*(1.+g2(cur)-2.*hgg(cur)*cosa)**(1.5)
+      hgfact=(1.-g2(cur))/(4.*pi*(1.+g2(cur)-2.*hgg(cur)*cosa)**(1.5))
             else
-                  hgfact=1.
+                  hgfact=1./(4.*pi)
                   tauflag=.FALSE.
             end if
 

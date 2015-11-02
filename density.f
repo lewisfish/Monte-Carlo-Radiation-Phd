@@ -15,7 +15,7 @@ c***** as called from the loop over cells in gridset.f
 !      r=sqrt(r2)
 
 c***** Set up optically diffrent sphere within the grid
-            if((y.lt..3.and.y.gt.-.3).and.(z.lt.-0.1.and.z.gt.-0.4)
+            if((y.lt..3.and.y.gt.-.3).and.(z.lt.0.05.and.z.gt.-0.25)
      +      .and.(x.lt..5.and.x.gt.-.5))then
                   if(kflag.eq.1)rho=kappa(2)*4.56
                   if(kflag.eq.2)rho=kappa(4)*4.56

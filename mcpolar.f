@@ -10,8 +10,8 @@ c***** Parameter declarations ****************************************
       integer nphotons,iseed,j,xcell,ycell,zcell
       integer cnt,io,Nbins,cur,cbinsnum,i,flucount
       real*8 nscatt
-      logical tflag,forceflag,sflag,tauflag
-      real mus1,mua1,xmax,ymax,zmax,absorb,dens(8)
+      logical tflag,forceflag,sflag,tauflag,stretchflag
+      real mus1,mua1,xmax,ymax,zmax,absorb,dens(8),sfact,p
       real pi,twopi,fourpi,delta,xcur,ycur,zcur,d,thetaim,phiim
       real, allocatable :: noise(:,:),reflc(:,:),trans(:,:),image(:,:)
       real, allocatable :: flu(:,:,:),deposit(:,:,:),fluro(:,:,:,:)
@@ -75,11 +75,10 @@ c**** Read in parameters from the file input.params
 
       ! set seed for rnd generator. id to change seed for each process
       iseed=95648324+id
-
+      !exp trasform parameter
+      p=0.01
       call reader(hgg,mua,mus,opt_parmas,cur)
-!      print*,'hgg',hgg
-!      print*,'mua',mua
-!      print*,'mus',mus
+
       dens(1)=1.113
       dens(2)=4.56
       dens(3)=1.113
@@ -256,9 +255,9 @@ C***** check whether the photon enters medium
 
 c****** Find scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
-     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
+     +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
      
 c************ Peel off photon into image
                    call peelingoff(xmax,ymax,zmax,cur,nxp,nyp,nzp
@@ -275,10 +274,15 @@ c******** Photon scatters in grid until it exits (tflag=TRUE)
 c******** Drop weight
 
       ! Select albedo based on current photon wavelength
+            if(stretchflag.eqv..TRUE.)then
 
+            weight=weight*((exp(-kappa(cur)*d*sfact))/(1.-sfact))
+            stretchflag=.FALSE.
+
+            else
             absorb=weight*(mua(cur)/kappa(cur))          
             weight=weight*albedo(cur)
-
+            end if
 c******** Drop weight in appro bin
             call binning(deposit,xcur,ycur,weight,ddx,fluro,
      +                  ddy,cbinsnum,zcur,ddz,cur)
@@ -305,9 +309,9 @@ c************ carry out russian roulette to kill off phototns
 
 c************ Find next scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens
-     +               ,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +            sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
+     +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
+     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
      
 
 c************ Peel off photon into image

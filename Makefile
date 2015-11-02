@@ -50,6 +50,7 @@ OBJSB =     density.o \
             fluro.o \
             force.o \
             reader.o \
+            stretch.o \
             writer.o
 
 mcgrid:	$(OBJSB)

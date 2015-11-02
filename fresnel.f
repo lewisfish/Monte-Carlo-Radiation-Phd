@@ -27,7 +27,7 @@
             end if
 !            print *, tir
             if(ran2(iseed).lt.tir)then
-                  tflag=1
+                  tflag=.TRUE.
                        reflc(xcell,ycell)=reflc(xcell,ycell)+weight
             else
                   trans(xcell,ycell)=trans(xcell,ycell)+weight
