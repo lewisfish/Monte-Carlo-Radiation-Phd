@@ -6,6 +6,5 @@
 *.dat
 *.gp
 data/
-Makefile
 *.txt
 *.png

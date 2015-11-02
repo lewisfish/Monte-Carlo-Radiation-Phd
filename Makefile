@@ -4,7 +4,7 @@
 FC     =       mpifort
 #EXTRA_OPT =     -mpentium -malign-double -fforce-mem -fforce-addr \
 #                -ffast-math -funroll-all-loops
-#debug flags                 -g -fcheck=all -fbounds-check
+#debug flags  -g -fcheck=all -fbounds-check
 # May want to experiment by adding the extra optimization flags to get
 ## better runtime. But then again, maybe not.
 #FFLAGS  =       -O2 $(EXTRA_OPT) -ffloat-store
@@ -51,6 +51,7 @@ OBJSB =     density.o \
             force.o \
             reader.o \
             stretch.o \
+            banking.o \
             writer.o
 
 mcgrid:	$(OBJSB)

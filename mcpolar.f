@@ -7,17 +7,17 @@
       include 'photon.txt'
 
 c***** Parameter declarations ****************************************
-      integer nphotons,iseed,j,xcell,ycell,zcell
-      integer cnt,io,Nbins,cur,cbinsnum,i,flucount
+      integer nphotons,iseed,j,xcell,ycell,zcell,ibank,gennum
+      integer cnt,io,Nbins,cur,cbinsnum,i,flucount,totcount,totphot
       real*8 nscatt
-      logical tflag,forceflag,sflag,tauflag,stretchflag
+      logical tflag,forceflag,sflag,tauflag,stretchflag,loopflag
       real mus1,mua1,xmax,ymax,zmax,absorb,dens(8),sfact,p
       real pi,twopi,fourpi,delta,xcur,ycur,zcur,d,thetaim,phiim
       real, allocatable :: noise(:,:),reflc(:,:),trans(:,:),image(:,:)
       real, allocatable :: flu(:,:,:),deposit(:,:,:),fluro(:,:,:,:)
-      real, allocatable :: kappa(:),albedo(:)
+      real, allocatable :: kappa(:),albedo(:),bank(:,:,:)
       real ran2,n1,n2,start,finish,weight,terminate,chance
-      real ddz,ddx,ddy,tau,v(3)
+      real ddz,ddx,ddy,tau,v(3),WH,WL
       real costim,cospim,sintim,sinpim
       real mua(8),mus(8),hgg(8),g2(8)
       
@@ -137,6 +137,7 @@ c****** setup up arrays and bin numbers/dimensions
       allocate(depositGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum))
       allocate(fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum,4))
       allocate(kappa(cur),albedo(cur))
+      allocate(bank(0:10000,1:7,0:1))
 !      ! set arrays to 0.
       image=0.
       flu=0.
@@ -149,6 +150,7 @@ c****** setup up arrays and bin numbers/dimensions
       depositGLOBAL=0.
       fluroGLOBAL=0.
       flucountGLOBAL=0.
+      bank=0.
 
 c***** Set up constants, pi and 2*pi  ********************************
       pi=4.*atan(1.)
@@ -157,7 +159,12 @@ c***** Set up constants, pi and 2*pi  ********************************
       sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons are treated diffrently to outgoing ones
       iseed=-abs(iseed)  ! Random number seed must be negative for ran2
       flucount=0
-      
+      !weight window parameters
+      WH=5.
+      WL=0.001
+      totcount=1
+      loopflag=.FALSE.
+      gennum=5
       
       ! postion image in degrees
       phiim=0.*pi/180.
@@ -215,26 +222,60 @@ c**** Loop over nph photons from each source *************************
         call cpu_time(start)
               print*, ' '
               print*, 'Photons now running on core:',id
+        do i=1,gennum
+        
+            if(mod(gennum,2).eq.0)then
+                  ibank=1
+            else
+                  ibank=0
+            end if
+            
+            if(i.gt.1)then
+            print*,'going to run:',totcount,'photons. On core:',id
+            totcount=0
+            end if
+            
         do j=1,nphotons
             !set init weight and optical properties of current medium(usually 1)
-            weight=1.0
-            cur=1
-            tauflag=.FALSE.
+            if(loopflag.eqv..FALSE.)then
+                  weight=1.0
+                  cur=1
+                  tauflag=.FALSE.
+            end if
+
           if(mod(j,10000).eq.0)then
              print *, j,' scattered photons completed on core:',id
           end if
-
-c***** Release photon from point source *******************************
+          
+      if(i.eq.1)then
+c***** Release photon from point source if genum is 1*******************************
           call sourceph(xp,yp,zp,nxp,nyp,nzp,
      +                    sint,cost,sinp,cosp,phi,
      +                    xmax,ymax,zmax,twopi,
      +                    xcell,ycell,zcell,nxg,nyg,nzg,iseed)
-     
 c***** Update xcur etc.
 
-      xcur=xp+xmax
-      ycur=yp+ymax
-      zcur=zp+zmax
+            xcur=xp+xmax
+            ycur=yp+ymax
+            zcur=zp+zmax
+      else
+      
+            xcur=bank(j,1,ibank)
+            ycur=bank(j,2,ibank)
+            zcur=bank(j,3,ibank)
+            
+            nxp=bank(j,4,ibank)
+            nyp=bank(j,5,ibank)
+            nzp=bank(j,6,ibank)
+            
+            weight=bank(j,7,ibank)
+      
+            xp=xcur-xmax
+            yp=ycur-ymax
+            zp=zcur-zmax
+      
+      end if
+      
       
 c**** force photon to interact
 
@@ -277,8 +318,11 @@ c******** Drop weight
             if(stretchflag.eqv..TRUE.)then
 
             weight=weight*((exp(-kappa(cur)*d*sfact))/(1.-sfact))
+            weight=weight*albedo(cur)
             stretchflag=.FALSE.
-
+            !window splitting routine
+            call banking(bank,xcur,ycur,zcur,weight,nxp,nyp,nzp
+     +                  ,WH,WL,totcount,loopflag,ibank)
             else
             absorb=weight*(mua(cur)/kappa(cur))          
             weight=weight*albedo(cur)
@@ -301,7 +345,7 @@ c************ carry out russian roulette to kill off phototns
            call binning(deposit,xcur,ycur,weight,ddx,fluro,
      +                  ddy,cbinsnum,zcur,ddz,cur)
                         weight=0.
-                        goto 100
+                        exit
                   end if           
             end if                   
                    
@@ -327,9 +371,14 @@ c************ Peel off photon into image
             
           end do
 
-100      continue
+      continue
 
         end do      ! end loop over nph photons
+              totphot=totphot+nphotons
+              nphotons=totcount
+        end do      ! end loop over generations
+        
+        
       call cpu_time(finish)
             if(finish-start.ge.60.)then
              print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
@@ -361,9 +410,8 @@ c************ Peel off photon into image
      
      
       if(id.eq.0)then
-      
       print*,'Average # of scatters per photon:',sngl(nscattGLOBAL
-     +                                        /(nphotons*numproc))
+     +                                        /(totphot*numproc))
      
 !      print*,'% of fluro photons',real(flucountGLOBAL/
 !     +                                nphotons*numproc)*100.
