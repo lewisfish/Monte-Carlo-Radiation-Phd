@@ -2,7 +2,7 @@
 
       parameter(nxg=201,nyg=201,nzg=201)
 
-      real xface(nxg+3),yface(nyg+3),zface(nzg+3)
-      real rhokap(nxg+3,nyg+3,nzg+3,4)
-      real jmean(nxg+3,nyg+3,nzg+3,4)
-      real jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4)
+      double precision xface(nxg+3),yface(nyg+3),zface(nzg+3)
+      double precision rhokap(nxg+3,nyg+3,nzg+3,4)
+      double precision jmean(nxg+3,nyg+3,nzg+3,4)
+      double precision jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4)

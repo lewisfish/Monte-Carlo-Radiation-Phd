@@ -7,11 +7,11 @@
       include 'grid.txt'
 
       integer xcell,ycell,zcell,cur
-      real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
+      double precision xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax
 
       integer celli,cellj,cellk
-      real xcur,ycur,zcur,dx,dy,dz,d,dcell,taurun,taucell,tau1
-      real smax,dsx,dsy,dsz,delta,v(3)
+      double precision xcur,ycur,zcur,dx,dy,dz,d,dcell,taurun
+      double precision smax,dsx,dsy,dsz,delta,v(3),taucell,tau1
 
       nxp=v(1)
       nyp=v(2)
@@ -58,7 +58,7 @@ c***** calculate smax -- maximum distance photon can travel *******
          dsz=1.e2*zmax
       endif
 
-      smax=amin1(dsx,dsy,dsz)
+      smax=min(dsx,dsy,dsz)
 
       if(smax.lt.delta) then
          tau1=0.
@@ -160,14 +160,14 @@ c***** in fact hit another wall
          if( (dz.eq.0.) .or. ((abs(dz)).lt.(delta)) ) dz=1.e2*zmax
 
 c***** find distance to next cell wall -- minimum of dx, dy, and dz
-         dcell=amin1(dx,dy,dz)
+         dcell=min(dx,dy,dz)
          if(dcell.le.0.) then
             print *,'taufind1: dcell < 0'
 c            stop
          endif
-         if(dx.lt.0.) dcell=amin1(dy,dz)
-         if(dy.lt.0.) dcell=amin1(dx,dz)
-         if(dz.lt.0.) dcell=amin1(dx,dy)
+         if(dx.lt.0.) dcell=min(dy,dz)
+         if(dy.lt.0.) dcell=min(dx,dz)
+         if(dz.lt.0.) dcell=min(dx,dy)
 
          d=d+dcell
 

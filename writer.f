@@ -7,13 +7,15 @@
       include 'grid.txt'
       
       integer i,j,Nbins,cbinsnum,cnt
-      real reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
-      real imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),
+      double precision reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
+      double precision imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),
      + -((Nbins-1)/2):((Nbins-1)/2))
-      real fluGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((
-     +      Nbins-1)/2):((Nbins-1)/2),4)
-      real depositGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum)
-      real fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:cbinsnum,4)
+      double precision fluGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),
+     +      -((Nbins-1)/2):((Nbins-1)/2),4)
+      double precision depositGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:
+     +cbinsnum)
+      double precision fluroGLOBAL(-1:cbinsnum,-1:cbinsnum,-1:
+     +cbinsnum,4)
       character(*) fileplace 
 
      
@@ -31,10 +33,10 @@
       end do
       close(62)
       
-      open(63,file=fileplace//'jmean/809.dat')
-      open(64,file=fileplace//'jmean/1064.dat')
-      open(65,file=fileplace//'jmean/900.dat')
-      open(66,file=fileplace//'jmean/1300.dat')
+      open(63,file=fileplace//'jmean/809t1.dat')
+      open(64,file=fileplace//'jmean/1064t1.dat')
+      open(65,file=fileplace//'jmean/900t1.dat')
+      open(66,file=fileplace//'jmean/1300t1.dat')
       do i=1,nxg
             write(63,*) (jmeanGLOBAL(i,100,j,1),j=1,nzg)
             write(64,*) (jmeanGLOBAL(i,100,j,2),j=1,nzg)
@@ -47,24 +49,24 @@
       close(66)
       
 
-      open(67,file=fileplace//'deposit/809.dat')
-      open(68,file=fileplace//'deposit/1064.dat')
-      open(73,file=fileplace//'deposit/900.dat')
-      open(74,file=fileplace//'deposit/1300.dat')
+      open(67,file=fileplace//'deposit/809t1.dat')
+      open(68,file=fileplace//'deposit/1064t1.dat')
+      open(73,file=fileplace//'deposit/900t1.dat')
+      open(74,file=fileplace//'deposit/1300t1.dat')
       do i=0,cbinsnum
       
-            write(67,*) (depositGLOBAL(i,100,j),j=0,cbinsnum)
+            write(67,*) (depositGLOBAL(i,101,j),j=0,cbinsnum)
             write(68,*) (fluroGLOBAL(i,100,j,2),j=0,cbinsnum)
             write(73,*) (fluroGLOBAL(i,100,j,3),j=0,cbinsnum)
-            write(74,*) (fluroGLOBAL(i,100,j,4),j=0,cbinsnum)
+            write(74,*) (fluroGLOBAL(i,101,j,4),j=0,cbinsnum)
       
       end do
       
 
-      open(69,file=fileplace//'im/809nm.dat')
-      open(70,file=fileplace//'im/1064nm.dat')
-      open(71,file=fileplace//'im/900nm.dat')
-      open(72,file=fileplace//'im/1300nm.dat')      
+      open(69,file=fileplace//'im/809nmt1.dat')
+      open(70,file=fileplace//'im/1064nmt1.dat')
+      open(71,file=fileplace//'im/900nmt1.dat')
+      open(72,file=fileplace//'im/1300nmt1.dat')      
       do i=-(Nbins-1)/2,(Nbins-1)/2-1
             write(69,*) (imageGLOBAL(j,i),j=-(Nbins-1)/2,(Nbins-1)/2-1)
             write(70,*) (fluGLOBAL(j,i,2),j=-(Nbins-1)/2,(Nbins-1)/2-1)

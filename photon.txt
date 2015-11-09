@@ -1,1 +1,1 @@
-      real xp,yp,zp,nxp,nyp,nzp,sint,cost,sinp,cosp,phi
+      double precision xp,yp,zp,nxp,nyp,nzp,sint,cost,sinp,cosp,phi

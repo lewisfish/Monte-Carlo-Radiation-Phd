@@ -1,13 +1,13 @@
       subroutine gridset(xface,yface,zface,rhokap,xmax,ymax,zmax,
-     +                  kappa,id,cur)
+     +                  kappa,id,cur,xlow,xhi,ylow,yhi,zlow,zhi,face)
 
       implicit none
 
       include 'grid.txt'
       
-      integer i,j,k,kflag,id,cur
-      real xmax,ymax,zmax,kappa(8)
-      real x,y,z,rho,taueq1,taupole1,taueq2,taupole2
+      integer i,j,k,kflag,id,cur,face(6),Nlower
+      double precision xmax,ymax,zmax,kappa(8),xlow,xhi,ylow,yhi,zlow
+      double precision x,y,z,rho,taueq1,taupole1,taueq2,taupole2,zhi
       
       if(id.eq.0.)then
       print*, ' '
@@ -23,7 +23,21 @@ c**********  Linear Cartesian grid. Set up grid faces ****************
       do i=1,nzg+1
          zface(i)=(i-1)*2.*zmax/nzg
       end do
+cStore location of crystals faces for fresnel reflc in (x/y/z)cell units ***
 
+      call search(xlow+xmax-xmax/nxg,xface,nxg+1,Nlower)
+      face(1)=Nlower
+      call search(xhi+xmax-xmax/nxg,xface,nxg+1,Nlower)
+      face(2)=Nlower
+      call search(ylow+ymax-ymax/nyg,yface,nyg+1,Nlower)
+      face(3)=Nlower
+      call search(yhi+ymax-ymax/nyg,yface,nyg+1,Nlower)
+      face(4)=Nlower
+      call search(zlow+zmax-zmax/nzg,zface,nzg+1,Nlower)
+      face(5)=Nlower      
+      call search(zhi+zmax-zmax/nzg,zface,nzg+1,Nlower)
+      face(6)=Nlower
+             
 c**************  Loop through x, y, and z to set up grid density.  ****
       do i=1,nxg
        do j=1,nyg
@@ -33,16 +47,20 @@ c**************  Loop through x, y, and z to set up grid density.  ****
            z=zface(k)-zmax+zmax/nzg
 c**********************Call density setup subroutine 
            kflag=1
-           call density(x,y,z,rho,kflag,kappa,cur)
+           call density(x,y,z,rho,kflag,kappa,cur,xlow,xhi,ylow,
+     +                  yhi,zlow,zhi)
            rhokap(i,j,k,kflag)=rho
            kflag=2
-           call density(x,y,z,rho,kflag,kappa,cur)
+           call density(x,y,z,rho,kflag,kappa,cur,xlow,xhi,ylow,
+     +                  yhi,zlow,zhi)
            rhokap(i,j,k,kflag)=rho
            kflag=3
-           call density(x,y,z,rho,kflag,kappa,cur)
+           call density(x,y,z,rho,kflag,kappa,cur,xlow,xhi,ylow,
+     +                  yhi,zlow,zhi)
            rhokap(i,j,k,kflag)=rho 
            kflag=4
-           call density(x,y,z,rho,kflag,kappa,cur)
+           call density(x,y,z,rho,kflag,kappa,cur,xlow,xhi,ylow,
+     +                  yhi,zlow,zhi)
            rhokap(i,j,k,kflag)=rho
         end do
        end do

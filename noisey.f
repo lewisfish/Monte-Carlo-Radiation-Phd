@@ -3,9 +3,9 @@
 
       implicit none
       integer cnt,xcell,ycell
-      real newNorm(3),Norm(3),xvec(3),yvec(3),xgrad,ygrad
-      real nxp,nyp,nzp,sint,cost,sinp
-      real  noise(1:cnt,1:cnt),theta,cosp
+      double precision newNorm(3),Norm(3),xvec(3),yvec(3)
+      double precision nxp,nyp,nzp,sint,cost,sinp,xgrad
+      double precision  noise(1:cnt,1:cnt),theta,cosp,ygrad
       
 
 !      sets vectors in stupid fashion

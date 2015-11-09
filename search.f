@@ -1,10 +1,9 @@
-      subroutine search(value,array,length,iseed,Nlower)
+      subroutine search(value,array,length,Nlower)
       
       implicit none
       
-      real :: value,array(1:37),ran2
-      integer :: Nupper,Nlower,middle,length,iseed
-      
+      integer :: Nupper,Nlower,middle,length
+      double precision :: value,array(length+1)
       
       Nupper=length
       Nlower=1

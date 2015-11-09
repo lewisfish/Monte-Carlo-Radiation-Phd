@@ -7,16 +7,16 @@
             
       implicit none
       
-      real xim,yim,tau1,prob,v(3),pi
-      real xp,yp,zp,zmax,bin_width,hgfact,sintim,sinpim
-      real xmax,xface,yface,zface,smax,nxp,nyp,nzp
-      real delta,ymax,rhokap,cosa,costim,cospim
+      double precision xim,yim,tau1,prob,v(3),pi,sinpim
+      double precision xp,yp,zp,zmax,bin_width,hgfact,sintim
+      double precision xmax,xface,yface,zface,smax,nxp,nyp,nzp
+      double precision delta,ymax,rhokap,cosa,costim,cospim
       integer binx,biny,xcell,ycell,zcell,Nbins,cur
       logical tauflag
-      real image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2)
-     +      :((Nbins-1)/2))
-      real flu(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2)
-     +      :((Nbins-1)/2),4),g2(8),hgg(8)
+      double precision image(-((Nbins-1)/2):((Nbins-1)/2),
+     +      -((Nbins-1)/2):((Nbins-1)/2))
+      double precision flu(-((Nbins-1)/2):((Nbins-1)/2),
+     +      -((Nbins-1)/2):((Nbins-1)/2),4),g2(8),hgg(8)
 
       ! set bin width for images
       bin_width=4.*xmax/Nbins

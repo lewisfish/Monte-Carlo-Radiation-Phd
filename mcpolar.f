@@ -7,39 +7,43 @@
       include 'photon.txt'
 
 c***** Parameter declarations ****************************************
-      integer nphotons,iseed,j,xcell,ycell,zcell,ibank,gennum
+      integer nphotons,iseed,j,xcell,ycell,zcell,ibank,gennum,deathexit
       integer cnt,io,Nbins,cur,cbinsnum,i,flucount,totcount,totphot
-      real*8 nscatt
+      integer face(6)
+      double precision  nscatt
       logical tflag,forceflag,sflag,tauflag,stretchflag,loopflag
-      real mus1,mua1,xmax,ymax,zmax,absorb,dens(8),sfact,p
-      real pi,twopi,fourpi,delta,xcur,ycur,zcur,d,thetaim,phiim
-      real, allocatable :: noise(:,:),reflc(:,:),trans(:,:),image(:,:)
-      real, allocatable :: flu(:,:,:),deposit(:,:,:),fluro(:,:,:,:)
-      real, allocatable :: kappa(:),albedo(:),bank(:,:,:)
-      real ran2,n1,n2,start,finish,weight,terminate,chance
-      real ddz,ddx,ddy,tau,v(3),WH,WL
-      real costim,cospim,sintim,sinpim
-      real mua(8),mus(8),hgg(8),g2(8)
+      double precision  xmax,ymax,zmax,absorb,dens(8),sfact,p,zlow
+      double precision  pi,twopi,fourpi,delta,xcur,ycur,zcur,d,thetaim
+      double precision , allocatable :: noise(:,:),reflc(:,:),trans(:,:)
+      double precision , allocatable :: flu(:,:,:),deposit(:,:,:)
+      double precision , allocatable :: kappa(:),albedo(:),bank(:,:,:)
+      double precision , allocatable :: image(:,:),fluro(:,:,:,:)
+      double precision  n1,n2,n3,weight,terminate
+      double precision  ddz,ddx,ddy,tau,v(3),WH,WL,xexit,yexit,zexit
+      double precision  costim,cospim,sintim,sinpim,xlow,xhi,ylow,yhi
+      double precision  mua(8),mus(8),hgg(8),g2(8),phiim,zhi,chance
+      real start,finish,ran2
       
 !      !variables for openmpi. GLOBAL indicates final values after mpi reduce
 !      !numproc is number of process being run, id is the indivdual id of each process
 !      !error is the error flag for MPI
       
-      real*8 nscattGLOBAL
-      real flucountGLOBAL
-      integer error,numproc,id
+      double precision nscattGLOBAL
+      double precision flucountGLOBAL,xexitGLOBAL,yexitGLOBAL
+      integer error,numproc,id,deathexitGLOBAL,zexitGLOBAL
       
-      real, allocatable :: imageGLOBAL(:,:),fluGLOBAL(:,:,:)
-      real, allocatable :: fluroGLOBAL(:,:,:,:),depositGLOBAL(:,:,:)
+      double precision, allocatable :: imageGLOBAL(:,:),fluGLOBAL(:,:,:)
+      double precision, allocatable :: fluroGLOBAL(:,:,:,:)
+      double precision, allocatable :: depositGLOBAL(:,:,:)
       
-      character(len=100) :: opt_parmas,spec1
+      character(len=100) :: opt_parmas
       
 !      !set directory for data storage
       character(*),parameter::
      +      fileplace="/home/lewis/phdshizz/grid/data/"
-      
+     
+      !get filename for optical properties
       call get_command_argument(1,opt_parmas)
-!      call get_command_argument(2,spec1)
       
 !      !init mpi
       call MPI_init(error)
@@ -71,12 +75,18 @@ c**** Read in parameters from the file input.params
           read(10,*) zmax
           read(10,*) n1
           read(10,*) n2
+          read(10,*) n3
+          read(10,*) xlow
+          read(10,*) xhi
+          read(10,*) ylow
+          read(10,*) yhi
+          read(10,*) zlow
+          read(10,*) zhi
           close(10)   
-
+      
       ! set seed for rnd generator. id to change seed for each process
       iseed=95648324+id
-      !exp trasform parameter
-      p=0.01
+
       call reader(hgg,mua,mus,opt_parmas,cur)
 
       dens(1)=1.113
@@ -89,26 +99,26 @@ c**** Read in parameters from the file input.params
       dens(8)=4.56
 c***** read in noise data
       
-      open(13,file=fileplace//'noisesmooth.dat')
-      cnt=0
-      do
+!      open(13,file=fileplace//'noisedots.dat')
+!      cnt=0
+!      do
 
-        read(13,*,IOSTAT=io)
-        
-      if (io < 0) then
-           close(13)
-           allocate(noise(1:cnt,1:cnt))
-           noise=0.
-           exit
-      else
-       cnt=cnt+1
-      end if
+!        read(13,*,IOSTAT=io)
+!        
+!      if (io < 0) then
+!           close(13)
+           allocate(noise(1:1,1:1))
+!           noise=0.
+!           exit
+!      else
+!       cnt=cnt+1
+!      end if
 
-      end do
-      open(14,file=fileplace//'noisesmooth.dat') 
-      do i=1,cnt
-            read(14,*) (noise(i,j),j=1,cnt)
-      end do
+!      end do
+!      open(14,file=fileplace//'noisedots.dat') 
+!      do i=1,cnt
+!            read(14,*) (noise(i,j),j=1,cnt)
+!      end do
 
 
 c****** setup up arrays and bin numbers/dimensions
@@ -151,20 +161,31 @@ c****** setup up arrays and bin numbers/dimensions
       fluroGLOBAL=0.
       flucountGLOBAL=0.
       bank=0.
+      xexit=0
+      yexit=0
+      zexit=0
+      xexitGLOBAL=0
+      yexitGLOBAL=0
+      zexitGLOBAL=0
+      deathexitGLOBAL=0
+      deathexit=0
 
 c***** Set up constants, pi and 2*pi  ********************************
       pi=4.*atan(1.)
       twopi=2.*pi
       fourpi=4.*pi
-      sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons are treated diffrently to outgoing ones
+      sflag=.FALSE.     ! flag for fresnel subroutine. so that incoming photons are treated diffrently to outgoing ones
       iseed=-abs(iseed)  ! Random number seed must be negative for ran2
       flucount=0
       !weight window parameters
       WH=5.
       WL=0.001
       totcount=1
+      totphot=0
       loopflag=.FALSE.
-      gennum=5
+      gennum=1
+      !exp trasform parameter
+      p=0.0
       
       ! postion image in degrees
       phiim=0.*pi/180.
@@ -201,7 +222,7 @@ c***** Set up constants, pi and 2*pi  ********************************
             print*, ''      
             print*,'# of photons to run',nphotons*numproc
             do i=1,cur
-                        write(*,*),mua(i),mus(i)
+                        write(*,*) mua(i),mus(i)
             end do
       end if   
       
@@ -210,32 +231,39 @@ c**** Initialize arrays to zero *************************************
       
 c***** Set up density grid *******************************************
       call gridset(xface,yface,zface,rhokap,xmax,ymax,zmax,
-     +                  kappa,id,cur)
+     +                  kappa,id,cur,xlow,xhi,ylow,yhi,zlow,zhi,face)
 
 c***** Set small distance for use in optical depth integration routines 
 c***** for roundoff effects when crossing cell walls
       delta=1.e-6*(2.*xmax/nxg)
 
 
-c**** Loop over nph photons from each source *************************
         nscatt=0
         call cpu_time(start)
               print*, ' '
               print*, 'Photons now running on core:',id
+              
+              
+c*********************************************************************
+c*********************************************************************
+c*********************************************************************              
+c**** loop over generations of banked photons
         do i=1,gennum
-        
-            if(mod(gennum,2).eq.0)then
-                  ibank=1
-            else
-                  ibank=0
-            end if
             
-            if(i.gt.1)then
-            print*,'going to run:',totcount,'photons. On core:',id
-            totcount=0
-            end if
-            
+            !change bank from one to another when changing generations
+!            if(mod(gennum,2).eq.0)then
+!                  ibank=1
+!            else
+!                  ibank=0
+!            end if
+!            
+!            if(i.gt.1)then
+!            print*,'going to run:',totcount,'photons. On core:',id
+!            totcount=1
+!            end if
+        !loop over photons   
         do j=1,nphotons
+        
             !set init weight and optical properties of current medium(usually 1)
             if(loopflag.eqv..FALSE.)then
                   weight=1.0
@@ -247,7 +275,7 @@ c**** Loop over nph photons from each source *************************
              print *, j,' scattered photons completed on core:',id
           end if
           
-      if(i.eq.1)then
+!      if(i.eq.1)then
 c***** Release photon from point source if genum is 1*******************************
           call sourceph(xp,yp,zp,nxp,nyp,nzp,
      +                    sint,cost,sinp,cosp,phi,
@@ -258,23 +286,26 @@ c***** Update xcur etc.
             xcur=xp+xmax
             ycur=yp+ymax
             zcur=zp+zmax
-      else
-      
-            xcur=bank(j,1,ibank)
-            ycur=bank(j,2,ibank)
-            zcur=bank(j,3,ibank)
-            
-            nxp=bank(j,4,ibank)
-            nyp=bank(j,5,ibank)
-            nzp=bank(j,6,ibank)
-            
-            weight=bank(j,7,ibank)
-      
-            xp=xcur-xmax
-            yp=ycur-ymax
-            zp=zcur-zmax
-      
-      end if
+!      else
+!      ! else release from bank
+!      ! need to change ibank value so to release banked photons from last gen
+!            if(ibank.eq.0)ibank=1
+!            if(ibank.eq.1)ibank=0
+!            xcur=bank(j,1,ibank)
+!            ycur=bank(j,2,ibank)
+!            zcur=bank(j,3,ibank)
+!            
+!            nxp=bank(j,4,ibank)
+!            nyp=bank(j,5,ibank)
+!            nzp=bank(j,6,ibank)
+!            
+!            weight=bank(j,7,ibank)
+!      
+!            xp=xcur-xmax
+!            yp=ycur-ymax
+!            zp=zcur-zmax
+!      
+!      end if
       
       
 c**** force photon to interact
@@ -290,7 +321,7 @@ c***** Generate new normal corresponding to bumpy surface
      
 C***** check whether the photon enters medium     
 !          call fresnel(n1,n2,cost,sint,sflag,tflag,iseed,
-!     +      reflc,xcell,ycell,cnt,trans,weight)
+!     +      reflc,xcell,ycell,cnt,trans,weight,pi)
 
 !            sflag=.FALSE.
 
@@ -298,7 +329,8 @@ c****** Find scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
      +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
      +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    stretchflag,sint,cost,sinp,phi,twopi,tauflag,weight,xexit,
+     +    yexit,zexit,pi,sflag,n1,n2,trans,reflc,cosp,face)
      
 c************ Peel off photon into image
                    call peelingoff(xmax,ymax,zmax,cur,nxp,nyp,nzp
@@ -321,8 +353,8 @@ c******** Drop weight
             weight=weight*albedo(cur)
             stretchflag=.FALSE.
             !window splitting routine
-            call banking(bank,xcur,ycur,zcur,weight,nxp,nyp,nzp
-     +                  ,WH,WL,totcount,loopflag,ibank)
+!            call banking(bank,xcur,ycur,zcur,weight,nxp,nyp,nzp
+!     +                  ,WH,WL,totcount,ibank)
             else
             absorb=weight*(mua(cur)/kappa(cur))          
             weight=weight*albedo(cur)
@@ -345,6 +377,7 @@ c************ carry out russian roulette to kill off phototns
            call binning(deposit,xcur,ycur,weight,ddx,fluro,
      +                  ddy,cbinsnum,zcur,ddz,cur)
                         weight=0.
+                        deathexit=deathexit+1
                         exit
                   end if           
             end if                   
@@ -355,7 +388,8 @@ c************ Find next scattering location
           call tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
      +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
      +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    stretchflag,sint,cost,sinp,phi,twopi,tauflag,weight,xexit,
+     +    yexit,zexit,pi,sflag,n1,n2,trans,reflc,cosp,face)
      
 
 c************ Peel off photon into image
@@ -376,6 +410,8 @@ c************ Peel off photon into image
         end do      ! end loop over nph photons
               totphot=totphot+nphotons
               nphotons=totcount
+              loopflag=.TRUE.
+             
         end do      ! end loop over generations
         
         
@@ -389,25 +425,35 @@ c************ Peel off photon into image
 
 !      path length reduce     
       call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4
-     +                ,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+     +     ,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
 
       call MPI_REDUCE(deposit,depositGLOBAL,cbinsnum**3,
-     +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+     +     MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
       call MPI_REDUCE(fluro,fluroGLOBAL,(cbinsnum**3)*4,
-     +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+     +     MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
      
 !      images reduce
       call MPI_REDUCE(image,imageGLOBAL,Nbins**2,
-     +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+     +      MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
       call MPI_REDUCE(flu,fluGLOBAL,(Nbins**2)*4,
-     +                MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+     +     MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
      
 !     nscatt reduce
       call MPI_REDUCE(nscatt,nscattGLOBAL,1,
      +    MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
      
+!     exit location counter reduce     
+      call MPI_REDUCE(xexit,xexitGLOBAL,1,
+     +    MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
      
+      call MPI_REDUCE(yexit,yexitGLOBAL,1,
+     +    MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
      
+      call MPI_REDUCE(zexit,zexitGLOBAL,1,
+     +    MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
+     
+      call MPI_REDUCE(deathexit,deathexitGLOBAL,1,
+     +    MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
      
       if(id.eq.0)then
       print*,'Average # of scatters per photon:',sngl(nscattGLOBAL
@@ -416,6 +462,7 @@ c************ Peel off photon into image
 !      print*,'% of fluro photons',real(flucountGLOBAL/
 !     +                                nphotons*numproc)*100.
 
+      print*,xexitGLOBAL,yexitGLOBAL,zexitGLOBAL,deathexitGLOBAL
 
       !write out files
       

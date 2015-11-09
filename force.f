@@ -6,8 +6,9 @@
       
       include 'grid.txt'
       
-      real xp,yp,zp,smax,tau1,xmax,ymax,zmax,delta
-      real v(3),nyp,nzp,nxp,tau,ran2
+      double precision xp,yp,zp,smax,tau1,xmax,ymax
+      double precision v(3),nyp,nzp,nxp,tau,zmax,delta
+      real ran2
       integer cur,xcell,ycell,zcell,iseed
       
       v(1)=nxp

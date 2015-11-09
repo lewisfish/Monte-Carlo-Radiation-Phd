@@ -1,20 +1,21 @@
       subroutine banking(bank,xcur,ycur,zcur,weight,nxp,nyp,nzp
-     +                  ,WH,WL,totcount,loopflag,ibank)
+     +                  ,WH,WL,totcount,ibank)
       
       implicit none
       
-      real :: bank(0:10000,1:7,0:1),WH,WL
-      real :: xcur,ycur,zcur,weight,nxp,nyp,nzp
+      double precision :: bank(0:10000,1:7,0:1),WH,WL
+      double precision :: xcur,ycur,zcur,weight,nxp,nyp,nzp
       integer :: counter,i,totcount,ibank
-      logical :: loopflag
       
       counter=0
-      if(weight.gt.WH)then
-      !split particles
+      if(weight.gt.1)then
+      !split particles into pairs of equal weight
             do while(weight.gt.WH)
                   weight=weight/2.
                   counter=counter+2
             end do
+
+!            store particles in bank according to pos,dir and weight
             do i=totcount,totcount+counter
             
                   bank(totcount+counter,1,ibank)=xcur

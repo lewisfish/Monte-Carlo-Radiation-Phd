@@ -2,9 +2,9 @@
       
       implicit none
       
-      real,intent(OUT) :: sfact
-      real :: mu,mag,b
-      real,intent(IN) :: nxp,nyp,nzp,p
+      double precision,intent(OUT) :: sfact
+      double precision :: mu,mag
+      double precision,intent(IN) :: nxp,nyp,nzp,p
       logical,intent(out) :: stretchflag
       
       !calculate the cosine of the angle between the prefered 

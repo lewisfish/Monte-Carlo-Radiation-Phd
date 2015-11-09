@@ -1,5 +1,5 @@
       subroutine flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi,pi,
+     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi,
      +                   twopi,tauflag,weight,dens)
       
       implicit none
@@ -8,8 +8,9 @@
     !subroutine to check if photon is in fluro material, then release a fluro photon if appropriate
       integer xcell,ycell,zcell,cur,iseed,flucount
       logical tauflag
-      real ran2,chance,nxp,nyp,nzp,cost,sint,sinp,phi
-      real pi,twopi,cosp,ran,kappa(8),weight,dens(8)
+      real ran2
+      double precision chance,nxp,nyp,nzp,cost,sint,sinp,phi
+      double precision twopi,cosp,ran,kappa(8),weight,dens(8)
       
       chance=.50
       ran=ran2(iseed)

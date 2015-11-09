@@ -1,20 +1,23 @@
       subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
      +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
      +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +    stretchflag,sint,cost,sinp,phi,hgg,g2,pi,twopi,tauflag,weight)
+     +    stretchflag,sint,cost,sinp,phi,twopi,tauflag,weight,xexit,
+     +    yexit,zexit,pi,sflag,n1,n2,trans,reflc,cosp,face)
 
       implicit none
 
-      include 'grid.txt'
-
-      integer iseed,xcell,ycell,zcell,cnt,cur
-      logical tflag,tauflag,forceflag,stretchflag
-      real xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,phi,dens(8)
-      real ran2,kappa(8),twopi,pi,hgg(8),g2(8),sint,cost,sinp     
-
-      integer celli,cellj,cellk,flucount,i
-      real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,p,sfact
-      real dx,dy,dz,smax,delta,noise,dsx,dsy,dsz,weight
+      include 'grid.txt'     
+     
+      integer iseed,xcell,ycell,zcell,cnt,cur,i,face(6),location
+      logical tflag,tauflag,forceflag,stretchflag,sflag
+      double precision xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,phi,dens(8)
+      double precision kappa(8),twopi,sint,cost,sinp,xexit,yexit    
+      real ran2
+      integer celli,cellj,cellk,flucount
+      double precision tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,p
+      double precision sfact,cosp,n1,n2
+      double precision dx,dy,dz,smax,delta,noise,dsx,dsy,dsz,weight,pi
+      double precision reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt),zexit
 
 c***** tflag=0 means photon is in envelope
       tflag=.FALSE.
@@ -62,7 +65,7 @@ c***** calculate smax -- maximum distance photon can travel
          dsz=1.e2*zmax
       endif
 
-      smax=amin1(dsx,dsy,dsz)
+      smax=min(dsx,dsy,dsz)
       if(smax.lt.delta) then
          tflag=.TRUE.
          return
@@ -135,13 +138,13 @@ c***** in fact hit another wall
          if( (dz.eq.0.) .or. ((abs(dz)).lt.(delta)) ) dz=1.e2*zmax
 
 c***** find distance to next cell wall -- minimum of dx, dy, and dz
-         dcell=amin1(dx,dy,dz)
+         dcell=min(dx,dy,dz)
          if(dcell.le.0.) then
             print *,'tauint2: dcell < 0'
          endif
-         if(dx.lt.0.) dcell=amin1(dy,dz)
-         if(dy.lt.0.) dcell=amin1(dx,dz)
-         if(dz.lt.0.) dcell=amin1(dx,dy)
+         if(dx.lt.0.) dcell=min(dy,dz)
+         if(dy.lt.0.) dcell=min(dx,dz)
+         if(dz.lt.0.) dcell=min(dx,dy)
 
 c***** optical depth to next cell wall is 
 c***** taucell= (distance to cell)*(opacity of current cell)
@@ -176,7 +179,7 @@ c*************** Linear Grid ************************
             cellj=int(nyg*ycur/(2.*ymax))+1
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
-
+!            call facecheck(face,celli,cellj,cellk,iseed)
 
          else
 
@@ -193,6 +196,7 @@ c*************** Linear Grid ************************
             cellk=int(nzg*zcur/(2.*zmax))+1
 c****************************************************
           endif
+          !changes the opt prop based
 !          if(rhokap(xcell,ycell,zcell,cur).ne.kappa(cur))then
 !            do i=1,8
 !                  if(rhokap(xcell,ycell,zcell,cur).eq.kappa(i))then
@@ -211,10 +215,24 @@ c***** set tflag=TRUE.  if photon doesn't escape leave tflag=FALSE and update
 c***** photon position. 
       
       if((d.ge.(.999*smax))) then
-             tflag=.TRUE.
-             if(zcur.gt.2.*zmax*.999)then
+!             tflag=.TRUE.
+!           if((xcur.gt.2.*xmax*.999).or.(xcur.lt.0.0001))xexit=xexit+1
+!           if((zcur.gt.2.*zmax*.999))yexit=yexit+1
+           if((zcur.gt.2.*zmax*.999))then
+                  call fresnel(n1,n2,cost,sint,sflag,tflag,iseed,
+     +      reflc,xcell,ycell,cnt,trans,weight,pi,nxp,nyp,nzp,
+     +      cosp,sinp)
+                  if(tflag.eqv..TRUE.)then
+                  zexit=zexit+1
+                  else
+                  yexit=yexit+1
+                  end if
+           end if
+             if(zcur.gt.99.*zmax*.999)then
 !             call noisey(xcur,ycur,noise,cnt)
-             end if   
+             print*,'not meant to be here'
+             end if
+             tflag=.TRUE.   
       else
          xp=xp+d*nxp
          yp=yp+d*nyp
@@ -224,8 +242,8 @@ c***** photon position.
          zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
 
        call flurosub(flucount,rhokap,iseed,xcell,ycell,zcell,cur
-     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi
-     +                  ,pi,twopi,tauflag,weight,dens)
+     +                   ,kappa,nxp,nyp,sint,cost,sinp,phi,
+     +                   twopi,tauflag,weight,dens)
 
       endif
 

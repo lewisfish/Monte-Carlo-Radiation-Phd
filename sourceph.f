@@ -8,7 +8,8 @@
       include 'photon.txt'
 
       integer xcell,ycell,zcell,nxg,nyg,nzg,iseed
-      real xmax,ymax,zmax,w,twopi,r1,phigauss,zf,xf,temp
+      double precision xmax,ymax,zmax,w,twopi,r1,phigauss,zf
+      double precision xf,temp
       real ran2
 
 c***** emit photon from a circle on surface
@@ -52,7 +53,7 @@ c**** Collimated Gaussian Beam
 !      yp=r1*sin(phigauss)
       
 c**** Focused Gaussian Beam
-!      zf=1.
+!      zf=.05
 !      r1=w*sqrt(-log(ran2(iseed)))      
 !      phigauss=twopi*ran2(iseed) 
 !      xp=r1*cos(phigauss)

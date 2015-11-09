@@ -4,12 +4,12 @@
       implicit none
 
       integer iseed,cur
-      real nxp,nyp,nzp,sint,cost,sinp,cosp,phi
-      real hgg(8),g2(8),pi,twopi
+      double precision nxp,nyp,nzp,sint,cost,sinp,cosp,phi
+      double precision hgg(8),g2(8),pi,twopi
 
-      real costp,sintp,phip
-      real bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt,sini2,bott,cosdph
-      real cosi2,sini1,cosi1
+      double precision costp,sintp,phip
+      double precision bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt
+      double precision cosi2,sini1,cosi1,sini2,bott,cosdph
 
       real ran2
 

@@ -2,10 +2,11 @@
       
       implicit none
       
-      real :: value,choice
-      real, intent(out) :: output
-      real,allocatable :: wave(:),flux(:),cdf(:)
+      double precision :: value,choice
+      double precision, intent(out) :: output
+      double precision,allocatable :: wave(:),flux(:),cdf(:)
       double precision :: summ
+      real ran2
       integer :: i,j,Nlower
       integer,intent(in) :: iseed
       character(*),intent(in):: fileplace,inputspec

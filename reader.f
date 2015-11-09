@@ -3,7 +3,7 @@
       implicit none
       
       character(len=100) :: opt_parmas,line
-      real,intent(out) :: hgg(8),mua(8),mus(8)
+      double precision,intent(out) ::hgg(8),mua(8),mus(8)
       integer :: io,cnt,i
       
       open(1,file=opt_parmas,status='old',iostat=io)
@@ -48,7 +48,7 @@
       character(*),intent(in) :: line
       character(len=30) :: cfg_param
       integer :: cnt,i
-      real :: hgg(cnt),mua(cnt),mus(cnt)
+      double precision :: hgg(cnt),mua(cnt),mus(cnt)
       
       if(scan(line,'hgg').eq.0)then
       cfg_param = adjustl(line(:index(line,'!')-1))
