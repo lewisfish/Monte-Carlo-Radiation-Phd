@@ -1,23 +1,22 @@
-      subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,forceflag,
-     +    flucount,kappa,xface,yface,zface,rhokap,noise,cnt,d,tau,dens,
-     +    p,sfact,xcell,ycell,zcell,tflag,iseed,delta,cur,jmean,
-     +    stretchflag,sint,cost,sinp,phi,twopi,tauflag,weight,xexit,
-     +    yexit,zexit,pi,sflag,n1,n2,trans,reflc,cosp,face)
+      subroutine tauint2(xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,
+     +    forceflag,flucount,kappa,xface,yface,zface,rhokap,noise,
+     +    cnt,d,tau,dens,xcell,ycell,zcell,tflag,iseed,jmean,sint,
+     +    cost,sinp,phi,twopi,tauflag,weight,pi,sflag,n1,n2,trans,
+     +    reflc,cosp,face)
 
       implicit none
 
       include 'grid.txt'     
      
       integer iseed,xcell,ycell,zcell,cnt,cur,i,face(6),location
-      logical tflag,tauflag,forceflag,stretchflag,sflag
+      logical tflag,tauflag,forceflag,sflag
       double precision xp,yp,zp,nxp,nyp,nzp,xmax,ymax,zmax,phi,dens(8)
-      double precision kappa(8),twopi,sint,cost,sinp,xexit,yexit    
+      double precision kappa(8),twopi,sint,cost,sinp,cosp,n1,n2  
       real ran2
       integer celli,cellj,cellk,flucount
-      double precision tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,p
-      double precision sfact,cosp,n1,n2
+      double precision tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur
       double precision dx,dy,dz,smax,delta,noise,dsx,dsy,dsz,weight,pi
-      double precision reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt),zexit
+      double precision reflc(1:cnt,1:cnt),trans(1:cnt,1:cnt)
 
 c***** tflag=0 means photon is in envelope
       tflag=.FALSE.
@@ -74,7 +73,6 @@ c***** calculate smax -- maximum distance photon can travel
 c***** integrate through grid
       do while((taurun.lt.tau).and.(d.lt.(.999*smax)))
       
-
 c***** find distance to next x, y, and z cell walls.  
 c***** note that dx is not the x-distance, but the actual distance along 
 c*****the direction of travel to the next x-face, and likewise for dy and dz.
@@ -148,12 +146,8 @@ c***** find distance to next cell wall -- minimum of dx, dy, and dz
 
 c***** optical depth to next cell wall is 
 c***** taucell= (distance to cell)*(opacity of current cell)
-         if(cur.eq.1)then
-         call stretch(sfact,nxp,nyp,nzp,p,stretchflag)
-         taucell=dcell*rhokap(celli,cellj,cellk,cur)*(1.-sfact)         
-         else
          taucell=dcell*rhokap(celli,cellj,cellk,cur)
-         end if
+         
 c***** if taurun+taucell>tau then scatter at distance d+d1.  
 c***** update photon position and cell.  
 c***** if taurun+taucell<tau then photon moves distance dcell 
@@ -161,12 +155,7 @@ c***** (i.e. ends up on next cell wall) and update photon position
 c***** and cell.
 
          if((taurun+taucell).ge.tau) then
-            if(cur.eq.1)then
-            call stretch(sfact,nxp,nyp,nzp,p,stretchflag)
-            d1=(tau-taurun)/(rhokap(celli,cellj,cellk,cur)*(1.-sfact))       
-            else
             d1=(tau-taurun)/rhokap(celli,cellj,cellk,cur)
-            end if            
             d=d+d1
             taurun=taurun+taucell
             xcur=xcur+d1*nxp
@@ -215,18 +204,10 @@ c***** set tflag=TRUE.  if photon doesn't escape leave tflag=FALSE and update
 c***** photon position. 
       
       if((d.ge.(.999*smax))) then
-!             tflag=.TRUE.
-!           if((xcur.gt.2.*xmax*.999).or.(xcur.lt.0.0001))xexit=xexit+1
-!           if((zcur.gt.2.*zmax*.999))yexit=yexit+1
            if((zcur.gt.2.*zmax*.999))then
-                  call fresnel(n1,n2,cost,sint,sflag,tflag,iseed,
-     +      reflc,xcell,ycell,cnt,trans,weight,pi,nxp,nyp,nzp,
-     +      cosp,sinp)
-                  if(tflag.eqv..TRUE.)then
-                  zexit=zexit+1
-                  else
-                  yexit=yexit+1
-                  end if
+!                  call fresnel(n1,n2,cost,sint,sflag,tflag,iseed,
+!     +      reflc,xcell,ycell,cnt,trans,weight,pi,nxp,nyp,nzp,
+!     +      cosp,sinp)
            end if
              if(zcur.gt.99.*zmax*.999)then
 !             call noisey(xcur,ycur,noise,cnt)

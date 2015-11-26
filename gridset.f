@@ -87,18 +87,18 @@ c****************** Calculate equatorial and polar optical depths ****
       print *,'taueq1 = ',taueq1,'  taupole1 = ',taupole1
       print *,'taueq2 = ',taueq2,'  taupole2 = ',taupole2
       end if
-      open(10,file='density1.dat')
-      open(11,file='density2.dat')
-      open(12,file='density3.dat')
-      open(13,file='density4.dat')
-      do i=1,nxg
-           write(10,*) (rhokap(i,102,j,1),j=1,nzg)
-           write(11,*) (rhokap(i,102,j,2),j=1,nzg)
-           write(12,*) (rhokap(i,102,j,3),j=1,nzg)
-           write(13,*) (rhokap(i,102,j,4),j=1,nzg)
-           end do
-      close(10)
-      close(11)
+!      open(10,file='density1.dat')
+!      open(11,file='density2.dat')
+!      open(12,file='density3.dat')
+!      open(13,file='density4.dat')
+!      do i=1,nxg
+!           write(10,*) (rhokap(i,102,j,1),j=1,nzg)
+!           write(11,*) (rhokap(i,102,j,2),j=1,nzg)
+!           write(12,*) (rhokap(i,102,j,3),j=1,nzg)
+!           write(13,*) (rhokap(i,102,j,4),j=1,nzg)
+!           end do
+!      close(10)
+!      close(11)
       
 
       return

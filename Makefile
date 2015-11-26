@@ -1,14 +1,14 @@
 #*************** Makefile created by Mike Wolff ****************************
 
 #******************************** G77/Linux Fortran ************************
-FC     =       mpifort 
+FC     =       mpiifort 
 #EXTRA_OPT =     -mpentium -malign-double -fforce-mem -fforce-addr \
 #                -ffast-math -funroll-all-loops
 #debug flags  -g -fcheck=all -fbounds-check -ffpe-trap=zero,overflow,underflow -Wall -Wextra
 # May want to experiment by adding the extra optimization flags to get
 ## better runtime. But then again, maybe not.
 #FFLAGS  =       -O2 $(EXTRA_OPT) -ffloat-store
-FFLAGS  =        -Ofast       
+#FFLAGS  =        -Ofast       
 #LDFLAGS = 
 #time_it         = get_cpu_sun
 
@@ -50,9 +50,6 @@ OBJSB =     density.o \
             fluro.o \
             force.o \
             reader.o \
-            stretch.o \
-            search.o \
-            banking.o \
             facecheck.o \
             facenormal.o \
             writer.o

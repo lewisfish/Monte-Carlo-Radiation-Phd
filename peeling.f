@@ -1,7 +1,7 @@
       subroutine peelingoff(xmax,ymax,zmax,cur,nxp,nyp,nzp
      +                  ,xface,yface,zface,rhokap,
      +                  xcell,ycell,zcell,delta,xp,yp,zp,
-     +                  pi,image,Nbins,flu,v,g2,hgg,
+     +                  pi,image,Nbins,v,g2,hgg,
      +                  sintim,costim,sinpim,cospim,tauflag)
       
             
@@ -14,8 +14,6 @@
       integer binx,biny,xcell,ycell,zcell,Nbins,cur
       logical tauflag
       double precision image(-((Nbins-1)/2):((Nbins-1)/2),
-     +      -((Nbins-1)/2):((Nbins-1)/2))
-      double precision flu(-((Nbins-1)/2):((Nbins-1)/2),
      +      -((Nbins-1)/2):((Nbins-1)/2),4),g2(8),hgg(8)
 
       ! set bin width for images
@@ -46,7 +44,7 @@
             !calc total weight of peeled off photon
             prob=hgfact*exp(-tau1)
             
-            image(binx,biny)=image(binx,biny)+prob
+            image(binx,biny,cur)=image(binx,biny,cur)+prob
       else
       
             if(tauflag.eqv..FALSE.)then
@@ -58,6 +56,6 @@
 
             !calc total weight of peeled off photon
             prob=hgfact*exp(-tau1)
-            flu(binx,biny,cur)=flu(binx,biny,cur)+prob
+            image(binx,biny,cur)=image(binx,biny,cur)+prob
       end if
       end subroutine peelingoff
