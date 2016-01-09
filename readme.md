@@ -1,6 +1,4 @@
-### --------------------------------------
 #        3D SCATTERED LIGHT CODE
-### --------------------------------------
 
 This directory contains the source codes for the 3D Cartesian grid.
 At the end of the simulation the code outputs to the screen the average number of scatterings 
