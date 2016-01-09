@@ -4,7 +4,7 @@ This directory contains the source codes for the 3D Cartesian grid.
 At the end of the simulation the code outputs to the screen the average number of scatterings 
 per Monte Carlo photon packet, and fluences into the data folder.
 
-### The FORTRAN source files are:
+#### The FORTRAN source files are:
 
             density.f95 
             gridset.f95 
@@ -23,19 +23,19 @@ per Monte Carlo photon packet, and fluences into the data folder.
             reader.f95
             writer.f95
 
-### The FORTRAN modules are:
+#### The FORTRAN modules are:
 
             constants.mod 
             photon.mod
             subs.mod
 
-### Input parameters are in:
+#### Input parameters are in:
 
 	input.params
 	opt.params
 	noisedots.dat
 
-### The file that compiles the code and creates the executable file 'mcgrid' is:
+##### The file that compiles the code and creates the executable file 'mcgrid' is:
 
 	install.sh
 	
