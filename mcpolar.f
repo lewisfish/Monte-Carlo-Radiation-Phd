@@ -257,7 +257,7 @@ c************ Peel off photon into image
           call peelingoff(xmax,ymax,zmax,cur,nxp,nyp,nzp,xface,
      +         yface,zface,rhokap,xcell,ycell,zcell,delta,xp,yp,
      +         zp,pi,image,Nbins,v,g2,hgg,sintim,costim,sinpim,
-     +         cospim,tauflag)g)
+     +         cospim,tauflag)
 !      forceflag=.FALSE.
 
 c******** Photon scatters in grid until it exits (tflag=TRUE) 

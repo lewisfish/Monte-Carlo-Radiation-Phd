@@ -25,18 +25,18 @@ c**********  Linear Cartesian grid. Set up grid faces ****************
       end do
 cStore location of crystals faces for fresnel reflc in (x/y/z)cell units ***
 
-      call search(xlow+xmax-xmax/nxg,xface,nxg+1,Nlower)
-      face(1)=Nlower
-      call search(xhi+xmax-xmax/nxg,xface,nxg+1,Nlower)
-      face(2)=Nlower
-      call search(ylow+ymax-ymax/nyg,yface,nyg+1,Nlower)
-      face(3)=Nlower
-      call search(yhi+ymax-ymax/nyg,yface,nyg+1,Nlower)
-      face(4)=Nlower
-      call search(zlow+zmax-zmax/nzg,zface,nzg+1,Nlower)
-      face(5)=Nlower      
-      call search(zhi+zmax-zmax/nzg,zface,nzg+1,Nlower)
-      face(6)=Nlower
+!      call search(xlow+xmax-xmax/nxg,xface,nxg+1,Nlower)
+!      face(1)=Nlower
+!      call search(xhi+xmax-xmax/nxg,xface,nxg+1,Nlower)
+!      face(2)=Nlower
+!      call search(ylow+ymax-ymax/nyg,yface,nyg+1,Nlower)
+!      face(3)=Nlower
+!      call search(yhi+ymax-ymax/nyg,yface,nyg+1,Nlower)
+!      face(4)=Nlower
+!      call search(zlow+zmax-zmax/nzg,zface,nzg+1,Nlower)
+!      face(5)=Nlower      
+!      call search(zhi+zmax-zmax/nzg,zface,nzg+1,Nlower)
+!      face(6)=Nlower
              
 c**************  Loop through x, y, and z to set up grid density.  ****
       do i=1,nxg

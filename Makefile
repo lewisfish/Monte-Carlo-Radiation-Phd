@@ -1,7 +1,7 @@
 #*************** Makefile created by Mike Wolff ****************************
 
 #******************************** G77/Linux Fortran ************************
-FC     =       mpiifort 
+FC     =       mpifort -g -fcheck=all -fbounds-check -fbacktrace
 #EXTRA_OPT =     -mpentium -malign-double -fforce-mem -fforce-addr \
 #                -ffast-math -funroll-all-loops
 #debug flags  -g -fcheck=all -fbounds-check -ffpe-trap=zero,overflow,underflow -Wall -Wextra

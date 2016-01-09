@@ -5,6 +5,6 @@
 *~
 *.dat
 *.gp
-data/
+/data/*
 *.txt
 *.png
