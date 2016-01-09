@@ -1,10 +1,11 @@
 *.params
 *.o
-*noise
-*mcgrid
-*~
+*.*~
 *.dat
 *.gp
 data/
-Makefile
+build/
+ext/
+bin/
 *.txt
+*.png
