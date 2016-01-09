@@ -6,21 +6,21 @@ per Monte Carlo photon packet, and fluences into the data folder.
 
 ### The FORTRAN source files are:
 
-            density.f95 \
-            gridset.f95 \
-            iarray.f95 \
-            mcpolar.f95 \
-            ran2.f \
-            findsmax.f95 \
-            stokes.f95 \
-            sourceph.f95 \
-            noisey.f95 \
-            fresnel.f95 \
-            tauint2.f95 \
-            peeling.f95 \
-            taufind1.f95 \
-            binning.f95 \
-            reader.f95 \
+            density.f95 
+            gridset.f95 
+            iarray.f95 
+            mcpolar.f95
+            ran2.f 
+            findsmax.f95 
+            stokes.f95 
+            sourceph.f95
+            noisey.f95 
+            fresnel.f95
+            tauint2.f95
+            peeling.f95 
+            taufind1.f95
+            binning.f95 
+            reader.f95
             writer.f95
 
 ### The FORTRAN modules are:
