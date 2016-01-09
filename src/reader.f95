@@ -1,13 +1,16 @@
-subroutine reader(hgg,mua,mus,opt_parmas,cnt)
+subroutine reader(hgg,mua,mus,cnt)
+
+use constants,only : resdir
 
 implicit none
 
-character(len=100) :: opt_parmas,line
+character(len=100) :: line
 real,intent(out) ::hgg(1),mua(1),mus(1)
 integer :: io,cnt,i
 
-open(1,file=opt_parmas,status='old',iostat=io)
+open(1,file=trim(resdir)//'opt.params',status='old',iostat=io)
 if(io.ne.0)then
+print*, trim(resdir)//'opt.params','does not exsist'
 print*, 'File cant be opened!'
 print*, 'Exiting...'
 call EXIT(0)
@@ -24,7 +27,7 @@ else
       cnt=cnt+1
 end if
 end do
-open(2,file=opt_parmas,status='old',iostat=io)
+open(2,file=trim(resdir)//'opt.params',status='old',iostat=io)
 
 cnt=cnt-1
 !      allocate(hgg(cnt),mua(cnt),mua(cnt))

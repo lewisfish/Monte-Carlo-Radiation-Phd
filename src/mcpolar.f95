@@ -3,6 +3,7 @@ program mcpolar
 use mpi
 use constants
 use photon
+use subs
 
 implicit none
 
@@ -35,13 +36,9 @@ integer error,numproc,id
 real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
 real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
 
-character(len=100) :: opt_parmas
+!set directory paths
+call directory
 
-!      !set directory for data storage
-character(*),parameter::fileplace="/home/lewis/Desktop/lm959/data/"
-     
-!get filename for optical properties
-call get_command_argument(1,opt_parmas)
 
 !      !init mpi
 call MPI_init(error)
@@ -66,7 +63,7 @@ call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 !parallize-done but not 100% happy with. change makefile so that mpi is an option.
 
 !**** Read in parameters from the file input.params
-open(10,file='input.params',status='old')
+open(10,file=trim(resdir)//'input.params',status='old')
     read(10,*) nphotons
     read(10,*) xmax
     read(10,*) ymax
@@ -78,11 +75,11 @@ open(10,file='input.params',status='old')
 ! set seed for rnd generator. id to change seed for each process
 iseed=95648324+id
 
-call reader(hgg,mua,mus,opt_parmas,cur)
+call reader(hgg,mua,mus,cur)
 
 !***** read in noise data
 
-open(13,file=fileplace//'noisedots.dat')
+open(13,file=trim(resdir)//'noisedots.dat')
 cnt=0
 do
 
@@ -98,7 +95,7 @@ else
 end if
 
 end do
-open(14,file=fileplace//'noisedots.dat') 
+open(14,file=trim(resdir)//'noisedots.dat') 
 do i=1,cnt
 read(14,*) (noise(i,j),j=1,cnt)
 end do

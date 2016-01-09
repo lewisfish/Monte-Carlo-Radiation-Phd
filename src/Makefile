@@ -7,6 +7,7 @@ FCFLAGS = -Ofast
 PROGRAM =  mcgrid 
 SRCS =      constants.f95 \
             photon.f95 \
+            subs.f95 \
             density.f95 \
             gridset.f95 \
             iarray.f95 \

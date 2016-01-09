@@ -5,9 +5,15 @@ cd src
 make clean && make 
 
 cd ..
+if [ ! -d "build" ]; then
+   mkdir "build"
+fi
 cd build
 ndirec="$(pwd)"
 cd ..
+if [ ! -d "bin" ]; then
+   mkdir "bin"
+fi
 cd bin
 bdirc="$(pwd)"
 cd ..
@@ -21,4 +27,4 @@ for i in *; do
 done
 
 
-mv mcgrid "$bdirc" 
+mv mcgrid "$bdirc" && echo " "&& echo "*****Install complete*****" && echo " "

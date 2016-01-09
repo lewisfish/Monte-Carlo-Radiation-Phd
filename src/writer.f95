@@ -1,6 +1,6 @@
-subroutine writer(imageGLOBAL,Nbins,fileplace,depGLOBAL,depositGLOBAL,cbinsnum,transGLOBAL)
+subroutine writer(imageGLOBAL,Nbins,depGLOBAL,depositGLOBAL,cbinsnum,transGLOBAL)
 
-use constants,only : nxg,nyg,nzg,jmeanGLOBAL
+use constants,only : nxg,nyg,nzg,jmeanGLOBAL,fileplace
 
 implicit none
 
@@ -8,9 +8,6 @@ integer Nbins,cbinsnum,j
 real imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4)
 real transGLOBAL(cbinsnum,cbinsnum)
 real depositGLOBAL(cbinsnum,cbinsnum),depGLOBAL(cbinsnum)
-character(*) fileplace
-
-
 
 open(62,file=fileplace//'jmean/jmean.dat',access='direct',form='unformatted',recl=((nxg+3)*(nyg+3)*(nzg+3))*4*4)
 
