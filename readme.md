@@ -1,5 +1,5 @@
 --------------------------------------
-3D SCATTERED LIGHT CODE: POINT SOURCES
+3D SCATTERED LIGHT CODE
 --------------------------------------
 
 This directory contains the source codes for the 3D Cartesian grid.
