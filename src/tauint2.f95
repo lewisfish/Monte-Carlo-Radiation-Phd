@@ -1,19 +1,20 @@
 subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
-            ,ycell,zcell,tflag,iseed,delta,sflag,trans,weight,ddx,ddy,cbinsnum,noise,cnt)
+            ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 
-use constants,only : xface,yface,zface,rhokap,jmean,PI,nxg,nyg,nzg
+use constants,only : PI,nxg,nyg,nzg,cbinsnum
 use photon,only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
+use iarray,only : noise,jmean,xface,yface,zface,rhokap,trans
 
 implicit none
 
-integer iseed,xcell,ycell,zcell,cbinsnum,cnt
+integer iseed,xcell,ycell,zcell,cnt
 real xmax,ymax,zmax,weight,ddx,ddy
-real ran2,n1,n2,noise(1:cnt,1:cnt)
+real ran2,n1,n2
 logical tflag,sflag
 
 integer celli,cellj,cellk
 real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
-real dx,dy,dz,smax,delta,trans(cbinsnum,cbinsnum)
+real dx,dy,dz,smax,delta
 
 !***** tflag=.FALSE. means photon is in envelope
 tflag=.FALSE.
@@ -200,8 +201,8 @@ end do
 if((d.ge.(.999*smax))) then
 
 if(zcur.gt.2.*zmax*.999)then
-call noisey(xcell,ycell,noise,cnt)
-call fresnel(n1,n2,sflag,tflag,iseed,trans,ddx,ddy,weight,cbinsnum,xcur,ycur)
+call noisey(xcell,ycell,cnt)
+call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
       if(nzp.gt.0.)then
 !                  if(tau-taurun.gt.0.)then
 !                        goto 100

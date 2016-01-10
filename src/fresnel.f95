@@ -1,15 +1,15 @@
-subroutine fresnel(n1,n2,sflag,tflag,iseed,trans,ddx,ddy,weight,cbinsnum,xcur,ycur)
+subroutine fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
      
-use constants,only : pi
-use photon,only : nxp,nyp,nzp,cost,sint,cosp,sinp
+use constants, only : pi,cbinsnum
+use photon, only : nxp,nyp,nzp,cost,sint,cosp,sinp
+use iarray, only : trans
 
 implicit none
      
 
 real n1,n2,n,tir,cost2,f1,f2,xcur,ycur
 real ran2,costt,crit,ran,weight,ddx,ddy
-integer iseed,ix,iy,cbinsnum
-real trans(cbinsnum,cbinsnum)
+integer iseed,ix,iy
 logical sflag,tflag
      
      

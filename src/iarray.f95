@@ -1,14 +1,16 @@
-subroutine iarray
+MODULE iarray
 
-use constants,only : xface,yface,zface,rhokap
+implicit none
+save
 
+real, allocatable :: xface(:),yface(:),zface(:)
+real, allocatable :: rhokap(:,:,:,:)
+real, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
-!**** Initialize array values to be zero
+real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
+real, allocatable :: image(:,:,:),deposit(:,:)
+real, allocatable :: kappa(:),albedo(:),dep(:)
+real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
+real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
 
-  xface=0.
-  yface=0.
-  zface=0.
-  rhokap=0.
-        
-return
-end
+end MODULE iarray

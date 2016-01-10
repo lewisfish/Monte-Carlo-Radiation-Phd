@@ -3,6 +3,7 @@ program mcpolar
 use mpi
 use constants
 use photon
+use iarray
 use subs
 
 implicit none
@@ -11,14 +12,11 @@ implicit none
 
 !***** Parameter declarations ****************************************
 integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
-integer cnt,io,Nbins,cur,cbinsnum,i,flucount,k
+integer cnt,io,cur,i,flucount,k
 logical tflag,sflag,tauflag
 DOUBLE PRECISION nscatt
 real  xmax,ymax,zmax,absorb,ddy,ddx
 real  delta,xcur,ycur,zcur,d,thetaim
-real ,allocatable :: noise(:,:),reflc(:,:),trans(:,:)
-real ,allocatable :: image(:,:,:),deposit(:,:)
-real ,allocatable :: kappa(:),albedo(:),dep(:)
 real  n1,n2,weight,terminate
 
 real  ddz,ddr,tau,v(3)
@@ -33,12 +31,11 @@ real start,finish,ran2
 DOUBLE PRECISION nscattGLOBAL
 integer error,numproc,id
 
-real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
-real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
-
 !set directory paths
 call directory
 
+call alloc_array
+call zarray
 
 !      !init mpi
 call MPI_init(error)
@@ -101,9 +98,6 @@ read(14,*) (noise(i,j),j=1,cnt)
 end do
 
 !****** setup up arrays and bin numbers/dimensions
- 
-Nbins=401
-cbinsnum=200
      
 !     ! set bin widths for deposit method
 ddz=(2.*zmax)/cbinsnum
@@ -112,22 +106,10 @@ ddy=(2.*ymax)/cbinsnum
 ddr=(ymax+xmax)/(2.*cbinsnum)
 
 
-!      !allocate arrays for program
-allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),dep(cbinsnum))
-allocate(deposit(cbinsnum,cbinsnum))
-allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
-allocate(depositGLOBAL(cbinsnum,cbinsnum))
-allocate(kappa(cur),albedo(cur),reflc(cbinsnum,cbinsnum))
-allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
-!      ! set arrays to 0.
-image=0.
-deposit=0.
-dep=0.
-jmean=0.
-jmeanGLOBAL=0.
-imageGLOBAL=0.
-depositGLOBAL=0.
-depGLOBAL=0.
+!      allocate arrays for program
+
+
+allocate(kappa(1),albedo(1))
 
 !***** Set up constants, pi and 2*pi  ********************************
 
@@ -169,10 +151,7 @@ print*,'# of photons to run',nphotons*numproc
 do i=1,cur
             write(*,*) mua(i),mus(i)
 end do
-end if   
-
-!**** Initialize arrays to zero *************************************
-call iarray
+end if
 
 !***** Set up density grid *******************************************
 call gridset(xmax,ymax,zmax,kappa,id,cur)
@@ -212,19 +191,19 @@ ycur=yp+ymax
 zcur=zp+zmax
 
 !***** Generate new normal corresponding to bumpy surface
-    call noisey(xcell,ycell,noise,cnt)
+    call noisey(xcell,ycell,cnt)
 
 !***** check whether the photon enters medium     
-    call fresnel(n1,n2,sflag,tflag,iseed,trans,ddx,ddy,weight,cbinsnum,xcur,ycur)
+    call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
 sflag=.FALSE.
 
 !****** Find scattering location
       call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell,&
-tflag,iseed,delta,sflag,trans,weight,ddx,ddy,cbinsnum,noise,cnt)
+tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
      
 !************ Peel off photon into image
       call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
-      image,Nbins,v,g2,hgg,sintim,costim,sinpim,cospim)
+      v,g2,hgg,sintim,costim,sinpim,cospim)
 
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
     do while(tflag.eqv..FALSE.) 
@@ -236,7 +215,7 @@ tflag,iseed,delta,sflag,trans,weight,ddx,ddy,cbinsnum,noise,cnt)
 absorb=weight*(mua(1)/kappa(1))          
 weight=weight*albedo(1)
 !******** Drop weight in appro bin
-call binning(deposit,ddr,cbinsnum,zcur,ddz,absorb)
+call binning(ddr,zcur,ddz,absorb)
     
 !************ Scatter photon into new direction and update Stokes parameters
 
@@ -247,7 +226,7 @@ if(weight.le.terminate)then
             weight=weight/chance
       else
             absorb=weight
-     call binning(deposit,ddr,cbinsnum,zcur,ddz,absorb)
+     call binning(ddr,zcur,ddz,absorb)
             weight=0.
             tflag=.TRUE.
             exit
@@ -258,12 +237,12 @@ nscatt=nscatt+1
 
 !************ Find next scattering location
     call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
-    ,tflag,iseed,delta,sflag,trans,weight,ddx,ddy,cbinsnum,noise,cnt)
+    ,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
      
 
 !************ Peel off photon into image
     call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
-    ,image,Nbins,v,g2,hgg,sintim,costim,sinpim,cospim)
+    ,v,g2,hgg,sintim,costim,sinpim,cospim)
    
 xcur=xp+xmax
 ycur=yp+ymax
@@ -327,7 +306,7 @@ print*,'Average # of scatters per photon:',sngl(nscattGLOBAL/(nphotons*numproc))
 
 !write out files
 
-call writer(imageGLOBAL,Nbins,fileplace,depGLOBAL,depositGLOBAL,cbinsnum,transGLOBAL)
+call writer
 print*,'write done'
 end if
 

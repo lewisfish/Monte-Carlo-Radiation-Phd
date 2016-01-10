@@ -1,12 +1,13 @@
-subroutine noisey(xcell,ycell,noise,cnt)
+subroutine noisey(xcell,ycell,cnt)
 
-use photon,only : nxp,nyp,nzp,cost,sint,cosp,sinp
+use photon, only : nxp,nyp,nzp,cost,sint,cosp,sinp
+use iarray, only : noise
 
 implicit none
 
 integer cnt,xcell,ycell
 real newNorm(3),Norm(3),xvec(3),yvec(3)
-real noise(1:cnt,1:cnt),theta,ygrad,xgrad
+real theta,ygrad,xgrad
 
 
 !      sets vectors in stupid fashion

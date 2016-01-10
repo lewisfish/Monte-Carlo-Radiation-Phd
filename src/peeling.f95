@@ -1,16 +1,17 @@
 subroutine peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
-                      ,image,Nbins,v,g2,hgg,sintim,costim,sinpim,cospim) 
+                      ,v,g2,hgg,sintim,costim,sinpim,cospim) 
 
-use constants,only : xface,yface,zface,rhokap,pi
+use constants,only : pi,nbins
 use photon,only : xp,yp,zp,nxp,nyp,nzp
+use iarray,only : xface,yface,zface,rhokap,image
 
 implicit none
 
 real xim,yim,tau1,prob,v(3),sinpim
 real zmax,bin_width,hgfact,sintim,xmax
 real delta,ymax,cosa,costim,cospim
-integer binx,biny,xcell,ycell,zcell,Nbins
-real image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),g2(1),hgg(1)
+integer binx,biny,xcell,ycell,zcell
+real hgg(1),g2(1)
 
 ! set bin width for images
 bin_width=4.*xmax/Nbins

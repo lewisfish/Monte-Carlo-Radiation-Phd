@@ -1,6 +1,7 @@
 subroutine gridset(xmax,ymax,zmax,kappa,id,cur)
 
-use constants,only : rhokap,xface,yface,zface,nxg,nyg,nzg
+use constants ,only : nxg,nyg,nzg
+use iarray, only : rhokap,xface,yface,zface
 
 implicit none
 

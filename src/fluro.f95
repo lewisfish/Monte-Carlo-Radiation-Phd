@@ -1,7 +1,8 @@
 subroutine flurosub(flucount,iseed,xcell,ycell,zcell,cur,kappa,tauflag,weight,dens)
 
-use constants,only : rhokap,twopi 
-use photon,only : nxp,nyp,nzp,cost,sint,cosp,sinp,phi
+use constants, only : twopi 
+use photon, only : nxp,nyp,nzp,cost,sint,cosp,sinp,phi
+use iarray, only : rhokap
 
 implicit none
 

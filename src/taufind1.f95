@@ -1,7 +1,8 @@
 subroutine taufind1(xmax,ymax,zmax,v,tau1,xcell,ycell,zcell,delta)
 
-use constants,only : xface,yface,zface,rhokap,nxg,nyg,nzg
+use constants,only : nxg,nyg,nzg
 use photon,only : xp,yp,zp
+use iarray,only : xface,yface,zface,rhokap
 
 implicit none
 
