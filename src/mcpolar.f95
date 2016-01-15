@@ -50,13 +50,11 @@ call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 !fix up fluro shizz
 !change opt arrays to allocatble 
 !create subroutine for reading files, i.e. noise data.
-!somehow add all array setting to iarray !!!!!!!!!!!can do this by using modules!!!!!!!!!!!!!!!!
 !test fresnel
 !test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
 !add kennys stuff(piece of paper) 
 !add colours/render shizz
 !proper formatting
-!convert to f95
 !parallize-done but not 100% happy with. change makefile so that mpi is an option.
 
 !**** Read in parameters from the file input.params

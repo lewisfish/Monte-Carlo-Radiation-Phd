@@ -7,6 +7,9 @@ save
 
 CONTAINS
    SUBROUTINE directory
+!  subroutine defines vars to hold paths to various folders   
+!   
+!   
    use constants,only : cwd,homedir,fileplace,resdir
    implicit none
 
@@ -60,7 +63,9 @@ CONTAINS
    end SUBROUTINE zarray
 
    SUBROUTINE alloc_array
-   
+!  subroutine allocates allocatable arrays
+!   
+!   
    use iarray
    use constants,only : nxg,nyg,nzg,Nbins,cbinsnum
    
