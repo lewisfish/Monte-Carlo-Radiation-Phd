@@ -1,4 +1,4 @@
-#        3D SCATTERED LIGHT CODE
+#        3D SCATTERED LIGHT MONTE CARLO CODE
 
 This repository contains the source codes for the 3D grid Cartesian monte carlo radiation transfer codes developed as part of my phd.
 The codes simulate the transfer of ligth through tissue of various types and optical properties.
