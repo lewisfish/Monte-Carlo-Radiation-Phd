@@ -2,9 +2,19 @@ program mcpolar
 
 use mpi
 use constants
-use photon
+use photon_vars
 use iarray
 use subs
+use reader_mod
+use gridset_mod
+use sourceph_mod
+use noisey_mod
+use tauint
+use stokes_mod
+use fresnel_mod
+use binning_mod
+use peelingoff_mod
+use writer_mod
 
 implicit none
 

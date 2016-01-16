@@ -1,6 +1,6 @@
 subroutine findsmax(xmax,ymax,zmax,xcur,ycur,zcur,delta,smax,tflag)
 
-use photon,only : nxp,nyp,nzp
+use photon_vars, only : nxp,nyp,nzp
 
 implicit none
 
