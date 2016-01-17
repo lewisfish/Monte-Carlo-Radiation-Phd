@@ -4,15 +4,15 @@ implicit none
 save
 
 CONTAINS
-   subroutine reader(hgg,mua,mus,cnt)
+   subroutine reader0(hgg,mua,mus,cnt)
 
    use constants,only : resdir
 
    implicit none
 
    character(len=100) :: line
-   real,intent(out) ::hgg(1),mua(1),mus(1)
-   integer :: io,cnt,i
+   real, intent(out)  :: hgg(1),mua(1),mus(1)
+   integer            :: io,cnt,i
 
    open(1,file=trim(resdir)//'opt.params',status='old',iostat=io)
    if(io.ne.0)then
@@ -54,10 +54,10 @@ CONTAINS
 
       implicit none
 
-      character(*),intent(in) :: line
-      character(len=30) :: cfg_param
-      integer :: cnt,i
-      real :: hgg(cnt),mua(cnt),mus(cnt)
+      character(*), intent(in) :: line
+      character(len=30)        :: cfg_param
+      integer                  :: cnt,i
+      real                     :: hgg(cnt),mua(cnt),mus(cnt)
 
       if(scan(line,'hgg').eq.0)then
       cfg_param = adjustl(line(:index(line,'!')-1))
@@ -74,5 +74,61 @@ CONTAINS
       end if
 
       end subroutine linereader
-   end subroutine reader
+   end subroutine reader0
+   
+   subroutine reader1
+   
+   use iarray, only : mua_array,mus_array
+   use constants, only : resdir
+   
+   implicit none
+   
+   integer :: cnt,io,i,j
+   
+   open(1,file=trim(resdir)//'mua.dat')
+   cnt=0
+   do
+
+      read(1,*,IOSTAT=io)
+     
+      if (io < 0) then
+         close(1)
+         allocate(mua_array(cnt-1,2))
+         mua_array=0.
+         exit
+      else
+         cnt=cnt+1
+      end if
+
+   end do
+   open(2,file=trim(resdir)//'mua.dat') 
+
+   do i=1,cnt-1
+      read(2,*) mua_array(i,1),mua_array(i,2)
+   end do
+
+   !mus
+   open(3,file=trim(resdir)//'mus.dat')
+   cnt=0
+   do
+
+      read(3,*,IOSTAT=io)
+     
+      if (io < 0) then
+         close(3)
+         allocate(mus_array(1:cnt-1,1:2))
+         mus_array=0.
+         exit
+      else
+         cnt=cnt+1
+      end if
+
+   end do
+   
+   open(4,file=trim(resdir)//'mus.dat') 
+   do i=1,cnt-1
+      read(4,*) mus_array(i,1),mus_array(i,2)
+   end do
+   
+   end subroutine reader1
 end MODULE reader_mod

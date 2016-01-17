@@ -4,15 +4,15 @@ implicit none
 save
 
 CONTAINS
-   subroutine stokes(hgg,g2,iseed,cur)
+   subroutine stokes(iseed)
 
-   use constants, only : PI,TWOPI
+   use constants, only   : PI,TWOPI
    use photon_vars, only : nxp,nyp,nzp,cost,sint,cosp,sinp,phi
-
+   use opt_prop, only    : hgg,g2
+   
    implicit none
 
-   integer iseed,cur
-   real hgg(1),g2(1)
+   integer iseed
 
    real costp,sintp,phip
    real bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt
@@ -22,7 +22,7 @@ CONTAINS
 
 
    !***** isotropic scattering if g = 0.0 ******************************
-   if(hgg(1).eq.0.0) then
+   if(hgg.eq.0.0) then
      cost=2.*ran2(iseed)-1.
      sint=(1.-cost*cost)
      if(sint.le.0.)then
@@ -47,7 +47,7 @@ CONTAINS
    sintp=sint
    phip=phi
 
-   bmu=((1.+g2(1))-((1.-g2(1))/(1.-hgg(1)+2.*hgg(1)*ran2(iseed)))**2)/(2.*hgg(1))
+   bmu=((1.+g2)-((1.-g2)/(1.-hgg+2.*hgg*ran2(iseed)))**2)/(2.*hgg)
    cosb2=bmu**2
    b=cosb2-1.
 

@@ -4,12 +4,13 @@ implicit none
 save
 
 CONTAINS
-   subroutine density(x,y,z,rho,kappa,cur,xmax,ymax,zmax)
+   subroutine density(x,y,z,rho,xmax,ymax,zmax)
 
+   use opt_prop, only : kappa   
+   
    implicit none
 
-   integer cur
-   real x,y,z,rho,kappa(cur)
+   real x,y,z,rho
    real xmax,ymax,zmax
 
 !***** calculate some distances for use in setting up density 
@@ -20,7 +21,7 @@ CONTAINS
 
 !***** Set up optically diffrent sphere within the grid
    if((x.gt.-2.*xmax .and. x.lt.2.*xmax).and.(y.gt.-2.*ymax .and. y.lt.2.*ymax).and.(z.gt.-2.*zmax .and. z.lt.2.*zmax))then
-         rho=kappa(1)
+         rho=kappa
    else  
          rho=0.
    end if

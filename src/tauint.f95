@@ -210,18 +210,18 @@ tau=-alog(ran2(iseed))
 !***** photon position.
    if((d.ge.(.999*smax))) then
 
-   if(zcur.gt.2.*zmax*.999)then
-   call noisey(xcell,ycell,cnt)
-   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
-      if(nzp.gt.0.)then
-!                  if(tau-taurun.gt.0.)then
-!                        goto 100
-!                  end if
-            tflag=.TRUE.
-      end if
-   else
+!   if(zcur.gt.2.*zmax*.999)then
+!   call noisey(xcell,ycell,cnt)
+!   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
+!      if(nzp.gt.0.)then
+!!                  if(tau-taurun.gt.0.)then
+!!                        goto 100
+!!                  end if
+!            tflag=.TRUE.
+!      end if
+!   else
       tflag=.TRUE.
-   end if
+!   end if
    else
       xp=xp+d*nxp
       yp=yp+d*nyp
@@ -231,13 +231,6 @@ tau=-alog(ran2(iseed))
       zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
 
    endif
-
-!         xp=xp+d*nxp
-!         yp=yp+d*nyp
-!         zp=zp+d*nzp
-!         xcell=int(nxg*(xp+xmax)/(2.*xmax))+1
-!         ycell=int(nyg*(yp+ymax)/(2.*ymax))+1
-!         zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
 
    end subroutine tauint2
 end MODULE tauint

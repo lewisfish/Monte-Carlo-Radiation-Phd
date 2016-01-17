@@ -1,9 +1,7 @@
 MODULE subs
 
-
 implicit none
 save
-
 
 CONTAINS
    SUBROUTINE directory

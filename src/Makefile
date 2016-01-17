@@ -8,13 +8,15 @@ PROGRAM =  mcgrid
 SRCS =      constants.f95 \
             photon_vars.f95 \
             iarray.f95 \
+            opt_prop.f95 \
             subs.f95 \
+            ch_opt.f95 \
             density.f95 \
+            gridset.f95 \
             noisey.f95 \
             fresnel.f95 \
             taufind1.f95 \
             tauint.f95 \
-            gridset.f95 \
             stokes.f95 \
             sourceph.f95 \
             peeling.f95 \

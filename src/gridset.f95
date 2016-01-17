@@ -4,17 +4,18 @@ implicit none
 save
 
 CONTAINS
-   subroutine gridset(xmax,ymax,zmax,kappa,id,cur)
+   subroutine gridset(xmax,ymax,zmax,id)
 
    use density_mod
-   use constants ,only : nxg,nyg,nzg
-   use iarray, only : rhokap,xface,yface,zface
+   use constants, only : nxg,nyg,nzg
+   use iarray, only    : rhokap,xface,yface,zface
+   use opt_prop, only  : kappa
 
    implicit none
 
 
-   integer i,j,k,kflag,id,cur
-   real xmax,ymax,zmax,kappa(1)
+   integer i,j,k,kflag,id
+   real xmax,ymax,zmax
    real x,y,z,rho,taueq1,taupole1,taueq2,taupole2
 
    if(id.eq.0.)then
@@ -41,7 +42,7 @@ CONTAINS
         z=zface(k)-zmax+zmax/nzg
    !**********************Call density setup subroutine 
         kflag=1
-        call density(x,y,z,rho,kappa,cur,xmax,ymax,zmax)
+        call density(x,y,z,rho,xmax,ymax,zmax)
         rhokap(i,j,k,kflag)=rho
      end do
     end do

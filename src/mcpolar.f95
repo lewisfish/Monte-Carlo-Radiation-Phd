@@ -1,15 +1,22 @@
 program mcpolar
 
+!external libs
 use mpi
+
+!shared data
 use constants
 use photon_vars
 use iarray
+use opt_prop
+
+!subroutines
 use subs
 use reader_mod
 use gridset_mod
 use sourceph_mod
 use noisey_mod
 use tauint
+use ch_opt
 use stokes_mod
 use fresnel_mod
 use binning_mod
@@ -18,28 +25,25 @@ use writer_mod
 
 implicit none
 
-
-
-!***** Parameter declarations ****************************************
 integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
-integer cnt,io,cur,i,flucount,k
+integer cnt,io,i,flucount,k
 logical tflag,sflag,tauflag
 DOUBLE PRECISION nscatt
-real  xmax,ymax,zmax,absorb,ddy,ddx
-real  delta,xcur,ycur,zcur,d,thetaim
-real  n1,n2,weight,terminate
+real :: xmax,ymax,zmax,absorb,ddy,ddx
+real :: delta,xcur,ycur,zcur,d,thetaim
+real :: n1,n2,weight,terminate
 
-real  ddz,ddr,tau,v(3)
-real  costim,cospim,sintim,sinpim
-real  mua(1),mus(1),hgg(1),g2(1),phiim,chance
-real start,finish,ran2
+real :: ddz,ddr,tau,v(3)
+real :: costim,cospim,sintim,sinpim
+real :: phiim,chance
+real :: start,finish,ran2
 
 !      !variables for openmpi. GLOBAL indicates final values after mpi reduce
 !      !numproc is number of process being run, id is the indivdual id of each process
 !      !error is the error flag for MPI
 
-DOUBLE PRECISION nscattGLOBAL
-integer error,numproc,id
+DOUBLE PRECISION :: nscattGLOBAL
+integer          :: error,numproc,id
 
 !set directory paths
 call directory
@@ -75,49 +79,44 @@ open(10,file=trim(resdir)//'input.params',status='old')
     read(10,*) zmax
     read(10,*) n1
     read(10,*) n2
-    close(10)   
+    close(10)
 
 ! set seed for rnd generator. id to change seed for each process
 iseed=95648324+id
 
-call reader(hgg,mua,mus,cur)
+!read in optical property data
+call reader1
 
 !***** read in noise data
 
-open(13,file=trim(resdir)//'noisedots.dat')
-cnt=0
-do
+!open(13,file=trim(resdir)//'noisedots.dat')
+!cnt=0
+!do
 
-  read(13,*,IOSTAT=io)
-  
-if (io < 0) then
-      close(13)
-      allocate(noise(1:cnt,1:cnt))
+!  read(13,*,IOSTAT=io)
+!  
+!if (io < 0) then
+!      close(13)
+      allocate(noise(1:1,1:1))
       noise=0.
-      exit
-else
-      cnt=cnt+1
-end if
+!      exit
+!else
+!      cnt=cnt+1
+!end if
 
-end do
-open(14,file=trim(resdir)//'noisedots.dat') 
-do i=1,cnt
-read(14,*) (noise(i,j),j=1,cnt)
-end do
+!end do
+!open(14,file=trim(resdir)//'noisedots.dat') 
+!do i=1,cnt
+!read(14,*) (noise(i,j),j=1,cnt)
+!end do
 
 !****** setup up arrays and bin numbers/dimensions
-     
+
 !     ! set bin widths for deposit method
 ddz=(2.*zmax)/cbinsnum
 ddx=(2.*xmax)/cbinsnum
 ddy=(2.*ymax)/cbinsnum
 ddr=(ymax+xmax)/(2.*cbinsnum)
-
-
-!      allocate arrays for program
-
-
-allocate(kappa(1),albedo(1))
 
 !***** Set up constants, pi and 2*pi  ********************************
 
@@ -146,23 +145,15 @@ terminate=0.0001
 chance=0.1
 
 !set optical properties
-do i=1,cur
-g2(i)=hgg(i)**2
-kappa(i)=mua(i)+mus(i)
-albedo(i)=mus(i)/kappa(i)
-
-end do
+call init_opt
 
 if(id.eq.0)then
-print*, ''      
-print*,'# of photons to run',nphotons*numproc
-do i=1,cur
-            write(*,*) mua(i),mus(i)
-end do
+   print*, ''      
+   print*,'# of photons to run',nphotons*numproc
 end if
 
 !***** Set up density grid *******************************************
-call gridset(xmax,ymax,zmax,kappa,id,cur)
+call gridset(xmax,ymax,zmax,id)
 
 !***** Set small distance for use in optical depth integration routines 
 !***** for roundoff effects when crossing cell walls
@@ -177,10 +168,9 @@ print*, 'Photons now running on core:',id
 !loop over photons   
 do j=1,nphotons
   
-!set init weight and optical properties of current medium(usually 1)
+!set init weight and flags
 
       weight=1.0
-      cur=1
       tauflag=.FALSE.
       tflag=.FALSE.
       sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
@@ -199,10 +189,10 @@ ycur=yp+ymax
 zcur=zp+zmax
 
 !***** Generate new normal corresponding to bumpy surface
-    call noisey(xcell,ycell,cnt)
+!    call noisey(xcell,ycell,cnt)
 
 !***** check whether the photon enters medium     
-    call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
+!    call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
 sflag=.FALSE.
 
 !****** Find scattering location
@@ -211,7 +201,7 @@ tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
      
 !************ Peel off photon into image
       call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
-      v,g2,hgg,sintim,costim,sinpim,cospim)
+      v,sintim,costim,sinpim,cospim)
 
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
     do while(tflag.eqv..FALSE.) 
@@ -220,14 +210,14 @@ tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 
 ! Select albedo based on current photon wavelength
 
-absorb=weight*(mua(1)/kappa(1))          
-weight=weight*albedo(1)
+absorb=weight*(mua/kappa)          
+weight=weight*albedo
 !******** Drop weight in appro bin
 call binning(ddr,zcur,ddz,absorb)
     
 !************ Scatter photon into new direction and update Stokes parameters
 
-call stokes(hgg,g2,iseed,cur)
+call stokes(iseed)
 !************ carry out russian roulette to kill off phototns
 if(weight.le.terminate)then
       if(ran2(iseed).le.chance)then
@@ -238,20 +228,20 @@ if(weight.le.terminate)then
             weight=0.
             tflag=.TRUE.
             exit
-      end if           
-end if                   
-       
+      end if
+end if
+
 nscatt=nscatt+1
 
 !************ Find next scattering location
     call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
     ,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
-     
+
 
 !************ Peel off photon into image
     call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
-    ,v,g2,hgg,sintim,costim,sinpim,cospim)
-   
+    ,v,sintim,costim,sinpim,cospim)
+
 xcur=xp+xmax
 ycur=yp+ymax
 zcur=zp+zmax
@@ -261,14 +251,14 @@ end do
 continue
 
 end do      ! end loop over nph photons
- 
+
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
 else
       print*, 'time taken ~',floor(finish-start/60.),'s'
 end if
-            
+
 !force syncro
 call MPI_Barrier(MPI_COMM_WORLD,error)
 
@@ -283,7 +273,7 @@ do i=1,cbinsnum
 end do
 end do
 
-dep=dep/(mua(1)*nphotons*(ddz))
+dep=dep/(mua*nphotons*(ddz))
 
 call MPI_REDUCE(dep,depGLOBAL,cbinsnum,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 call MPI_Barrier(MPI_COMM_WORLD,error)
