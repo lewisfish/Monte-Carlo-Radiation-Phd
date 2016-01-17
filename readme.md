@@ -1,7 +1,7 @@
 #        3D SCATTERED LIGHT MONTE CARLO CODE
 
 This repository contains the source codes for the 3D grid Cartesian monte carlo radiation transfer codes developed as part of my phd.
-The codes simulate the transfer of ligth through tissue of various types and optical properties.
+The codes simulate the transfer of light through tissue of various types and optical properties.
 Currently there are two codes, the master and the spain branches. The spain branch has a cuboid of Nd:yag under tissue that fluoresces at three diffrent wavelengths.
 The master branch is more general and can be adapted for purpose.
 At the end of the simulation the code outputs to the screen the average number of scatterings 
