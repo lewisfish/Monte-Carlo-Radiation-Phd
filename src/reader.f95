@@ -78,7 +78,7 @@ CONTAINS
    
    subroutine reader1
    
-   use iarray, only : mua_array,mus_array
+   use iarray, only : mua_array,mus_array,fluro_array,cdf
    use constants, only : resdir
    
    implicit none
@@ -130,5 +130,34 @@ CONTAINS
       read(4,*) mus_array(i,1),mus_array(i,2)
    end do
    
+   !fluro
+      open(5,file=trim(resdir)//'fluro.dat')
+   cnt=0
+   do
+
+      read(5,*,IOSTAT=io)
+     
+      if (io < 0) then
+         close(5)
+         allocate(fluro_array(cnt,2))
+         fluro_array=0.
+         exit
+      else
+         cnt=cnt+1
+      end if
+
+   end do
+   
+   open(5,file=trim(resdir)//'fluro.dat') 
+   do i=1,cnt
+      read(5,*) fluro_array(i,1),fluro_array(i,2)
+   end do
+   
+   allocate(cdf(cnt))
+   cdf=0.
+   open(10,file='/home/lewis/phdshizz/grid/res/testf.dat')
+   do i=1,cnt
+      write(10,*) fluro_array(i,1),fluro_array(i,2)
+   end do
    end subroutine reader1
 end MODULE reader_mod

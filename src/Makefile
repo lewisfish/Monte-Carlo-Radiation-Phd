@@ -5,7 +5,9 @@ FCFLAGS = -O2
 #FCFLAGS = -Wall -Wextra -pedantic
 #LDFLAGS = 
 PROGRAM =  mcgrid 
-SRCS =      constants.f95 \
+
+SRCS =      ran2.f \
+            constants.f95 \
             photon_vars.f95 \
             iarray.f95 \
             opt_prop.f95 \
@@ -24,8 +26,8 @@ SRCS =      constants.f95 \
             reader.f95 \
             writer.f95 \
             findsmax.f95 \
-            mcpolar.f95 \
-            ran2.f 
+            mcpolar.f95 
+            
 OBJECTS = $(SRCS:.f95=.o)
 
 all:	$(PROGRAM)

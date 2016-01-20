@@ -35,7 +35,7 @@ real :: n1,n2,weight,terminate
 
 real :: ddz,ddr,tau,v(3)
 real :: costim,cospim,sintim,sinpim
-real :: phiim,chance
+real :: phiim,chance,wave
 real :: start,finish,ran2
 
 !      !variables for openmpi. GLOBAL indicates final values after mpi reduce
@@ -43,7 +43,7 @@ real :: start,finish,ran2
 !      !error is the error flag for MPI
 
 DOUBLE PRECISION :: nscattGLOBAL
-integer          :: error,numproc,id
+integer          :: error,numproc,id,bin(1000)
 
 !set directory paths
 call directory
@@ -59,6 +59,7 @@ call MPI_Comm_size(MPI_COMM_WORLD,numproc,error)
 call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 
 !!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
+! change reader1 to be better i.e. no repeated code.
 !sort fresnel so can differ between transmission on diffrent faces
 !investigate +1 in celli,j,k calc in tauint2
 !fix up fluro shizz
@@ -145,7 +146,9 @@ terminate=0.0001
 chance=0.1
 
 !set optical properties
-call init_opt
+wave=500.
+call mk_cdf(fluro_array,cdf,size(cdf))
+call init_opt(wave)
 
 if(id.eq.0)then
    print*, ''      
@@ -164,7 +167,8 @@ call MPI_Barrier(MPI_COMM_WORLD,error)
 call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
-  
+
+
 !loop over photons   
 do j=1,nphotons
   
@@ -210,28 +214,40 @@ tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 
 ! Select albedo based on current photon wavelength
 
-absorb=weight*(mua/kappa)          
-weight=weight*albedo
-!******** Drop weight in appro bin
-call binning(ddr,zcur,ddz,absorb)
-    
-!************ Scatter photon into new direction and update Stokes parameters
+   absorb=weight*(mua/kappa)
+   weight=weight*albedo
 
-call stokes(iseed)
-!************ carry out russian roulette to kill off phototns
-if(weight.le.terminate)then
-      if(ran2(iseed).le.chance)then
-            weight=weight/chance
-      else
-            absorb=weight
-     call binning(ddr,zcur,ddz,absorb)
-            weight=0.
-            tflag=.TRUE.
-            exit
+   if((ran2(iseed).lt.albedo))then
+      call stokes(iseed)
+      nscatt=nscatt+1
+   else
+      call sample(wave,iseed)
+      call init_opt(wave)
+      if(wave.lt.250..or.wave.gt.900.)then
+      print*, wave,mua,mus
       end if
-end if
+   endif
 
-nscatt=nscatt+1
+!******** Drop weight in appro bin
+!call binning(ddr,zcur,ddz,absorb)
+    
+!!************ Scatter photon into new direction and update Stokes parameters
+
+!call stokes(iseed)
+!************ carry out russian roulette to kill off phototns
+!if(weight.le.terminate)then
+!      if(ran2(iseed).le.chance)then
+!            weight=weight/chance
+!      else
+!            absorb=weight
+!     call binning(ddr,zcur,ddz,absorb)
+!            weight=0.
+!            tflag=.TRUE.
+!            exit
+!      end if
+!end if
+
+!nscatt=nscatt+1
 
 !************ Find next scattering location
     call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
