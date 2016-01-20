@@ -184,6 +184,5 @@ CONTAINS
 
    tau1=taurun
 
-   return
-   end
+   end subroutine taufind1
 end MODULE taufind

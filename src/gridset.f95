@@ -65,6 +65,5 @@ CONTAINS
    print *,'taueq1 = ',taueq1,'  taupole1 = ',taupole1
    end if
 
-   return
-   end
+   end subroutine gridset
 end MODULE gridset_mod

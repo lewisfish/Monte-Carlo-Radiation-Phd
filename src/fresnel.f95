@@ -94,7 +94,6 @@ CONTAINS
    n1=n
    end if
 
-   return       
-   end
+   end subroutine fresnel
 end MODULE fresnel_mod
         

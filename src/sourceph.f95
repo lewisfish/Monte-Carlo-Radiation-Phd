@@ -98,6 +98,5 @@ CONTAINS
    zcell=int(nzg*(zp+zmax)/(2.*zmax))+1
    !*****************************************************
 
-   return
-   end
+   end subroutine sourceph
 end MODULE sourceph_mod

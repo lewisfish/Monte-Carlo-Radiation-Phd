@@ -155,6 +155,5 @@ CONTAINS
 
    100   continue
 
-   return
-   end
+   end subroutine stokes
 end MODULE stokes_mod

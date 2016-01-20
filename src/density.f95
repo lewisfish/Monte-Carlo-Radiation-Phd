@@ -26,7 +26,6 @@ CONTAINS
          rho=0.
    end if
 
-   return
-   end
+   end subroutine density
 end MODULE density_mod
 

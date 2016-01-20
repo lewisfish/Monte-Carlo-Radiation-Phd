@@ -44,6 +44,5 @@ CONTAINS
    end do
    close(71)
    
-   return
-   end
+   end subroutine writer
 end MODULE writer_mod

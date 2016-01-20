@@ -63,5 +63,5 @@ CONTAINS
    nyp=sint*sinp
    nzp=cost
                
-   end
+   end subroutine noisey
 end MODULE noisey_mod
