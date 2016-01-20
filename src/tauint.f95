@@ -9,9 +9,10 @@ CONTAINS
    subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
             ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 
-   use constants ,only : PI,nxg,nyg,nzg,cbinsnum
-   use photon_vars ,only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
-   use iarray ,only : noise,jmean,xface,yface,zface,rhokap,trans
+   use constants,   only : PI,nxg,nyg,nzg,cbinsnum
+   use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
+   use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
+   use opt_prop,    only : wave
    use fresnel_mod
    use noisey_mod
 
@@ -209,8 +210,10 @@ tau=-alog(ran2(iseed))
 !***** set tflag=.TRUE.  if photon doesn't escape leave tflag=.FALSE. and update 
 !***** photon position.
    if((d.ge.(.999*smax))) then
-
-!   if(zcur.gt.2.*zmax*.999)then
+   
+   if(zcur.gt.2.*zmax*.999)then
+      fluroexit(int(wave))=fluroexit(int(wave))+1
+   end if
 !   call noisey(xcell,ycell,cnt)
 !   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
 !      if(nzp.gt.0.)then

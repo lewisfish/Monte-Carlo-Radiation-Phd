@@ -15,4 +15,5 @@ real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
 
 real, allocatable :: cdf(:),mua_array(:,:)
 real, allocatable :: mus_array(:,:),fluro_array(:,:)
+integer, allocatable :: fluroexit(:),fluroexitGLOBAL(:)
 end MODULE iarray

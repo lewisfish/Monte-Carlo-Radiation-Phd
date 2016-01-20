@@ -155,9 +155,6 @@ CONTAINS
    
    allocate(cdf(cnt))
    cdf=0.
-   open(10,file='/home/lewis/phdshizz/grid/res/testf.dat')
-   do i=1,cnt
-      write(10,*) fluro_array(i,1),fluro_array(i,2)
-   end do
+
    end subroutine reader1
 end MODULE reader_mod

@@ -31,11 +31,11 @@ logical tflag,sflag,tauflag
 DOUBLE PRECISION nscatt
 real :: xmax,ymax,zmax,absorb,ddy,ddx
 real :: delta,xcur,ycur,zcur,d,thetaim
-real :: n1,n2,weight,terminate
+real :: n1,n2,weight,terminate,hggtmp
 
 real :: ddz,ddr,tau,v(3)
 real :: costim,cospim,sintim,sinpim
-real :: phiim,chance,wave
+real :: phiim,chance
 real :: start,finish,ran2
 
 !      !variables for openmpi. GLOBAL indicates final values after mpi reduce
@@ -43,7 +43,7 @@ real :: start,finish,ran2
 !      !error is the error flag for MPI
 
 DOUBLE PRECISION :: nscattGLOBAL
-integer          :: error,numproc,id,bin(1000)
+integer          :: error,numproc,id
 
 !set directory paths
 call directory
@@ -147,8 +147,9 @@ chance=0.1
 
 !set optical properties
 wave=500.
+
 call mk_cdf(fluro_array,cdf,size(cdf))
-call init_opt(wave)
+call init_opt
 
 if(id.eq.0)then
    print*, ''      
@@ -168,68 +169,69 @@ call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
 
-
 !loop over photons   
 do j=1,nphotons
   
 !set init weight and flags
 
-      weight=1.0
-      tauflag=.FALSE.
-      tflag=.FALSE.
-      sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
+   weight=1.0
+   tauflag=.FALSE.
+   tflag=.FALSE.
+   sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
-    if(mod(j,10000).eq.0)then
- print *, j,' scattered photons completed on core:',id
-    end if
+   if(mod(j,10000).eq.0)then
+      print *, j,' scattered photons completed on core:',id
+   end if
     
 !***** Release photon from point source *******************************
-    call sourceph(xmax,ymax,zmax,xcell,ycell,zcell,iseed)
+   call sourceph(xmax,ymax,zmax,xcell,ycell,zcell,iseed)
 !***** Update xcur etc.
 
-xcur=xp+xmax
-ycur=yp+ymax
-zcur=zp+zmax
+   xcur=xp+xmax
+   ycur=yp+ymax
+   zcur=zp+zmax
 
 !***** Generate new normal corresponding to bumpy surface
-!    call noisey(xcell,ycell,cnt)
+!   call noisey(xcell,ycell,cnt)
 
 !***** check whether the photon enters medium     
-!    call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
-sflag=.FALSE.
+!   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
+   sflag=.FALSE.
 
 !****** Find scattering location
-      call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell,&
-tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
+   call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell,&
+   tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
      
 !************ Peel off photon into image
-      call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
-      v,sintim,costim,sinpim,cospim)
+   call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
+   v,sintim,costim,sinpim,cospim)
 
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
-    do while(tflag.eqv..FALSE.) 
+   do while(tflag.eqv..FALSE.) 
 
 !******** Drop weight
 
 ! Select albedo based on current photon wavelength
 
-   absorb=weight*(mua/kappa)
-   weight=weight*albedo
+      absorb=weight*(mua/kappa)
+      weight=weight*albedo
 
-   if((ran2(iseed).lt.albedo))then
-      call stokes(iseed)
-      nscatt=nscatt+1
-   else
-      call sample(wave,iseed)
-      call init_opt(wave)
-      if(wave.lt.250..or.wave.gt.900.)then
-      print*, wave,mua,mus
-      end if
-   endif
+      if((ran2(iseed).lt.albedo))then
+         call stokes(iseed)
+         nscatt=nscatt+1
+      else
+         call sample(wave,iseed)
+         call init_opt
+         !set hgg to zero temp, as fluro photon emitted isotropically
+         hggtmp=hgg
+         hgg=0.
+         call stokes(iseed)
+         hgg=hggtmp
+      endif
 
 !******** Drop weight in appro bin
-!call binning(ddr,zcur,ddz,absorb)
+!      call binning(ddr,zcur,ddz,absorb)
     
 !!************ Scatter photon into new direction and update Stokes parameters
 
@@ -250,21 +252,21 @@ tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 !nscatt=nscatt+1
 
 !************ Find next scattering location
-    call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
-    ,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
+      call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
+      ,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
 
 
 !************ Peel off photon into image
-    call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
-    ,v,sintim,costim,sinpim,cospim)
+      call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
+      ,v,sintim,costim,sinpim,cospim)
 
-xcur=xp+xmax
-ycur=yp+ymax
-zcur=zp+zmax
+      xcur=xp+xmax
+      ycur=yp+ymax
+      zcur=zp+zmax
 
-end do
+   end do
 
-continue
+   continue
 
 end do      ! end loop over nph photons
 
@@ -311,7 +313,10 @@ call MPI_REDUCE(nscatt,nscattGLOBAL,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WO
 !     trans reduce
 call MPI_Barrier(MPI_COMM_WORLD,error)
 call MPI_REDUCE(trans,transGLOBAL,nxg*nyg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-
+print*,'done trans'
+!     fluroexit reduce
+call MPI_Barrier(MPI_COMM_WORLD,error)
+call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 print*,'done all reduces',id
 call MPI_Barrier(MPI_COMM_WORLD,error)

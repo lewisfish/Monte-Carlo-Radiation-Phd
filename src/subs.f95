@@ -57,6 +57,8 @@ CONTAINS
    yface=0.
    zface=0.
    rhokap=0.
+   fluroexit=0.
+   fluroexitGLOBAL=0.
    
    end SUBROUTINE zarray
 
@@ -80,6 +82,7 @@ CONTAINS
    allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
    allocate(jmean(nxg+3,nyg+3,nzg+3,4)) 
    allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))
+   allocate(fluroexit(1000),fluroexitGLOBAL(1000))
    
    
    end SUBROUTINE alloc_array

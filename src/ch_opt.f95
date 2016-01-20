@@ -4,16 +4,14 @@ implicit none
 
 CONTAINS
    
-   subroutine init_opt(wave)
+   subroutine init_opt
    
    use iarray, only : mua_array,mus_array
    use opt_prop
    
    implicit none
    
-   integer         :: nlow
-   real,intent(IN) :: wave
-   
+   integer :: nlow
 
    !set mua
    call search_2D(size(mua_array,1),mua_array,nlow,wave)
