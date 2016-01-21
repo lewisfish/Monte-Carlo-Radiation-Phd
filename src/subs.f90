@@ -24,9 +24,14 @@ CONTAINS
    !checks to see if data folder exists, if not creates it.
    call chdir(fileplace,io)
    if(io.ne.0)then
-      print*,'directory does not exist'
-      print*, 'creating directory'
-      call system("mkdir"//fileplace)
+      print*,'data directory does not exist...'
+      print*, 'creating directory...'
+      call system("mkdir "//fileplace)
+      call chdir(fileplace,io)
+      call system("mkdir jmean/")
+      call system("mkdir deposit/")
+      call system("mkdir im/")
+      print*, 'created directory ',trim(fileplace)
    end if
    
    !get res dir

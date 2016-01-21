@@ -146,7 +146,7 @@ terminate=0.0001
 chance=0.1
 
 !set optical properties
-wave=500.
+wave=310.
 
 call mk_cdf(fluro_array,cdf,size(cdf))
 call init_opt
