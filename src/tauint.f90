@@ -27,9 +27,6 @@ CONTAINS
    real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
    real dx,dy,dz,smax,delta
 
-!***** tflag=.FALSE. means photon is in envelope
-   tflag=.FALSE.
-
 !**** generate random optical depth tau
 tau=-alog(ran2(iseed))
 
@@ -211,8 +208,12 @@ tau=-alog(ran2(iseed))
 !***** photon position.
    if((d.ge.(.999*smax))) then
    
-   if(zcur.gt.2.*zmax*.999)then
-      fluroexit(int(wave))=fluroexit(int(wave))+1
+   if(zcur.gt.2.*zmax*.999.or.zcur.gt.0.0001)then
+      if(int(wave).eq.355)then
+      
+      else
+         fluroexit(int(wave))=fluroexit(int(wave))+1
+      end if
    end if
       tflag=.TRUE.
    else

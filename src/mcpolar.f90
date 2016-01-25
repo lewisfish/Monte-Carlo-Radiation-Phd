@@ -174,7 +174,7 @@ print*, 'Photons now running on core:',id
 do j=1,nphotons
   
 !set init weight and flags
-
+   wave=355.
    weight=1.0
    tauflag=.FALSE.
    tflag=.FALSE.
@@ -232,22 +232,25 @@ do j=1,nphotons
             call search_2D(size(e_cdf),excite_array,nlow,wave)
             call lin_inter_2D(excite_array,wave,size(e_cdf),nlow,fluro_prob)
       !see if photon fluros or not
+!            print*,fluro_prob,wave
             if(ran2(iseed).lt.fluro_prob)then
          !fluros
+!               print*,fluro_prob,wave,'abs'
                call sample(fluro_array,size(f_cdf),f_cdf,wave,iseed)
                call init_opt
+!               print*,wave,'wave new'
             else
          !absorbs reset photon
-            wave=355.
+            cycle
             tflag=.TRUE.
             end if    
          else
       !absorbs reset photon
-            wave=355.
+            cycle
             tflag=.TRUE.
          end if
       end if
-
+!      if(tflag.eqv..true.)print*,tflag,'a'
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
     
@@ -268,16 +271,15 @@ do j=1,nphotons
 !end if
 
 !nscatt=nscatt+1
-
+!      print*,tflag,'bt'
 !************ Find next scattering location
       call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
       ,tflag,iseed,delta,sflag,weight,ddx,ddy)
-
+!      print*,tflag,'at'
 
 !************ Peel off photon into image
       call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
       ,v,sintim,costim,sinpim,cospim)
-
       xcur=xp+xmax
       ycur=yp+ymax
       zcur=zp+zmax
