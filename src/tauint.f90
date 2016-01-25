@@ -7,9 +7,9 @@ MODULE tauint
 CONTAINS
 
    subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
-            ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy,cnt)
+            ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy)
 
-   use constants,   only : PI,nxg,nyg,nzg,cbinsnum
+   use constants,   only : PI,nxg,nyg,nzg
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
    use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
    use opt_prop,    only : wave
@@ -18,7 +18,7 @@ CONTAINS
 
    implicit none
 
-   integer iseed,xcell,ycell,zcell,cnt
+   integer iseed,xcell,ycell,zcell
    real xmax,ymax,zmax,weight,ddx,ddy
    real ran2,n1,n2
    logical tflag,sflag
@@ -39,7 +39,7 @@ tau=-alog(ran2(iseed))
 !***** bottom corner of the grid.
    taurun=0.
    d=0.
-   100   continue
+
    xcur=xp+xmax
    ycur=yp+ymax
    zcur=zp+zmax
@@ -214,17 +214,7 @@ tau=-alog(ran2(iseed))
    if(zcur.gt.2.*zmax*.999)then
       fluroexit(int(wave))=fluroexit(int(wave))+1
    end if
-!   call noisey(xcell,ycell,cnt)
-!   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
-!      if(nzp.gt.0.)then
-!!                  if(tau-taurun.gt.0.)then
-!!                        goto 100
-!!                  end if
-!            tflag=.TRUE.
-!      end if
-!   else
       tflag=.TRUE.
-!   end if
    else
       xp=xp+d*nxp
       yp=yp+d*nyp

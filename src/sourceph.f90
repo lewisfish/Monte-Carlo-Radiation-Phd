@@ -19,16 +19,16 @@ CONTAINS
 
    !***** emit photon from a circle on surface
 
-   zp=zmax
-   w=0.5
-   !      xp=0.
-   !      yp=0.
-   xp=xmax
-   yp=ymax
-   do while(xp**2+yp**2 .gt. w**2)
-   xp=2.*ran2(iseed)-1.
-   yp=2.*ran2(iseed)-1.
-   end do
+!   zp=zmax
+!   w=0.5
+!   !      xp=0.
+!   !      yp=0.
+!   xp=xmax
+!   yp=ymax
+!   do while(xp**2+yp**2 .gt. w**2)
+!   xp=2.*ran2(iseed)-1.
+!   yp=2.*ran2(iseed)-1.
+!   end do
    !***** emit isotropically from a point
 
    !      xp=0.
@@ -49,9 +49,9 @@ CONTAINS
 
    !**** emit uniformly across surface
 
-   !      zp=zmax
-   !      xp=2.*xmax*ran2(iseed)-xmax
-   !      yp=2.*ymax*ran2(iseed)-ymax
+         zp=zmax
+         xp=2.*xmax*ran2(iseed)-xmax
+         yp=2.*ymax*ran2(iseed)-ymax
 
    !**** Collimated Gaussian Beam
 

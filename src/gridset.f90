@@ -9,7 +9,6 @@ CONTAINS
    use density_mod
    use constants, only : nxg,nyg,nzg
    use iarray, only    : rhokap,xface,yface,zface
-   use opt_prop, only  : kappa
 
    implicit none
 

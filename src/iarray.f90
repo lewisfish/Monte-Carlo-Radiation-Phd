@@ -1,5 +1,7 @@
 MODULE iarray
-
+!
+!  Contains all array var names.
+!
 implicit none
 save
 
@@ -13,7 +15,7 @@ real, allocatable :: image(:,:,:),deposit(:,:),dep(:)
 real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
 real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
 
-real, allocatable :: cdf(:),mua_array(:,:)
-real, allocatable :: mus_array(:,:),fluro_array(:,:)
+real, allocatable :: f_cdf(:),mua_array(:,:),excite_array(:,:)
+real, allocatable :: mus_array(:,:),fluro_array(:,:),e_cdf(:)
 integer, allocatable :: fluroexit(:),fluroexitGLOBAL(:)
 end MODULE iarray

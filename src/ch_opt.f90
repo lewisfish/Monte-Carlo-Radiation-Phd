@@ -29,17 +29,20 @@ CONTAINS
    albedo = mus / kappa
    
    end subroutine init_opt
-   
-   subroutine sample(wave,iseed)
+
+   subroutine sample(array,size_of,cdf,wave,iseed)
       
-      use iarray, only : fluro_array,cdf
-      
-      real :: ran2,value,wave
-      integer :: iseed,nlow
+      integer, intent(IN)    :: iseed,size_of
+      real,    intent(IN)    :: array(size_of,2),cdf(size_of)
+      real,    intent(INOUT) :: wave
+
+      real :: ran2,value
+      integer :: nlow
       
       value = ran2(iseed)
+      
       call search_1D(size(cdf),cdf,nlow,value)
-      call lin_inter_1D(fluro_array,cdf,value,size(cdf),nlow,wave)
+      call lin_inter_1D(array,cdf,value,size(cdf),nlow,wave)
    
    end subroutine sample
    
@@ -106,19 +109,19 @@ CONTAINS
    end subroutine search_2D
    
    subroutine mk_cdf(array,cdf,length)
-   
+
+   integer, intent(IN) :: length
    real, intent(IN)    :: array(length,2)
    real, intent(INOUT) :: cdf(length)
-   integer, intent(IN) :: length
    real                :: summ
    integer             :: i,j
    
    do j=1,length-1
-	   summ=0.
-	   do i=1,j   
-		   summ=summ+0.5*(array(i+1,2)+array(i,2))*(array(i+1,1)-array(i,1))
-	   end do
-	   cdf(j)=summ      
+      summ=0.
+      do i=1,j   
+         summ=summ+0.5*(array(i+1,2)+array(i,2))*(array(i+1,1)-array(i,1))
+      end do
+      cdf(j)=summ      
    end do
    cdf=cdf/cdf(length-1)
    

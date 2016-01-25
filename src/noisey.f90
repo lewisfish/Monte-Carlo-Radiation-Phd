@@ -4,14 +4,14 @@ implicit none
 save
 
 CONTAINS
-   subroutine noisey(xcell,ycell,cnt)
+   subroutine noisey(xcell,ycell)
 
    use photon_vars, only : nxp,nyp,nzp,cost,sint,cosp,sinp
    use iarray, only : noise
 
    implicit none
 
-   integer cnt,xcell,ycell
+   integer xcell,ycell
    real newNorm(3),Norm(3),xvec(3),yvec(3)
    real theta,ygrad,xgrad
 

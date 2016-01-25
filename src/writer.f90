@@ -7,7 +7,7 @@ CONTAINS
    subroutine writer
 
    use constants,only : nxg,nyg,nzg,fileplace,Nbins,cbinsnum
-   use iarray,only : jmean,jmeanGLOBAL,imageGLOBAL,depGLOBAL,depositGLOBAL,transGLOBAL &
+   use iarray,only : jmeanGLOBAL,imageGLOBAL,depGLOBAL,depositGLOBAL,transGLOBAL &
                      ,fluroexitGLOBAL
 
    implicit none

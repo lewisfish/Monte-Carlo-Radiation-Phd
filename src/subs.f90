@@ -62,8 +62,8 @@ CONTAINS
    yface=0.
    zface=0.
    rhokap=0.
-   fluroexit=0.
-   fluroexitGLOBAL=0.
+   fluroexit=0
+   fluroexitGLOBAL=0
    
    end SUBROUTINE zarray
 

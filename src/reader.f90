@@ -14,7 +14,7 @@ CONTAINS
    real, intent(out)  :: hgg(1),mua(1),mus(1)
    integer            :: io,cnt,i
 
-   open(1,file=trim(resdir)//'opt.params',status='old',iostat=io)
+   open(10,file=trim(resdir)//'opt.params',status='old',iostat=io)
    if(io.ne.0)then
    print*, trim(resdir)//'opt.params','does not exsist'
    print*, 'File cant be opened!'
@@ -24,16 +24,16 @@ CONTAINS
 
    cnt=0
    do
-   read(1,*,IOSTAT=io)
+   read(10,*,IOSTAT=io)
      
    if (io < 0) then
-         close(1)
+         close(10)
          exit
    else
          cnt=cnt+1
    end if
    end do
-   open(2,file=trim(resdir)//'opt.params',status='old',iostat=io)
+   open(20,file=trim(resdir)//'opt.params',status='old',iostat=io)
 
    cnt=cnt-1
    !      allocate(hgg(cnt),mua(cnt),mua(cnt))
@@ -43,11 +43,11 @@ CONTAINS
    i=1
    do while(.true.)
 
-   read(2,'(A)', end=99) line
+   read(20,'(A)', end=99) line
    call linereader(line,cnt,hgg,mus,mua,i)
    end do
    99    continue
-   close(2)
+   close(20)
 
    contains
       subroutine linereader(line,cnt,hgg,mua,mus,i)
@@ -78,21 +78,22 @@ CONTAINS
    
    subroutine reader1
    
-   use iarray, only : mua_array,mus_array,fluro_array,cdf
+   use iarray,    only : mua_array,mus_array,f_cdf,fluro_array, &
+                         e_cdf,excite_array
    use constants, only : resdir
    
    implicit none
    
    integer :: cnt,io,i,j
    
-   open(1,file=trim(resdir)//'mua.dat')
+   open(10,file=trim(resdir)//'mua.dat')
    cnt=0
    do
 
-      read(1,*,IOSTAT=io)
+      read(10,*,IOSTAT=io)
      
       if (io < 0) then
-         close(1)
+         close(10)
          allocate(mua_array(cnt-1,2))
          mua_array=0.
          exit
@@ -101,21 +102,21 @@ CONTAINS
       end if
 
    end do
-   open(2,file=trim(resdir)//'mua.dat') 
+   open(20,file=trim(resdir)//'mua.dat') 
 
    do i=1,cnt-1
-      read(2,*) mua_array(i,1),mua_array(i,2)
+      read(20,*) mua_array(i,1),mua_array(i,2)
    end do
-
+   close(20)
    !mus
-   open(3,file=trim(resdir)//'mus.dat')
+   open(30,file=trim(resdir)//'mus.dat')
    cnt=0
    do
 
-      read(3,*,IOSTAT=io)
+      read(30,*,IOSTAT=io)
      
       if (io < 0) then
-         close(3)
+         close(30)
          allocate(mus_array(1:cnt-1,1:2))
          mus_array=0.
          exit
@@ -125,20 +126,20 @@ CONTAINS
 
    end do
    
-   open(4,file=trim(resdir)//'mus.dat') 
+   open(40,file=trim(resdir)//'mus.dat') 
    do i=1,cnt-1
-      read(4,*) mus_array(i,1),mus_array(i,2)
+      read(40,*) mus_array(i,1),mus_array(i,2)
    end do
-   
+   close(40)
    !fluro
-      open(5,file=trim(resdir)//'fluro.dat')
+      open(50,file=trim(resdir)//'fluro.dat')
    cnt=0
    do
 
-      read(5,*,IOSTAT=io)
+      read(50,*,IOSTAT=io)
      
       if (io < 0) then
-         close(5)
+         close(50)
          allocate(fluro_array(cnt,2))
          fluro_array=0.
          exit
@@ -148,13 +149,40 @@ CONTAINS
 
    end do
    
-   open(5,file=trim(resdir)//'fluro.dat') 
+   open(50,file=trim(resdir)//'fluro.dat') 
    do i=1,cnt
-      read(5,*) fluro_array(i,1),fluro_array(i,2)
+      read(50,*) fluro_array(i,1),fluro_array(i,2)
+   end do
+   close(50)
+   allocate(f_cdf(cnt))
+   f_cdf=0.
+   
+   !excite
+   
+   open(90,file=trim(resdir)//'excite.dat')
+   cnt=0
+   do
+
+      read(90,*,IOSTAT=io)
+     
+      if (io < 0) then
+         close(90)
+         allocate(excite_array(cnt,2))
+         excite_array=0.
+         exit
+      else
+         cnt=cnt+1
+      end if
+
    end do
    
-   allocate(cdf(cnt))
-   cdf=0.
+   open(11,file=trim(resdir)//'excite.dat') 
+   do i=1,cnt
+      read(11,*) excite_array(i,1),excite_array(i,2)
+   end do
+   close(11)
+   allocate(e_cdf(cnt))
+   e_cdf=0.
 
    end subroutine reader1
 end MODULE reader_mod
