@@ -232,13 +232,10 @@ do j=1,nphotons
             call search_2D(size(e_cdf),excite_array,nlow,wave)
             call lin_inter_2D(excite_array,wave,size(e_cdf),nlow,fluro_prob)
       !see if photon fluros or not
-!            print*,fluro_prob,wave
             if(ran2(iseed).lt.fluro_prob)then
          !fluros
-!               print*,fluro_prob,wave,'abs'
                call sample(fluro_array,size(f_cdf),f_cdf,wave,iseed)
                call init_opt
-!               print*,wave,'wave new'
             else
          !absorbs reset photon
             cycle
@@ -250,7 +247,7 @@ do j=1,nphotons
             tflag=.TRUE.
          end if
       end if
-!      if(tflag.eqv..true.)print*,tflag,'a'
+
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
     
