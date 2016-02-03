@@ -240,7 +240,6 @@ do j=1,nphotons
                call sample(fluro_array,size(f_cdf),f_cdf,wave,iseed)
                call init_opt
                counter2=counter2+1
-!               fluroexit(int(wave))=fluroexit(int(wave))+1
             else
       !absorbs. reset photon
             counter1=counter1+1
