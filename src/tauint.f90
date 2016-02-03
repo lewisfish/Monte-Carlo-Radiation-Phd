@@ -136,9 +136,9 @@ tau=-alog(ran2(iseed))
    dz=1.e2*zmax
       endif
 
-   if((celli.gt.nxg).or.(celli.lt.0)) print*,'celli',celli,xcur
-   if((cellj.gt.nyg).or.(cellj.lt.0)) print*,'cellj',cellj,ycur
-   if((cellk.gt.nyg).or.(cellk.lt.0)) print*,'cellk',cellk,zcur
+!   if((celli.gt.nxg).or.(celli.lt.0)) print*,'celli',celli,xcur
+!   if((cellj.gt.nyg).or.(cellj.lt.0)) print*,'cellj',cellj,ycur
+!   if((cellk.gt.nyg).or.(cellk.lt.0)) print*,'cellk',cellk,zcur
 
 
 !***** distances are only zero if photon is on cell wall.  if it is 
@@ -207,16 +207,21 @@ tau=-alog(ran2(iseed))
 !***** set tflag=.TRUE.  if photon doesn't escape leave tflag=.FALSE. and update 
 !***** photon position.
    if((d.ge.(.999*smax))) then
-   
-   if(zcur.gt.2.*zmax*.999.or.zcur.gt.0.0001)then
       if(int(wave).eq.355)then
       
       else
          fluroexit(int(wave))=fluroexit(int(wave))+1
       end if
+   if(zcur.gt.2.*zmax*.999.or.zcur.gt.0.0001)then
+      if(int(wave).eq.355)then
+      
+      else
+!         fluroexit(int(wave))=fluroexit(int(wave))+1
+      end if
    end if
       tflag=.TRUE.
    else
+!      fluroexit(int(wave))=fluroexit(int(wave))+1
       xp=xp+d*nxp
       yp=yp+d*nyp
       zp=zp+d*nzp

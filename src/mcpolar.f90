@@ -43,7 +43,7 @@ real :: start,finish,ran2
 !      error is the error flag for MPI
 
 DOUBLE PRECISION :: nscattGLOBAL
-integer          :: error,numproc,id
+integer          :: error,numproc,id,counter1,counter2
 
 !set directory paths
 call directory
@@ -87,7 +87,8 @@ iseed=95648324+id
 
 !read in optical property data
 call reader1
-
+counter1=0
+counter2=0
 !***** read in noise data
 
 !open(13,file=trim(resdir)//'noisedots.dat')
@@ -175,13 +176,14 @@ do j=1,nphotons
   
 !set init weight and flags
    wave=355.
+   call init_opt
    weight=1.0
    tauflag=.FALSE.
    tflag=.FALSE.
    sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
-   if(mod(j,10000).eq.0)then
+   if(mod(j,100000).eq.0)then
       print *, j,' scattered photons completed on core:',id
    end if
     
@@ -231,19 +233,22 @@ do j=1,nphotons
       !get fluro prob
             call search_2D(size(e_cdf),excite_array,nlow,wave)
             call lin_inter_2D(excite_array,wave,size(e_cdf),nlow,fluro_prob)
+
       !see if photon fluros or not
             if(ran2(iseed).lt.fluro_prob)then
          !fluros
                call sample(fluro_array,size(f_cdf),f_cdf,wave,iseed)
                call init_opt
+               counter2=counter2+1
+!               fluroexit(int(wave))=fluroexit(int(wave))+1
             else
-         !absorbs reset photon
-            cycle
+      !absorbs. reset photon
+            counter1=counter1+1
             tflag=.TRUE.
             end if    
          else
-      !absorbs reset photon
-            cycle
+      !absorbs. reset photon
+            counter1=counter1+1
             tflag=.TRUE.
          end if
       end if
@@ -286,7 +291,8 @@ do j=1,nphotons
    continue
 
 end do      ! end loop over nph photons
-
+print*, counter1, '# absorbed'
+print*, counter2, '# fluro'
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.

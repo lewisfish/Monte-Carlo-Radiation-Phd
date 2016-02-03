@@ -24,7 +24,8 @@ CONTAINS
 !   set g and hgg
    hgg = 0.62 + 0.29 * 10.**(-3.) * wave
    g2  = hgg**2
-   
+!   mua = 80.
+!   mus = 250.
    kappa  = mua + mus 
    albedo = mus / kappa
    

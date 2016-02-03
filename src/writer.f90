@@ -37,7 +37,7 @@ CONTAINS
    open(70,file=trim(fileplace)//'trans.dat',access='direct',form='unformatted',recl=cbinsnum*cbinsnum*4)  
    write(70,rec=1) transGLOBAL
    close(70)
-   print*,maxval(fluroexitGLOBAL)
+
    open(71,file=trim(fileplace)//'resfluro.dat')
    do j=1,1000
       write(71,*) real(fluroexitGLOBAL(j))/real(maxval(fluroexitGLOBAL))
