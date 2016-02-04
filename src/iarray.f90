@@ -11,9 +11,9 @@ real, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
 real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
 
-real, allocatable :: image(:,:,:),deposit(:,:),dep(:)
+real, allocatable :: image(:,:,:),deposit(:,:,:),dep(:)
 real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
-real, allocatable :: depositGLOBAL(:,:),depGLOBAL(:)
+real, allocatable :: depositGLOBAL(:,:,:),depGLOBAL(:)
 
 real, allocatable :: f_cdf(:),mua_array(:,:),excite_array(:,:)
 real, allocatable :: mus_array(:,:),fluro_array(:,:),e_cdf(:)

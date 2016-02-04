@@ -83,7 +83,7 @@ CONTAINS
    allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
    
    allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
-   allocate(deposit(cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum))
+   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
    allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
    allocate(jmean(nxg+3,nyg+3,nzg+3,4)) 
    allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))

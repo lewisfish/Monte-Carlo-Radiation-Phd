@@ -6,16 +6,20 @@ CONTAINS
    
    subroutine init_opt
    
-   use iarray, only : mua_array,mus_array
+   use iarray, only : mua_array,mus_array,excite_array
    use opt_prop
    
    implicit none
    
    integer :: nlow
 
-   !set mua
+   !set mua_skin
    call search_2D(size(mua_array,1),mua_array,nlow,wave)
-   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,muas)
+   
+   !set mua_fluro
+   call search_2D(size(excite_array,1),excite_array,nlow,wave)
+   call lin_inter_2D(excite_array,wave,size(excite_array,1),nlow,muaf)   
 
 !   set mus
    call search_2D(size(mus_array,1),mus_array,nlow,wave)
@@ -26,7 +30,7 @@ CONTAINS
    g2  = hgg**2
 !   mua = 80.
 !   mus = 250.
-   kappa  = mua + mus 
+   kappa  = muas + muaf + mus 
    albedo = mus / kappa
    
    end subroutine init_opt

@@ -118,7 +118,7 @@ counter2=0
 ddz=(2.*zmax)/cbinsnum
 ddx=(2.*xmax)/cbinsnum
 ddy=(2.*ymax)/cbinsnum
-ddr=(ymax+xmax)/(2.*cbinsnum)
+ddr=(ymax)/(cbinsnum)
 
 !***** Set up constants, pi and 2*pi  ********************************
 
@@ -217,14 +217,14 @@ do j=1,nphotons
 
 ! Select albedo based on current photon wavelength
 
-      absorb=weight*(mua/kappa)
+!      absorb=weight*(mua/kappa)
       weight=weight*albedo
-
-      if((ran2(iseed).lt.albedo))then !photons scatters
+      ran = ran2(iseed)
+      if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-      else  !photon absorbs
-
+      else if(ran.lt.(muaf/kappa))then  !photon absorbs
+      else if (ran.lt.(muas/kappa))then ! photon fluros
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
 
@@ -243,11 +243,13 @@ do j=1,nphotons
             else
       !absorbs. reset photon
             counter1=counter1+1
+            call binning(xmax,ymax,zmax,ddz,xcur,ycur,zcur)
             tflag=.TRUE.
             end if    
          else
       !absorbs. reset photon
             counter1=counter1+1
+            call binning(xmax,ymax,zmax,ddz,xcur,ycur,zcur)
             tflag=.TRUE.
          end if
       end if
@@ -290,8 +292,9 @@ do j=1,nphotons
    continue
 
 end do      ! end loop over nph photons
-print*, counter1, '# absorbed'
-print*, counter2, '# fluro'
+print*, counter1, '# absorbed',id
+print*, counter2, '# fluro',id
+print*, counter1+counter2,'total',id
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
@@ -308,18 +311,20 @@ call MPI_Barrier(MPI_COMM_WORLD,error)
 print*,'done jmean'
 
 do k=1,cbinsnum
-do i=1,cbinsnum
-      dep(k)=dep(k)+deposit(i,k)
-end do
+    do j=1,cbinsnum
+        do i=1,cbinsnum
+            dep(k)=dep(k)+deposit(i,j,k)
+        end do
+    end do
 end do
 
-dep=dep/(mua*nphotons*(ddz))
+!dep=dep/(mua*nphotons*(ddz))
 
 call MPI_REDUCE(dep,depGLOBAL,cbinsnum,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 call MPI_Barrier(MPI_COMM_WORLD,error)
 
 !     deposit reduce
-call MPI_REDUCE(deposit,depositGLOBAL,(cbinsnum**2),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+call MPI_REDUCE(deposit,depositGLOBAL,(cbinsnum**3),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 call MPI_Barrier(MPI_COMM_WORLD,error)
 print*,'done deposit'
 
@@ -343,12 +348,12 @@ call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WO
 print*,'done all reduces',id
 call MPI_Barrier(MPI_COMM_WORLD,error)
 if(id.eq.0)then
-print*,'Average # of scatters per photon:',sngl(nscattGLOBAL/(nphotons*numproc))
+    print*,'Average # of scatters per photon:',sngl(nscattGLOBAL/(nphotons*numproc))
 
-!write out files
+    !write out files
 
-call writer
-print*,'write done'
+    call writer
+    print*,'write done'
 end if
 
 !end MPI processes

@@ -132,7 +132,7 @@ CONTAINS
    end do
    close(40)
    !fluro
-      open(50,file=trim(resdir)//'fluro.dat')
+      open(50,file=trim(resdir)//'ppixfluro.dat')
    cnt=0
    do
 
@@ -149,7 +149,7 @@ CONTAINS
 
    end do
    
-   open(50,file=trim(resdir)//'fluro.dat') 
+   open(50,file=trim(resdir)//'ppixfluro.dat') 
    do i=1,cnt
       read(50,*) fluro_array(i,1),fluro_array(i,2)
    end do
@@ -159,7 +159,7 @@ CONTAINS
    
    !excite
    
-   open(90,file=trim(resdir)//'excite.dat')
+   open(90,file=trim(resdir)//'ppix.dat')
    cnt=0
    do
 
@@ -176,7 +176,7 @@ CONTAINS
 
    end do
    
-   open(11,file=trim(resdir)//'excite.dat') 
+   open(11,file=trim(resdir)//'ppix.dat') 
    do i=1,cnt
       read(11,*) excite_array(i,1),excite_array(i,2)
    end do

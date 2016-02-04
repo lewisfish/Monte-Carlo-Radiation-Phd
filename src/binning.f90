@@ -4,27 +4,28 @@ implicit none
 save
 
 CONTAINS
-   subroutine binning(ddr,zcur,ddz,absorb)
+   subroutine binning(xmax,ymax,zmax,ddz,xcur,ycur,zcur)
 
-   use constants, only   : cbinsnum
-   use photon_vars, only : xp,yp
+   use constants, only   : cbinsnum,nxg,nyg,nzg
+   use photon_vars, only : xp,yp,zp
    use iarray, only      : deposit
    
    implicit none
 
-   integer :: binz,binr
-   real    :: zcur,ddr,ddz,absorb
+   integer :: celli,cellj,cellk
+   real    :: zmax,ddr,ddz,xcur,ycur,zcur,xmax,ymax
 
-   binr = floor(sqrt(xp**2 + yp**2)/ddr)
-   binz = floor(zcur/ddz)
-
-   if(binz.lt.1..or.binr.lt.1.)then
-   !do nothing
-   elseif(binz.gt.cbinsnum.or.binr.gt.cbinsnum)then
-   !do nothing
-   else
-      deposit(binr,binz) = deposit(binr,binz) + absorb
-   end if
+   celli=int(nxg*xcur/(2.*xmax))+1
+   cellj=int(nyg*ycur/(2.*ymax))+1
+   cellk=int(nzg*zcur/(2.*zmax))+1
+   
+!   if(binz.lt.1..or.binx.lt.1..or.biny.lt.1.)then
+!   !do nothing
+!   elseif(binz.gt.cbinsnum.or.binx.gt.cbinsnum.or.biny.gt.cbinsnum)then
+!   !do nothing
+!   else
+      deposit(celli,cellj,cellk) = deposit(celli,cellj,cellk) + 1
+!   end if
 
    end subroutine binning
 end MODULE binning_mod

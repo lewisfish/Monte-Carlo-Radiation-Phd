@@ -18,17 +18,17 @@ CONTAINS
    real ran2
 
    !***** emit photon from a circle on surface
-
-!   zp=zmax
-!   w=0.5
-!   !      xp=0.
-!   !      yp=0.
-!   xp=xmax
-!   yp=ymax
-!   do while(xp**2+yp**2 .gt. w**2)
-!   xp=2.*ran2(iseed)-1.
-!   yp=2.*ran2(iseed)-1.
-!   end do
+   ! min+ran2*(max-min)
+   zp=zmax
+   w=0.01
+   !      xp=0.
+   !      yp=0.
+   xp=xmax
+   yp=ymax
+   do while(xp**2+yp**2 .gt. w**2)
+       xp=.02*ran2(iseed)-.01
+       yp=.02*ran2(iseed)-.01
+   end do
    !***** emit isotropically from a point
 
    !      xp=0.
@@ -49,9 +49,9 @@ CONTAINS
 
    !**** emit uniformly across surface
 
-         zp=zmax
-         xp=2.*xmax*ran2(iseed)-xmax
-         yp=2.*ymax*ran2(iseed)-ymax
+!         zp=zmax
+!         xp=2.*xmax*ran2(iseed)-xmax
+!         yp=2.*ymax*ran2(iseed)-ymax
 
    !**** Collimated Gaussian Beam
 

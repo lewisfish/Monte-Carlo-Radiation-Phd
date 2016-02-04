@@ -18,7 +18,7 @@ CONTAINS
    write(62,rec=1) jmeanGLOBAL
    close(62)
 
-   open(64,file=trim(fileplace)//'deposit/deposit.dat',access='direct',form='unformatted',recl=(cbinsnum**2)*4)
+   open(64,file=trim(fileplace)//'deposit/deposit.dat',access='direct',form='unformatted',recl=(cbinsnum**3)*4*4)
    write(64,rec=1) depositGLOBAL
    close(64)
 
