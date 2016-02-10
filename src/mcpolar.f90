@@ -218,19 +218,26 @@ do j=1,nphotons
 ! Select albedo based on current photon wavelength
 
 !      absorb=weight*(mua/kappa)
+
+
       weight=weight*albedo
       ran = ran2(iseed)
+      
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
+         
       else if(ran.lt.((mus/999.)+mus)/kappa)then  !photon absorbs
          counter1=counter1+1
          tflag=.TRUE.
+         
       else !photon fluros
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
          fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
          counter2=counter2+1
+         
+         
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
 

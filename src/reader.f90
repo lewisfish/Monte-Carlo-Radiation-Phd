@@ -109,7 +109,7 @@ CONTAINS
    end do
    close(20)
    !mus
-   open(30,file=trim(resdir)//'interlipid_scat2.dat')
+   open(30,file=trim(resdir)//'interlipid_scat5.dat')
    cnt=0
    do
 
@@ -126,13 +126,13 @@ CONTAINS
 
    end do
    
-   open(40,file=trim(resdir)//'interlipid_scat2.dat') 
+   open(40,file=trim(resdir)//'interlipid_scat5.dat') 
    do i=1,cnt-1
       read(40,*) mus_array(i,1),mus_array(i,2)
    end do
    close(40)
    !fluro
-      open(50,file=trim(resdir)//'fluro_louise.dat')
+      open(50,file=trim(resdir)//'fluro_mua_louise.dat')
    cnt=0
    do
 
@@ -149,7 +149,7 @@ CONTAINS
 
    end do
    
-   open(50,file=trim(resdir)//'fluro_louise.dat') 
+   open(50,file=trim(resdir)//'fluro_mua_louise.dat') 
    do i=1,cnt
       read(50,*) fluro_array(i,1),fluro_array(i,2)
    end do
@@ -159,7 +159,7 @@ CONTAINS
    
    !excite
    
-   open(90,file=trim(resdir)//'fluro_signal.dat')
+   open(90,file=trim(resdir)//'louise_response.dat')
    cnt=0
    do
 
@@ -176,7 +176,7 @@ CONTAINS
 
    end do
    
-   open(11,file=trim(resdir)//'fluro_signal.dat') 
+   open(11,file=trim(resdir)//'louise_response.dat') 
    do i=1,cnt
       read(11,*) excite_array(i,1),excite_array(i,2)
    end do

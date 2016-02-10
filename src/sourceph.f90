@@ -20,14 +20,14 @@ CONTAINS
    !***** emit photon from a circle on surface
    ! min+ran2*(max-min)
    zp=zmax
-   w=0.01
+   w=0.3
    !      xp=0.
    !      yp=0.
    xp=xmax
    yp=ymax
-   do while(xp**2+yp**2 .gt. w**2)
-       xp=.02*ran2(iseed)-.01
-       yp=.02*ran2(iseed)-.01
+   do while(xp**2+yp**2 .gt. w**2.)
+       xp=1.2*ran2(iseed)-0.6
+       yp=1.2*ran2(iseed)-0.6
    end do
    !***** emit isotropically from a point
 
