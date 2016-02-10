@@ -30,7 +30,7 @@ integer cnt,io,i,flucount,k,nlow
 logical tflag,sflag,tauflag
 DOUBLE PRECISION nscatt
 real :: xmax,ymax,zmax,absorb,ddy,ddx
-real :: delta,xcur,ycur,zcur,thetaim
+real :: delta,xcur,ycur,zcur,thetaim,ran
 real :: n1,n2,weight,terminate,hggtmp
 
 real :: ddz,ddr,v(3),fluro_prob
@@ -147,7 +147,7 @@ terminate=0.0001
 chance=0.1
 
 !set optical properties and make cdfs.
-wave=355. ! value used in http://www.photobiology.com/v1/sikorski/ and where the excite and fluro data comes from.
+wave=405. ! value used in http://www.photobiology.com/v1/sikorski/ and where the excite and fluro data comes from.
 
 call mk_cdf(fluro_array,f_cdf,size(f_cdf))
 call mk_cdf(excite_array,e_cdf,size(e_cdf))
@@ -175,7 +175,7 @@ print*, 'Photons now running on core:',id
 do j=1,nphotons
   
 !set init weight and flags
-   wave=355.
+   wave=405.
    call init_opt
    weight=1.0
    tauflag=.FALSE.
@@ -223,37 +223,18 @@ do j=1,nphotons
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-      else if(ran.lt.(muaf/kappa))then  !photon absorbs
-      else if (ran.lt.(muas/kappa))then ! photon fluros
+      else if(ran.lt.((mus/999.)+mus)/kappa)then  !photon absorbs
+         counter1=counter1+1
+         tflag=.TRUE.
+      else !photon fluros
+         call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
+         call init_opt
+         fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
+         counter2=counter2+1
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
 
-         if(wave.lt.maxval(maxval(excite_array,2)).and. &
-            wave.gt.minval(maxval(excite_array,2)))then
-      !get fluro prob
-            call search_2D(size(e_cdf),excite_array,nlow,wave)
-            call lin_inter_2D(excite_array,wave,size(e_cdf),nlow,fluro_prob)
-
-      !see if photon fluros or not
-            if(ran2(iseed).lt.fluro_prob)then
-         !fluros
-               call sample(fluro_array,size(f_cdf),f_cdf,wave,iseed)
-               call init_opt
-               counter2=counter2+1
-            else
-      !absorbs. reset photon
-            counter1=counter1+1
-            call binning(xmax,ymax,zmax,ddz,xcur,ycur,zcur)
-            tflag=.TRUE.
-            end if    
-         else
-      !absorbs. reset photon
-            counter1=counter1+1
-            call binning(xmax,ymax,zmax,ddz,xcur,ycur,zcur)
-            tflag=.TRUE.
-         end if
       end if
-
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
     
@@ -344,6 +325,9 @@ print*,'done trans'
 !     fluroexit reduce
 call MPI_Barrier(MPI_COMM_WORLD,error)
 call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+!     fluro_pos reduce
+call MPI_Barrier(MPI_COMM_WORLD,error)
+call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 print*,'done all reduces',id
 call MPI_Barrier(MPI_COMM_WORLD,error)

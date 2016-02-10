@@ -10,6 +10,7 @@ real, allocatable :: rhokap(:,:,:,:)
 real, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
 real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
+real, allocatable :: fluro_pos(:,:,:),fluro_posGLOBAL(:,:,:)
 
 real, allocatable :: image(:,:,:),deposit(:,:,:),dep(:)
 real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)

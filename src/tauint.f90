@@ -208,9 +208,8 @@ tau=-alog(ran2(iseed))
 !***** photon position.
    if((d.ge.(.999*smax))) then
 
-   if(zcur.gt.2.*zmax*.999.or.zcur.gt.0.0001)then
-      if(int(wave).eq.355)then
-      
+   if(zcur.gt.2.*zmax*.999.or.zcur.lt.0.0001)then
+      if(int(wave).eq.405.)then
       else
          fluroexit(int(wave))=fluroexit(int(wave))+1
       end if

@@ -64,6 +64,8 @@ CONTAINS
    rhokap=0.
    fluroexit=0
    fluroexitGLOBAL=0
+   fluro_pos=0.
+   fluro_posGLOBAL=0.
    
    end SUBROUTINE zarray
 
@@ -81,6 +83,7 @@ CONTAINS
    
    allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
    allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
+   allocate(fluro_pos(nxg,nyg,nzg),fluro_posGLOBAL(nxg,nyg,nzg))
    
    allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
    allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))

@@ -6,7 +6,7 @@ CONTAINS
    
    subroutine init_opt
    
-   use iarray, only : mua_array,mus_array,excite_array
+   use iarray, only : mua_array,mus_array,excite_array,fluro_array
    use opt_prop
    
    implicit none
@@ -14,25 +14,28 @@ CONTAINS
    integer :: nlow
 
    !set mua_skin
-   call search_2D(size(mua_array,1),mua_array,nlow,wave)
-   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,muas)
-   
+   call search_2D(size(fluro_array,1),fluro_array,nlow,wave)
+   call lin_inter_2D(fluro_array,wave,size(fluro_array,1),nlow,mua)
+   if(mua.lt.0.)mua=0.
    !set mua_fluro
-   call search_2D(size(excite_array,1),excite_array,nlow,wave)
-   call lin_inter_2D(excite_array,wave,size(excite_array,1),nlow,muaf)   
+!   call search_2D(size(excite_array,1),excite_array,nlow,wave)
+!   call lin_inter_2D(excite_array,wave,size(excite_array,1),nlow,muaf)   
 
 !   set mus
    call search_2D(size(mus_array,1),mus_array,nlow,wave)
    call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)
-
 !   set g and hgg
-   hgg = 0.62 + 0.29 * 10.**(-3.) * wave
-   g2  = hgg**2
+!   hgg = 0.62 + 0.29 * 10.**(-3.) * wave
+   hgg=0.7
+   g2  = hgg**2.
 !   mua = 80.
 !   mus = 250.
-   kappa  = muas + muaf + mus 
-   albedo = mus / kappa
-   
+!   muai=mus/999.
+   kappa  = mus + mua + (mus/999.) 
+   albedo = mus/kappa
+!   print*,mus,mua,albedo
+!   mus / kappa
+
    end subroutine init_opt
 
    subroutine sample(array,size_of,cdf,wave,iseed)

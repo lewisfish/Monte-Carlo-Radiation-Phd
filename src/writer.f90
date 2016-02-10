@@ -8,7 +8,7 @@ CONTAINS
 
    use constants,only : nxg,nyg,nzg,fileplace,Nbins,cbinsnum
    use iarray,only : jmeanGLOBAL,imageGLOBAL,depGLOBAL,depositGLOBAL,transGLOBAL &
-                     ,fluroexitGLOBAL
+                     ,fluroexitGLOBAL,fluro_posGLOBAL
 
    implicit none
 
@@ -38,11 +38,16 @@ CONTAINS
    write(70,rec=1) transGLOBAL
    close(70)
 
-   open(71,file=trim(fileplace)//'resfluro.dat')
+   open(71,file=trim(fileplace)//'resfluro2.dat')
    do j=1,1000
-      write(71,*) real(fluroexitGLOBAL(j))/real(maxval(fluroexitGLOBAL))
+      write(71,*) fluroexitGLOBAL(j)!/real(maxval(fluroexitGLOBAL))
    end do
    close(71)
+   
+   open(72,file=trim(fileplace)//'fluro_pos.dat',access='direct',form='unformatted',recl=((nxg)*(nyg)*(nzg))*4)
+   write(72,rec=1) fluro_posGLOBAL
+   close(72)
+
    
    end subroutine writer
 end MODULE writer_mod
