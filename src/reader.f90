@@ -109,7 +109,7 @@ CONTAINS
    end do
    close(20)
    !mus
-   open(30,file=trim(resdir)//'interlipid_scat5.dat')
+   open(30,file=trim(resdir)//'interlipid_scat8.dat')
    cnt=0
    do
 
@@ -126,7 +126,7 @@ CONTAINS
 
    end do
    
-   open(40,file=trim(resdir)//'interlipid_scat5.dat') 
+   open(40,file=trim(resdir)//'interlipid_scat8.dat') 
    do i=1,cnt-1
       read(40,*) mus_array(i,1),mus_array(i,2)
    end do
@@ -159,7 +159,7 @@ CONTAINS
    
    !excite
    
-   open(90,file=trim(resdir)//'louise_response.dat')
+   open(90,file=trim(resdir)//'lousie_response.dat')
    cnt=0
    do
 
@@ -176,7 +176,7 @@ CONTAINS
 
    end do
    
-   open(11,file=trim(resdir)//'louise_response.dat') 
+   open(11,file=trim(resdir)//'lousie_response.dat') 
    do i=1,cnt
       read(11,*) excite_array(i,1),excite_array(i,2)
    end do

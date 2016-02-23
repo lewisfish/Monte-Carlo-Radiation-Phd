@@ -18,7 +18,6 @@ use noisey_mod
 use tauint
 use ch_opt
 use stokes_mod
-use fresnel_mod
 use binning_mod
 use peelingoff_mod
 use writer_mod
@@ -165,7 +164,7 @@ call gridset(xmax,ymax,zmax,id)
 !***** for roundoff effects when crossing cell walls
 delta=1.e-6*(2.*xmax/nxg)
 nscatt=0
-
+tcount=0;tcount=0
 call MPI_Barrier(MPI_COMM_WORLD,error)
 call cpu_time(start)
 print*, ' '
@@ -207,8 +206,8 @@ do j=1,nphotons
    tflag,iseed,delta,sflag,weight,ddx,ddy)
      
 !************ Peel off photon into image
-   call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
-   v,sintim,costim,sinpim,cospim)
+!   call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
+!   v,sintim,costim,sinpim,cospim)
 
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
    do while(tflag.eqv..FALSE.) 
@@ -226,17 +225,23 @@ do j=1,nphotons
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-         
-      else if(ran.lt.((mus/999.)+mus)/kappa)then  !photon absorbs
-         counter1=counter1+1
-         tflag=.TRUE.
-         
-      else !photon fluros
+         call stokes(iseed)
+!         print*,mua,mus,kappa,wave
+      else if(ran.lt.(mua+mus)/kappa)then  !photon fluros
+
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
          fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
          counter2=counter2+1
-         
+         hgg=0.
+         g2=0.
+         call stokes(iseed)
+         hgg=.7
+         g2=.49
+      else !photon absorbs
+         counter1=counter1+1
+         tflag=.TRUE.
+!         
          
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
@@ -244,10 +249,8 @@ do j=1,nphotons
       end if
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
-    
-!!************ Scatter photon into new direction and update Stokes parameters
 
-!call stokes(iseed)
+
 !************ carry out russian roulette to kill off phototns
 !if(weight.le.terminate)then
 !      if(ran2(iseed).le.chance)then
@@ -269,8 +272,8 @@ do j=1,nphotons
 !      print*,tflag,'at'
 
 !************ Peel off photon into image
-      call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
-      ,v,sintim,costim,sinpim,cospim)
+!      call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
+!      ,v,sintim,costim,sinpim,cospim)
       xcur=xp+xmax
       ycur=yp+ymax
       zcur=zp+zmax
@@ -346,7 +349,8 @@ if(id.eq.0)then
     call writer
     print*,'write done'
 end if
-
+print*,'t',tcount,id
+print*,'b',bcount,id
 !end MPI processes
 call MPI_Finalize(error)
 end program mcpolar

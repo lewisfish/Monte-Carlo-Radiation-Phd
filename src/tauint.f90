@@ -6,14 +6,13 @@ MODULE tauint
    
 CONTAINS
 
-   subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
+   recursive subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
             ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy)
 
-   use constants,   only : PI,nxg,nyg,nzg
+   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
    use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
-   use opt_prop,    only : wave
-   use fresnel_mod
+   use opt_prop,    only : wave,kappa
    use noisey_mod
 
    implicit none
@@ -163,7 +162,7 @@ tau=-alog(ran2(iseed))
 
 !***** optical depth to next cell wall is 
 !***** taucell= (distance to cell)*(opacity of current cell)
-   taucell=dcell*rhokap(celli,cellj,cellk,1)
+   taucell=dcell*kappa!rhokap(celli,cellj,cellk,1)
 
 !***** if taurun+taucell>tau then scatter at distance d+d1.  
 !***** update photon position and cell.  
@@ -171,7 +170,7 @@ tau=-alog(ran2(iseed))
 !***** (i.e. ends up on next cell wall) and update photon position
 !***** and cell.
    if((taurun+taucell).ge.tau) then
-   d1=(tau-taurun)/rhokap(celli,cellj,cellk,1)
+   d1=(tau-taurun)/kappa!/rhokap(celli,cellj,cellk,1)
    d=d+d1
    jmean(celli,cellj,cellk,1)=jmean(celli,cellj,cellk,1)+d1
    taurun=taurun+taucell
@@ -209,17 +208,23 @@ tau=-alog(ran2(iseed))
    if((d.ge.(.999*smax))) then
 
    if(zcur.gt.2.*zmax*.999)then !.or.zcur.lt.0.0001
+
       if(int(wave).eq.405.)then
       else
-         if(((xcur-xmax)**2.+(ycur-ymax)**2.).lt.0.3**2)then
-            if(cost.gt..75)then
+         if(((xcur-xmax)**2.+(ycur-ymax)**2.).lt.0.03**2)then
+            tcount=tcount+1
+            if(cost.gt..78)then
+                              bcount=bcount+1
                fluroexit(int(wave))=fluroexit(int(wave))+1
             end if
          end if
       end if
+   else
+
    end if
       tflag=.TRUE.
    else
+
       xp=xp+d*nxp
       yp=yp+d*nyp
       zp=zp+d*nzp
@@ -230,4 +235,102 @@ tau=-alog(ran2(iseed))
    endif
 
    end subroutine tauint2
+   
+   
+!*************************************************************************   
+
+
+   subroutine fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
+        
+   use constants, only : pi,cbinsnum
+   use photon_vars, only : nxp,nyp,nzp,cost,sint,cosp,sinp
+   use iarray, only : trans
+
+   implicit none
+        
+
+   real n1,n2,n,tir,cost2,f1,f2,xcur,ycur
+   real ran2,costt,crit,ran,weight,ddx,ddy
+   integer iseed,ix,iy
+   logical sflag,tflag
+        
+        
+   !swap refractive index if going in to medium
+   if(sflag.eqv..TRUE.)then
+   n=0.
+   n=n1
+   n1=n2
+   n2=n
+
+   end if
+        
+   crit=asin(n2/n1)
+   !      print*,crit*180./pi 
+   if(nzp.lt.0.)then!adjust angle for fresnel calculation when photon heading down
+   costt=abs(cost)     
+   else
+   costt=cost
+   end if
+
+   !      print*,crit*180./pi,costt
+   if(n1.eq.n2)then!equal refrative indices
+   tir=0.
+   elseif(abs(costt).ge.1.*.999)then!cost straight down
+   tir=(n1-n2)**2/(n2+n1)**2
+   !      print*,'straight',acos(costt)*180./pi,tir
+   elseif(acos(costt).gt.crit)then!total internal reflection
+   tir=1.0
+   !            print*,'tir',acos(costt)*180./pi,tir
+   elseif(abs(costt).lt.1.E-6)then!oblique angle
+   tir=1.0
+   !            print*,'oblique',acos(costt)*180./pi,tir
+   else
+   sint=sqrt(1.-costt**2)
+   if(n1*sint/n2.gt.1.)print *,'shit1',sint,n1,n2
+   cost2=sqrt(1.-(n1*sint/n2)**2)
+
+   f1=abs((n1*costt-n2*cost2)/(n1*costt+n2*cost2))**2
+   f2=abs((n1*cost2-n2*costt)/(n1*cost2+n2*costt))**2
+   tir=0.5*(f1+f2)
+
+   !            print*,'other',acos(costt)*180./pi,tir
+   end if
+
+   ran=ran2(iseed)
+   if(ran.lt.tir)then
+   !           photon reflected
+        cost=-cost
+        call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
+                    ,tflag,iseed,delta,sflag,weight,ddx,ddy)
+   else
+   !photon transmitted
+   if(nzp.gt.0.)then
+   ix=floor(xcur/ddx)
+   iy=floor(ycur/ddy)
+   if(ix.gt.cbinsnum)ix=cbinsnum
+   if(ix.lt.1)ix=1
+   if(iy.gt.cbinsnum)iy=cbinsnum
+   if(iy.lt.1)iy=1            
+   trans(ix,iy)=trans(ix,iy)+weight
+         if(sflag.eqv..FALSE.)then
+                tflag=.TRUE.
+         end if
+   end if
+
+   !            weight=0.
+   end if
+
+   sint=sqrt(1.-cost**2)
+
+   nxp=sint*cosp  
+   nyp=sint*sinp
+   nzp=cost
+
+   !swap index back
+   if(sflag.eqv..TRUE.)then
+   n2=n1
+   n1=n
+   end if
+
+   end subroutine fresnel   
 end MODULE tauint

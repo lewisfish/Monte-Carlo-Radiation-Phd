@@ -1,5 +1,5 @@
 FCOMP = mpifort
-FCFLAGS = -O2
+FCFLAGS = -O2 
 #FCFLAGS = -g -fcheck=all -fbounds-check -fbacktrace 
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
@@ -16,7 +16,6 @@ SRCS =      ran2.f \
             density.f90 \
             gridset.f90 \
             noisey.f90 \
-            fresnel.f90 \
             taufind1.f90 \
             tauint.f90 \
             stokes.f90 \
@@ -34,9 +33,10 @@ all:	$(PROGRAM)
 
 $(PROGRAM):	$(OBJECTS)
 	$(FCOMP) $(FCFLAGS) -o $@ $^ 
-
+	#goes after $^ -pg 
+#-pg goes between fcomp and fcflags
 %.o:  %.f90
-	$(FCOMP) $(FCFLAGS) -c $<
+	$(FCOMP)  $(FCFLAGS) -c $<
 
 .PHONY:	clean
 

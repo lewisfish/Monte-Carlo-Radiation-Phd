@@ -38,7 +38,7 @@ CONTAINS
    write(70,rec=1) transGLOBAL
    close(70)
 
-   open(71,file=trim(fileplace)//'resfluro5.dat')
+   open(71,file=trim(fileplace)//'resfluro8.dat')
    do j=1,1000
       write(71,*) fluroexitGLOBAL(j)!/real(maxval(fluroexitGLOBAL))
    end do

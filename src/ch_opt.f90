@@ -26,9 +26,9 @@ CONTAINS
 
 !   set mus
    if(wave.eq.405.)then
-!      mus=25.!for .8%
-      mus=14!for .5%
-!      mus=6.!for .2%
+      mus=26.9 !for .8%
+!      mus=16.7 !for .5%
+!      mus=6.7 !for .2%
    else
       call search_2D(size(mus_array,1),mus_array,nlow,wave)
       call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)
@@ -39,9 +39,9 @@ CONTAINS
    g2  = hgg**2.
 !   mua = 80.
 !   mus = 250.
-   kappa  = mus + mua + (mus/999.) 
-   albedo = mus/kappa
-
+!   print*,mus
+   kappa  = mus + mua + ((mus)/999.)
+   albedo = (mus)/kappa
 
    end subroutine init_opt
 
