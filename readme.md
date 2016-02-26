@@ -46,4 +46,14 @@ per Monte Carlo photon packet, and fluences into the data folder.
 	May have to change permissions first in order to execute the script.
 	This can be done by using sudo chmod +755 instsll.sh on linux
 
-
+#### To do/implement
+   finish/test scatt_method and fix binning to be more general
+   sort fresnel so can differ between transmission on diffrent faces not just top and bottom/ tidy code up
+   investigate +1 in celli,j,k calc in tauint2
+   fix up fluro stuff i.e. give options for what type of fluro being done
+   change opt arrays to allocatble (as part of above point)
+   test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
+   add proper treatment of peeling off for noisy surface
+   add colours/render as option
+   proper formatting
+   parallize-done but not 100% happy with. change makefile so that mpi is an option.

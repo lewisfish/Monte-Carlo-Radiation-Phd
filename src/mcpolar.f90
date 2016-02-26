@@ -1,17 +1,3 @@
-!!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
-! finish/test scatt_method and fix binning to be more general
-!sort fresnel so can differ between transmission on diffrent faces
-!investigate +1 in celli,j,k calc in tauint2
-!fix up fluro shizz
-!change opt arrays to allocatble 
-!make fresnel work with anyface/ tidy up code
-!test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
-!add kennys stuff(piece of paper) 
-!add colours/render shizz
-!proper formatting
-!parallize-done but not 100% happy with. change makefile so that mpi is an option.
-
-
 program mcpolar
 
 !external libs
