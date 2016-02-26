@@ -48,13 +48,13 @@ per Monte Carlo photon packet, and fluences into the data folder.
 
 #### To do/implement
 
-   -Finish/test scatt_method and fix binning to be more general
-   -Sort fresnel so can differ between transmission on diffrent faces not just top and bottom/ tidy code up
-   -Investigate +1 in celli,j,k calc in tauint2
-   -Fix up fluro stuff i.e. give options for what type of fluro being done
-   -Change opt arrays to allocatble (as part of above point)
-   -Test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
-   -Add proper treatment of peeling off for noisy surface
-   -Add colours/render as option
-   -Proper formatting
-   -Parallize-done but not 100% happy with. change makefile so that mpi is an option.
+   - Finish/test scatt_method and fix binning to be more general
+   - Sort fresnel so can differ between transmission on diffrent faces not just top and bottom/ tidy code up
+   - Investigate +1 in celli,j,k calc in tauint2
+   - Fix up fluro stuff i.e. give options for what type of fluro being done
+   - Change opt arrays to allocatble (as part of above point)
+   - Test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
+   - Add proper treatment of peeling off for noisy surface
+   - Add colours/render as option
+   - Proper formatting
+   - Parallize-done but not 100% happy with. change makefile so that mpi is an option.
