@@ -4,16 +4,16 @@ implicit none
 save
 
 CONTAINS
-   subroutine sourceph(xmax,ymax,zmax,xcell,ycell,zcell,iseed)
+   subroutine sourceph(xcell,ycell,zcell,iseed)
 
-   use constants, only : nxg,nyg,nzg,twopi
+   use constants, only : nxg,nyg,nzg,TWOPI,xmax,ymax,zmax
    use photon_vars
 
    implicit none
 
 
    integer xcell,ycell,zcell,iseed
-   real xmax,ymax,zmax,w,r1,phigauss,zf
+   real w,r1,phigauss,zf
    real xf,temp
    real ran2
 
@@ -42,7 +42,7 @@ CONTAINS
    !        sint=sqrt(sint)
    !      endif
 
-   !      phi=twopi*ran2(iseed)
+   !      phi=TWOPI*ran2(iseed)
    !      cosp=cos(phi)
    !      sinp=sin(phi)
 
@@ -56,14 +56,14 @@ CONTAINS
    !**** Collimated Gaussian Beam
 
    !      r1=w*sqrt(-log(ran2(iseed)))
-   !      phigauss=twopi*ran2(iseed) 
+   !      phigauss=TWOPI*ran2(iseed) 
    !      xp=r1*cos(phigauss)
    !      yp=r1*sin(phigauss)
 
    !**** Focused Gaussian Beam
    !      zf=.05
    !      r1=w*sqrt(-log(ran2(iseed)))      
-   !      phigauss=twopi*ran2(iseed) 
+   !      phigauss=TWOPI*ran2(iseed) 
    !      xp=r1*cos(phigauss)
    !      yp=r1*sin(phigauss)
    !      

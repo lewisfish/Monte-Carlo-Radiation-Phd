@@ -75,6 +75,8 @@ CONTAINS
 
       end subroutine linereader
    end subroutine reader0
+  
+!****************************************************************************
    
    subroutine reader1
    
@@ -105,7 +107,7 @@ CONTAINS
    e_cdf=0.
    
    !noise data
-   call readfile_array2D(trim(resdir)//'b.dat', noise, 1)
+   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
 
    end subroutine reader1
    

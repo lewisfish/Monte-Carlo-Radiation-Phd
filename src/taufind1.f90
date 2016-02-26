@@ -4,9 +4,9 @@ implicit none
 save
 
 CONTAINS
-   subroutine taufind1(xmax,ymax,zmax,v,tau1,xcell,ycell,zcell,delta)
+   subroutine taufind1(v,tau1,xcell,ycell,zcell,delta)
 
-   use constants, only : nxg,nyg,nzg
+   use constants, only : nxg,nyg,nzg,xmax,ymax,zmax
    use photon_vars, only : xp,yp,zp
    use iarray, only : xface,yface,zface,rhokap
 
@@ -15,7 +15,7 @@ CONTAINS
    !change nxp etc as they ar local here. may cause confusion
 
    integer xcell,ycell,zcell
-   real xmax,ymax,zmax,nxp,nyp,nzp
+   real nxp,nyp,nzp
 
    integer celli,cellj,cellk
    real xcur,ycur,zcur,dx,dy,dz,d,dcell,taurun

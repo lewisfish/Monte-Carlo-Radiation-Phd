@@ -4,10 +4,10 @@ implicit none
 save
 
 CONTAINS
-   subroutine peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
+   subroutine peelingoff(xcell,ycell,zcell,delta &
                          ,v,sintim,costim,sinpim,cospim) 
 
-   use constants, only   : pi,nbins
+   use constants, only   : pi,nbins,xmax,ymax,zmax
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp
    use iarray, only      : xface,yface,zface,rhokap,image
    use opt_prop, only    : hgg,g2
@@ -16,15 +16,15 @@ CONTAINS
    implicit none
 
    real xim,yim,tau1,prob,v(3),sinpim
-   real zmax,bin_width,hgfact,sintim,xmax
-   real delta,ymax,cosa,costim,cospim
+   real bin_width,hgfact,sintim
+   real delta,cosa,costim,cospim
    integer binx,biny,xcell,ycell,zcell
 
    ! set bin width for images
    bin_width=4.*xmax/Nbins
 
    ! calculate distance to grid edge
-   call taufind1(xmax,ymax,zmax,v,tau1,xcell,ycell,zcell,delta)
+   call taufind1(v,tau1,xcell,ycell,zcell,delta)
 
    !calculate angle the peeled off photon will go in
    cosa=nxp*v(1)+nyp*v(2)+nzp*v(3)

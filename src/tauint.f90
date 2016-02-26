@@ -6,10 +6,10 @@ MODULE tauint
    
 CONTAINS
 
-   recursive subroutine tauint2(xmax,ymax,zmax,n1,n2,xcell &
-            ,ycell,zcell,tflag,iseed,delta,sflag,weight,ddx,ddy)
+   recursive subroutine tauint2(n1,n2,xcell,ycell,zcell,&
+                     tflag,iseed,delta,sflag,weight,ddx,ddy)
 
-   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount
+   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount,xmax,ymax,zmax
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
    use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
    use opt_prop,    only : wave,kappa
@@ -18,7 +18,7 @@ CONTAINS
    implicit none
 
    integer iseed,xcell,ycell,zcell
-   real xmax,ymax,zmax,weight,ddx,ddy
+   real weight,ddx,ddy
    real ran2,n1,n2
    logical tflag,sflag
 
@@ -300,8 +300,8 @@ tau=-alog(ran2(iseed))
    if(ran.lt.tir)then
    !           photon reflected
         cost=-cost
-        call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
-                    ,tflag,iseed,delta,sflag,weight,ddx,ddy)
+        !call tauint2(n1,n2,xcell,ycell,zcell,&
+         !      tflag,iseed,delta,sflag,weight,ddx,ddy)
    else
    !photon transmitted
    if(nzp.gt.0.)then

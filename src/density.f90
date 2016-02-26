@@ -4,14 +4,14 @@ implicit none
 save
 
 CONTAINS
-   subroutine density(x,y,z,rho,xmax,ymax,zmax)
+   subroutine density(x,y,z,rho)
 
-   use opt_prop, only : kappa   
+   use opt_prop, only : kappa
+   use constants, only : xmax,ymax,zmax  
    
    implicit none
 
    real x,y,z,rho
-   real xmax,ymax,zmax
 
 !***** calculate some distances for use in setting up density 
 !***** structure. Note that distances are in units of xmax, ymax, and zmax 

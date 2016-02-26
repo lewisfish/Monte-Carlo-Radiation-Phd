@@ -22,6 +22,7 @@ SRCS =      ran2.f \
             sourceph.f90 \
             peeling.f90 \
             binning.f90 \
+            scatt_method.f90 \
             reader.f90 \
             writer.f90 \
             findsmax.f90 \

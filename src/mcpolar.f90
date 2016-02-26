@@ -28,13 +28,13 @@ integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
 integer cnt,io,i,flucount,k,nlow
 logical tflag,sflag,tauflag
 DOUBLE PRECISION nscatt
-real :: xmax,ymax,zmax,absorb,ddy,ddx
+real :: absorb,ddy,ddx
 real :: delta,xcur,ycur,zcur,thetaim,ran
-real :: n1,n2,weight,terminate,hggtmp
+real :: n1,n2,weight,hggtmp
 
 real :: ddz,ddr,v(3),fluro_prob
 real :: costim,cospim,sintim,sinpim
-real :: phiim,chance
+real :: phiim
 real :: start,finish,ran2
 
 !      variables for openmpi. GLOBAL indicates final values after mpi reduce
@@ -42,7 +42,7 @@ real :: start,finish,ran2
 !      error is the error flag for MPI
 
 DOUBLE PRECISION :: nscattGLOBAL
-integer          :: error,numproc,id,counter1,counter2
+integer          :: error,numproc,id
 
 !set directory paths
 call directory
@@ -73,8 +73,8 @@ iseed=95648324+id
 
 !read in optical property data
 call reader1
-counter1=0
-counter2=0
+acount=0
+fcount=0
 
 
 !****** setup up arrays and bin numbers/dimensions
@@ -106,11 +106,6 @@ v(1)=sintim*cospim
 v(2)=sintim*sinpim
 v(3)=costim  
 
-! set the terminal value for russian roulette and init weight
-terminate=0.0001
-! value for russian roulette to increase packet 'energy' by 1/chance      
-chance=0.1
-
 !set optical properties and make cdfs.
 wave=405. ! value used in http://www.photobiology.com/v1/sikorski/ and where the excite and fluro data comes from.
 
@@ -124,7 +119,7 @@ if(id.eq.0)then
 end if
 
 !***** Set up density grid *******************************************
-call gridset(xmax,ymax,zmax,id)
+call gridset(id)
 
 !***** Set small distance for use in optical depth integration routines 
 !***** for roundoff effects when crossing cell walls
@@ -153,7 +148,7 @@ do j=1,nphotons
    end if
     
 !***** Release photon from point source *******************************
-   call sourceph(xmax,ymax,zmax,xcell,ycell,zcell,iseed)
+   call sourceph(xcell,ycell,zcell,iseed)
 !***** Update xcur etc.
 
    xcur=xp+xmax
@@ -168,11 +163,11 @@ do j=1,nphotons
    sflag=.FALSE.
 
 !****** Find scattering location
-   call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell,&
+   call tauint2(n1,n2,xcell,ycell,zcell,&
    tflag,iseed,delta,sflag,weight,ddx,ddy)
      
 !************ Peel off photon into image
-!   call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta, &
+!   call peelingoff(xcell,ycell,zcell,delta, &
 !   v,sintim,costim,sinpim,cospim)
 
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
@@ -198,14 +193,14 @@ do j=1,nphotons
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
          fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
-         counter2=counter2+1
+         fcount=fcount+1
          hgg=0.
          g2=0.
          call stokes(iseed)
          hgg=.7
          g2=.49
       else !photon absorbs
-         counter1=counter1+1
+         acount=acount+1
          tflag=.TRUE.
 !         
          
@@ -233,12 +228,12 @@ do j=1,nphotons
 !nscatt=nscatt+1
 !      print*,tflag,'bt'
 !************ Find next scattering location
-      call tauint2(xmax,ymax,zmax,n1,n2,xcell,ycell,zcell &
-      ,tflag,iseed,delta,sflag,weight,ddx,ddy)
+      call tauint2(n1,n2,xcell,ycell,zcell,&
+   tflag,iseed,delta,sflag,weight,ddx,ddy)
 !      print*,tflag,'at'
 
 !************ Peel off photon into image
-!      call peelingoff(xmax,ymax,zmax,xcell,ycell,zcell,delta &
+!      call peelingoff(xcell,ycell,zcell,delta &
 !      ,v,sintim,costim,sinpim,cospim)
       xcur=xp+xmax
       ycur=yp+ymax
@@ -249,9 +244,9 @@ do j=1,nphotons
    continue
 
 end do      ! end loop over nph photons
-print*, counter1, '# absorbed',id
-print*, counter2, '# fluro',id
-print*, counter1+counter2,'total',id
+print*, acount, '# absorbed',id
+print*, fcount, '# fluro',id
+print*, acount+fcount,'total',id
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
