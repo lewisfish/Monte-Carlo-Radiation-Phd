@@ -16,10 +16,10 @@ CONTAINS
 
    open(10,file=trim(resdir)//'opt.params',status='old',iostat=io)
    if(io.ne.0)then
-   print*, trim(resdir)//'opt.params','does not exsist'
-   print*, 'File cant be opened!'
-   print*, 'Exiting...'
-   call EXIT(0)
+      print*, trim(resdir)//'opt.params','does not exsist'
+      print*, 'File cant be opened!'
+      print*, 'Exiting...'
+      call EXIT(0)
    end if
 
    cnt=0
@@ -43,8 +43,8 @@ CONTAINS
    i=1
    do while(.true.)
 
-   read(20,'(A)', end=99) line
-   call linereader(line,cnt,hgg,mus,mua,i)
+      read(20,'(A)', end=99) line
+      call linereader(line,cnt,hgg,mus,mua,i)
    end do
    99    continue
    close(20)
@@ -129,9 +129,9 @@ CONTAINS
    
    open(10, file = filename, status = 'OLD', IOSTAT = io)
    if(io .ne. 0)then
-   print'(A,A,I2)',filename,' could not be opened. IOSTAT = ',io
-   print*,'Exiting...'
-   call exit(0)
+      print'(A,A,I2)',filename,' could not be opened. IOSTAT = ',io
+      print*,'Exiting...'
+      call exit(0)
    else
       cnt = 0
       do       !find file size and allocate array.
