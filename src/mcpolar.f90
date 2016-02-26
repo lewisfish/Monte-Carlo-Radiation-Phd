@@ -1,3 +1,17 @@
+!!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
+! allow for option to change between russian roulette and kennys method
+!sort fresnel so can differ between transmission on diffrent faces
+!investigate +1 in celli,j,k calc in tauint2
+!fix up fluro shizz
+!change opt arrays to allocatble 
+!make fresnel work with anyface/ tidy up code
+!test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
+!add kennys stuff(piece of paper) 
+!add colours/render shizz
+!proper formatting
+!parallize-done but not 100% happy with. change makefile so that mpi is an option.
+
+
 program mcpolar
 
 !external libs
@@ -57,19 +71,6 @@ call MPI_Comm_size(MPI_COMM_WORLD,numproc,error)
 !      ! get individual process id
 call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 
-!!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
-! change reader1 to be better i.e. no repeated code.
-!sort fresnel so can differ between transmission on diffrent faces
-!investigate +1 in celli,j,k calc in tauint2
-!fix up fluro shizz
-!change opt arrays to allocatble 
-!create subroutine for reading files, i.e. noise data.
-!test fresnel
-!test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
-!add kennys stuff(piece of paper) 
-!add colours/render shizz
-!proper formatting
-!parallize-done but not 100% happy with. change makefile so that mpi is an option.
 
 !**** Read in parameters from the file input.params
 open(10,file=trim(resdir)//'input.params',status='old')
@@ -92,7 +93,7 @@ counter2=0
 
 !****** setup up arrays and bin numbers/dimensions
 
-!     ! set bin widths for deposit method
+!     set bin widths for deposit method
 ddz=(2.*zmax)/cbinsnum
 ddx=(2.*xmax)/cbinsnum
 ddy=(2.*ymax)/cbinsnum
