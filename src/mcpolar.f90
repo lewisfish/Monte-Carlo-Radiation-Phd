@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!! todo !!!!!!!!!!!!!!!!
-! allow for option to change between russian roulette and kennys method
+! finish/test scatt_method and fix binning to be more general
 !sort fresnel so can differ between transmission on diffrent faces
 !investigate +1 in celli,j,k calc in tauint2
 !fix up fluro shizz
