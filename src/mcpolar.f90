@@ -88,28 +88,7 @@ iseed=95648324+id
 call reader1
 counter1=0
 counter2=0
-!***** read in noise data
 
-!open(13,file=trim(resdir)//'noisedots.dat')
-!cnt=0
-!do
-
-!  read(13,*,IOSTAT=io)
-!  
-!if (io < 0) then
-!      close(13)
-      allocate(noise(1:1,1:1))
-      noise=0.
-!      exit
-!else
-!      cnt=cnt+1
-!end if
-
-!end do
-!open(14,file=trim(resdir)//'noisedots.dat') 
-!do i=1,cnt
-!read(14,*) (noise(i,j),j=1,cnt)
-!end do
 
 !****** setup up arrays and bin numbers/dimensions
 
