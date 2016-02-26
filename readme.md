@@ -47,6 +47,7 @@ per Monte Carlo photon packet, and fluences into the data folder.
 	This can be done by using sudo chmod +755 instsll.sh on linux
 
 #### To do/implement
+
    finish/test scatt_method and fix binning to be more general
    sort fresnel so can differ between transmission on diffrent faces not just top and bottom/ tidy code up
    investigate +1 in celli,j,k calc in tauint2
