@@ -4,14 +4,14 @@ implicit none
 save
 
 CONTAINS
-   SUBROUTINE directory
+   SUBROUTINE directory(id)
 !  subroutine defines vars to hold paths to various folders   
 !   
 !   
    use constants,only : cwd,homedir,fileplace,resdir
    implicit none
 
-   integer :: io
+   integer :: io, id
 
    !get current working directory
    CALL getcwd(cwd)
@@ -23,8 +23,9 @@ CONTAINS
    
    !checks to see if data folder exists, if not creates it.
    call chdir(fileplace,io)
-   if(io.ne.0)then
-      print*,'data directory does not exist...'
+   
+   if(io.ne.0.and.id.eq.0)then
+      print*,'data directory does not exist...',id
       print*, 'creating directory...'
       call system("mkdir "//fileplace)
       call chdir(fileplace,io)

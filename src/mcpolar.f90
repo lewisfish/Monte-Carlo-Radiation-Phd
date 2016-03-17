@@ -26,7 +26,7 @@ implicit none
 
 integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
 integer cnt,io,i,flucount,k,nlow
-logical tflag,sflag,tauflag
+logical tflag,sflag,fflag
 DOUBLE PRECISION nscatt
 real :: absorb,ddy,ddx
 real :: delta,xcur,ycur,zcur,thetaim,ran
@@ -45,7 +45,7 @@ DOUBLE PRECISION :: nscattGLOBAL
 integer          :: error,numproc,id
 
 !set directory paths
-call directory
+call directory(id)
 
 call alloc_array
 call zarray
@@ -137,9 +137,8 @@ do j=1,nphotons
 !set init weight and flags
    wave=405.
    call init_opt
-   weight=1.0
-   tauflag=.FALSE.
    tflag=.FALSE.
+   fflag=.FALSE.
    sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
@@ -159,7 +158,7 @@ do j=1,nphotons
 !   call noisey(xcell,ycell)
 
 !***** check whether the photon enters medium     
-!   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
+   call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
    sflag=.FALSE.
 
 !****** Find scattering location
@@ -176,31 +175,36 @@ do j=1,nphotons
 !******** Drop weight
 
 ! Select albedo based on current photon wavelength
-
-!      absorb=weight*(mua/kappa)
-
-
-      weight=weight*albedo
-      ran = ran2(iseed)
-      
+      ran=ran2(iseed)
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-         call stokes(iseed)
+         acount=acount+1
 !         print*,mua,mus,kappa,wave
-      else if(ran.lt.(mua+mus)/kappa)then  !photon fluros
-
+!      else if(ran.lt.(mua+mus)/kappa)then  !photon fluros
+       elseif(fflag.eqv..FALSE..and.ran.lt.(mus+mua)/kappa)then
+         fflag=.TRUE.
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
          fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
          fcount=fcount+1
-         hgg=0.
-         g2=0.
-         call stokes(iseed)
-         hgg=.7
-         g2=.49
+         cost=2.*ran2(iseed)-1.
+         sint=(1.-cost*cost)
+         if(sint.le.0.)then
+            sint=0.
+         else
+            sint=sqrt(sint)
+         endif
+
+         phi=twopi*ran2(iseed)
+         cosp=cos(phi)
+         sinp=sin(phi)
+
+         nxp=sint*cosp  
+         nyp=sint*sinp
+         nzp=cost
       else !photon absorbs
-         acount=acount+1
+!         acount=acount+1
          tflag=.TRUE.
 !         
          
@@ -211,19 +215,6 @@ do j=1,nphotons
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
 
-
-!************ carry out russian roulette to kill off phototns
-!if(weight.le.terminate)then
-!      if(ran2(iseed).le.chance)then
-!            weight=weight/chance
-!      else
-!            absorb=weight
-!     call binning(ddr,zcur,ddz,absorb)
-!            weight=0.
-!            tflag=.TRUE.
-!            exit
-!      end if
-!end if
 
 !nscatt=nscatt+1
 !      print*,tflag,'bt'
@@ -242,7 +233,9 @@ do j=1,nphotons
    end do
 
    continue
-
+   if(int(wave).ne.405..and.zp.ge.zmax-.1)then
+      fluroexit(int(wave))=fluroexit(int(wave))+1
+   end if
 end do      ! end loop over nph photons
 print*, acount, '# absorbed',id
 print*, fcount, '# fluro',id

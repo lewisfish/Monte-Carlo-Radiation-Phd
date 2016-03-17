@@ -1,6 +1,6 @@
 FCOMP = mpifort
 FCFLAGS = -O2 
-#FCFLAGS = -g -fcheck=all -fbounds-check -fbacktrace 
+#FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace 
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
 #LDFLAGS = 

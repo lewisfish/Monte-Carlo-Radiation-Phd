@@ -34,12 +34,10 @@ CONTAINS
       call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)
    end if
 !   set g and hgg
-!   hgg = 0.62 + 0.29 * 10.**(-3.) * wave
+   mus=mus/10.
+   mua=mua/10.
    hgg=0.7
    g2  = hgg**2.
-!   mua = 80.
-!   mus = 250.
-!   print*,mus
    kappa  = mus + mua + ((mus)/999.)
    albedo = (mus)/kappa
 
@@ -73,10 +71,10 @@ CONTAINS
    
       real,    intent(OUT)  :: y
       integer, intent(IN)   :: length
-      real,    intent(IN)   :: value,array(length,2),cdf(length-1)
+      real,    intent(IN)   :: value, array(length, 2), cdf(length - 1)
       integer, intent(IN)   :: nlow
    
-      y = array(nlow+1,1) + (array(nlow+2,1) - array(nlow+1,1)) * (value - cdf(nlow))/(cdf(nlow+1) - cdf(nlow))
+      y = array(nlow+1, 1) + (array(nlow+2, 1) - array(nlow + 1, 1)) * (value - cdf(nlow))/(cdf(nlow+1) - cdf(nlow))
    
    end subroutine lin_inter_1D
    
@@ -88,7 +86,7 @@ CONTAINS
 
       real,    intent(OUT)  :: y
       integer, intent(IN)   :: length
-      real,    intent(IN)   :: value,array(length,2)
+      real,    intent(IN)   :: value, array(length,2)
       integer, intent(IN)   :: nlow
    
       y = array(nlow,2) + (array(nlow+1,2) - array(nlow,2)) * (value - array(nlow,1))/(array(nlow+1,1) - array(nlow,1))

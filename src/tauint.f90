@@ -9,7 +9,7 @@ CONTAINS
    recursive subroutine tauint2(n1,n2,xcell,ycell,zcell,&
                      tflag,iseed,delta,sflag,weight,ddx,ddy)
 
-   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount,xmax,ymax,zmax
+   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount,xmax,ymax,zmax,OFFSET
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
    use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
    use opt_prop,    only : wave,kappa
@@ -207,22 +207,13 @@ tau=-alog(ran2(iseed))
 !***** photon position.
    if((d.ge.(.999*smax))) then
 
-   if(zcur.gt.2.*zmax*.999)then !.or.zcur.lt.0.0001
-
-      if(int(wave).eq.405.)then
+      
+      if(zcur.gt.(2.*zmax)-OFFSET)then
+         call fresnel(n1,n2,sflag,tflag,iseed,ddx,ddy,weight,xcur,ycur)
       else
-         if(((xcur-xmax)**2.+(ycur-ymax)**2.).lt.0.03**2)then
-            tcount=tcount+1
-            if(cost.gt..78)then
-                              bcount=bcount+1
-               fluroexit(int(wave))=fluroexit(int(wave))+1
-            end if
-         end if
+            tflag=.TRUE.
       end if
-   else
 
-   end if
-      tflag=.TRUE.
    else
 
       xp=xp+d*nxp

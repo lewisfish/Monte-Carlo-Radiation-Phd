@@ -97,15 +97,17 @@ CONTAINS
    !fluro
    call readfile_array2D(trim(resdir)//'fluro_mua_louise.dat', fluro_array, 0, 2)
 
+   cnt=int(size(fluro_array))/2
    allocate(f_cdf(cnt))
    f_cdf=0.
    
    !excite
    call readfile_array2D(trim(resdir)//'lousie_response.dat', excite_array, 0, 2)
 
+   cnt=int(size(excite_array))/2
    allocate(e_cdf(cnt))
    e_cdf=0.
-   
+
    !noise data
    call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
 
