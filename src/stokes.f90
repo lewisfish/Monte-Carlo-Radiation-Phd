@@ -14,9 +14,9 @@ CONTAINS
 
    integer iseed
 
-   real costp,sintp,phip
-   real bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt
-   real cosi2,sini1,cosi1,sini2,bott,cosdph
+   DOUBLE PRECISION costp,sintp,phip
+   DOUBLE PRECISION bmu,b,ri1,ri3,cosi3,sini3,cosb2,sinbt
+   DOUBLE PRECISION cosi2,sini1,cosi1,sini2,bott,cosdph
 
    real ran2
 

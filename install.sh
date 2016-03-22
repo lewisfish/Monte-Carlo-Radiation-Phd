@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd bin
+rm mcgrid
+cd ..
 cd src
 
 make clean && make 
@@ -27,4 +30,4 @@ for i in *; do
 done
 
 
-mv mcgrid "$bdirc" && echo " "&& echo "*****Install complete*****" && echo " "
+mv mcgrid "$bdirc" && echo " " && echo "*****Install complete*****" && echo " "

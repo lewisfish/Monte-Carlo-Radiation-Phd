@@ -47,26 +47,25 @@ CONTAINS
    !sets all arrays to zero
    implicit none
    
-
-   reflc=0.
-   trans=0.
-   image=0.
-   deposit=0.
-   dep=0.
+!   reflc=0.
+!   trans=0.
+!   image=0.
+!   deposit=0.
+!   dep=0.
    jmean=0.
-   transGLOBAL=0.
+!   transGLOBAL=0.
    jmeanGLOBAL=0.
-   imageGLOBAL=0.
-   depositGLOBAL=0.
-   depGLOBAL=0.
+!   imageGLOBAL=0.
+!   depositGLOBAL=0.
+!   depGLOBAL=0.
    xface=0.
    yface=0.
    zface=0.
    rhokap=0.
    fluroexit=0
    fluroexitGLOBAL=0
-   fluro_pos=0.
-   fluro_posGLOBAL=0.
+!   fluro_pos=0.
+!   fluro_posGLOBAL=0.
    
    end SUBROUTINE zarray
 
@@ -80,16 +79,16 @@ CONTAINS
    implicit none
    
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
-   allocate(rhokap(nxg+3,nyg+3,nzg+3,4))
+   allocate(rhokap(nxg+3,nyg+3,nzg+3,4))!,followGLOBAL(nxg,nyg,nzg))
    
-   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
-   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
-   allocate(fluro_pos(nxg,nyg,nzg),fluro_posGLOBAL(nxg,nyg,nzg))
+!   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
+!   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
+!   allocate(fluro_pos(nxg,nyg,nzg),fluro_posGLOBAL(nxg,nyg,nzg))
    
-   allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
-   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
-   allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
-   allocate(jmean(nxg+3,nyg+3,nzg+3,4)) 
+!   allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
+!   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
+!   allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
+   allocate(jmean(nxg+3,nyg+3,nzg+3,4))!,follow(nxg,nyg,nzg),ftmp(nxg,nyg,nzg)) 
    allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))
    allocate(fluroexit(1000),fluroexitGLOBAL(1000))
    

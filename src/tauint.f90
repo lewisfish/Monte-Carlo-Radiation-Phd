@@ -11,20 +11,21 @@ CONTAINS
 
    use constants,   only : PI,nxg,nyg,nzg,tcount,bcount,xmax,ymax,zmax,OFFSET
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
-   use iarray,      only : noise,jmean,xface,yface,zface,rhokap,trans,fluroexit
+   use iarray,      only : jmean,xface,yface,zface,rhokap!,trans,fluroexit
    use opt_prop,    only : wave,kappa
    use noisey_mod
 
    implicit none
 
    integer iseed,xcell,ycell,zcell
-   real weight,ddx,ddy
-   real ran2,n1,n2
+   DOUBLE PRECISION weight,ddx,ddy
+   DOUBLE PRECISION n1,n2
    logical tflag,sflag
+   real ran2
 
    integer celli,cellj,cellk
-   real tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
-   real dx,dy,dz,smax,delta
+   DOUBLE PRECISION tau,taurun,taucell,d,d1,dcell,xcur,ycur,zcur,dsx,dsy,dsz
+   DOUBLE PRECISION dx,dy,dz,smax,delta
 
 !**** generate random optical depth tau
 tau=-alog(ran2(iseed))
@@ -235,13 +236,14 @@ tau=-alog(ran2(iseed))
         
    use constants, only : pi,cbinsnum
    use photon_vars, only : nxp,nyp,nzp,cost,sint,cosp,sinp
-   use iarray, only : trans
+!   use iarray, only : trans
 
    implicit none
         
 
-   real n1,n2,n,tir,cost2,f1,f2,xcur,ycur
-   real ran2,costt,crit,ran,weight,ddx,ddy
+   DOUBLE PRECISION n1,n2,n,tir,cost2,f1,f2,xcur,ycur
+   DOUBLE PRECISION costt,crit,ran,weight,ddx,ddy
+   real ran2
    integer iseed,ix,iy
    logical sflag,tflag
         
@@ -302,7 +304,7 @@ tau=-alog(ran2(iseed))
    if(ix.lt.1)ix=1
    if(iy.gt.cbinsnum)iy=cbinsnum
    if(iy.lt.1)iy=1            
-   trans(ix,iy)=trans(ix,iy)+weight
+!   trans(ix,iy)=trans(ix,iy)+weight
          if(sflag.eqv..FALSE.)then
                 tflag=.TRUE.
          end if

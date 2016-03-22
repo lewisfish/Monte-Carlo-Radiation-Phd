@@ -4,6 +4,8 @@ FCFLAGS = -O2
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
 #LDFLAGS = 
+#goes after $^ -pg 
+#-pg goes between fcomp and fcflags
 PROGRAM =  mcgrid 
 
 SRCS =      ran2.f \
@@ -34,8 +36,7 @@ all:	$(PROGRAM)
 
 $(PROGRAM):	$(OBJECTS)
 	$(FCOMP) $(FCFLAGS) -o $@ $^ 
-	#goes after $^ -pg 
-#-pg goes between fcomp and fcflags
+
 %.o:  %.f90
 	$(FCOMP)  $(FCFLAGS) -c $<
 

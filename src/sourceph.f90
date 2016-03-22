@@ -13,26 +13,27 @@ CONTAINS
 
 
    integer xcell,ycell,zcell,iseed
-   real w,r1,phigauss,zf
-   real xf,temp
+   DOUBLE PRECISION w,r1,phigauss,zf
+   DOUBLE PRECISION xf,temp
    real ran2
 
    !***** emit photon from a circle on surface
    ! min+ran2*(max-min)
    zp=zmax
-!   w=0.03
-!   !      xp=0.
-!   !      yp=0.
-!   xp=xmax
-!   yp=ymax
-!   do while(xp**2+yp**2 .gt. w**2.)
-!       xp=.12*ran2(iseed)-0.06
-!       yp=0.12*ran2(iseed)-0.06
-!   end do
+   !radius in mm
+   w=0.3
+!!   !      xp=0.
+!!   !      yp=0.
+   xp=xmax
+   yp=ymax
+   do while(xp**2+yp**2 .gt. w**2.)
+       xp=w*2.*ran2(iseed)-w
+       yp=w*2.*ran2(iseed)-w
+   end do
    !***** emit isotropically from a point
 
-         xp=0.
-         yp=0.
+!         xp=0.
+!         yp=0.
 
    !      cost=2.*ran2(iseed)-1.
    !      sint=(1.-cost*cost)
@@ -55,10 +56,10 @@ CONTAINS
 
    !**** Collimated Gaussian Beam
 
-   !      r1=w*sqrt(-log(ran2(iseed)))
-   !      phigauss=TWOPI*ran2(iseed) 
-   !      xp=r1*cos(phigauss)
-   !      yp=r1*sin(phigauss)
+!         r1=w*sqrt(-log(ran2(iseed)))
+!         phigauss=TWOPI*ran2(iseed) 
+!         xp=r1*cos(phigauss)
+!         yp=r1*sin(phigauss)
 
    !**** Focused Gaussian Beam
    !      zf=.05

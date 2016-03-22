@@ -28,14 +28,14 @@ integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
 integer cnt,io,i,flucount,k,nlow
 logical tflag,sflag,fflag
 DOUBLE PRECISION nscatt
-real :: absorb,ddy,ddx
-real :: delta,xcur,ycur,zcur,thetaim,ran
-real :: n1,n2,weight,hggtmp
+DOUBLE PRECISION :: absorb,ddy,ddx
+DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran
+DOUBLE PRECISION :: n1,n2,weight,hggtmp
 
-real :: ddz,ddr,v(3),fluro_prob
-real :: costim,cospim,sintim,sinpim
-real :: phiim
-real :: start,finish,ran2
+DOUBLE PRECISION :: ddz,ddr,v(3),fluro_prob
+DOUBLE PRECISION :: costim,cospim,sintim,sinpim
+DOUBLE PRECISION :: phiim
+real :: start,finish,ran2,sleft,fleft,time
 
 !      variables for openmpi. GLOBAL indicates final values after mpi reduce
 !      numproc is number of process being run, id is the indivdual id of each process
@@ -130,7 +130,7 @@ call MPI_Barrier(MPI_COMM_WORLD,error)
 call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
-
+call cpu_time(sleft)
 !loop over photons   
 do j=1,nphotons
   
@@ -142,10 +142,26 @@ do j=1,nphotons
    sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
-   if(mod(j,100000).eq.0)then
-      print *, j,' scattered photons completed on core:',id
+   if(mod(j,1000000).eq.0)then
+      if(id.eq.0)then
+         print *, ' percentage completed: ',real(real(j)/real(nphotons))*100.
+      end if
    end if
-    
+   if(id.eq.0)then
+   if (j.eq.100)then
+      call cpu_time(fleft)
+      time = ((fleft-sleft)/100.d0)*real(nphotons)
+      print*,' '
+      if(time.ge.60.)then
+         print'(A, I3, 1X, A)','Approx time program will take to run: ',floor((time)/60.d0),'mins'
+      else
+         print'(A, 1X, I2, A)', 'Approx time program will take to run:',floor(time),'s'
+      end if
+         print*,' '
+   end if
+   end if
+
+   
 !***** Release photon from point source *******************************
    call sourceph(xcell,ycell,zcell,iseed)
 !***** Update xcur etc.
@@ -179,15 +195,14 @@ do j=1,nphotons
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-         acount=acount+1
 !         print*,mua,mus,kappa,wave
 !      else if(ran.lt.(mua+mus)/kappa)then  !photon fluros
-       elseif(fflag.eqv..FALSE..and.ran.lt.(mus+mua)/kappa)then
+       elseif(fflag.eqv..FALSE.)then
          fflag=.TRUE.
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
-         fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
-         fcount=fcount+1
+!         fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
+!         fcount=fcount+1
          cost=2.*ran2(iseed)-1.
          sint=(1.-cost*cost)
          if(sint.le.0.)then
@@ -231,15 +246,22 @@ do j=1,nphotons
       zcur=zp+zmax
 
    end do
-
-   continue
-   if(int(wave).ne.405..and.zp.ge.zmax-.1)then
-      fluroexit(int(wave))=fluroexit(int(wave))+1
+   if(int(wave).ne.405..and.zp.ge.zmax*.999)then
+      acount=acount+1
+      if(xp**2+yp**2.lt.0.3**2.)then
+         fcount=fcount+1
+!         if(cost.gt.0.944)then
+            flucount=flucount+1
+            fluroexit(int(wave))=fluroexit(int(wave))+1
+!         end if
+      end if
    end if
 end do      ! end loop over nph photons
-print*, acount, '# absorbed',id
-print*, fcount, '# fluro',id
-print*, acount+fcount,'total',id
+
+print*, acount, '1st barrier',id
+print*, fcount, '2nd barrier',id
+print*, flucount,'# photons collected',id
+
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
@@ -251,31 +273,22 @@ end if
 call MPI_Barrier(MPI_COMM_WORLD,error)
 
 !      path length reduce     
-call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4,MPI_DOUBLE_PRECISION &
+               ,MPI_SUM,0,MPI_COMM_WORLD,error)
 call MPI_Barrier(MPI_COMM_WORLD,error)
 print*,'done jmean'
 
-do k=1,cbinsnum
-    do j=1,cbinsnum
-        do i=1,cbinsnum
-            dep(k)=dep(k)+deposit(i,j,k)
-        end do
-    end do
-end do
-
-!dep=dep/(mua*nphotons*(ddz))
-
-call MPI_REDUCE(dep,depGLOBAL,cbinsnum,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-call MPI_Barrier(MPI_COMM_WORLD,error)
+!call MPI_REDUCE(dep,depGLOBAL,cbinsnum,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
 
 !     deposit reduce
-call MPI_REDUCE(deposit,depositGLOBAL,(cbinsnum**3),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-call MPI_Barrier(MPI_COMM_WORLD,error)
-print*,'done deposit'
+!call MPI_REDUCE(deposit,depositGLOBAL,(cbinsnum**3),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
+!print*,'done deposit'
 
-!      images reduce
-call MPI_REDUCE(image,imageGLOBAL,(Nbins**2)*4,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
-call MPI_Barrier(MPI_COMM_WORLD,error)
+!!      images reduce
+!call MPI_REDUCE(image,imageGLOBAL,(Nbins**2)*4,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
 print*,'done image'
 
 !     nscatt reduce
@@ -283,15 +296,19 @@ call MPI_Barrier(MPI_COMM_WORLD,error)
 call MPI_REDUCE(nscatt,nscattGLOBAL,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 !     trans reduce
-call MPI_Barrier(MPI_COMM_WORLD,error)
-call MPI_REDUCE(trans,transGLOBAL,nxg*nyg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
+!call MPI_REDUCE(trans,transGLOBAL,nxg*nyg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 print*,'done trans'
+
+!call MPI_Barrier(MPI_COMM_WORLD,error)
+!call MPI_REDUCE(follow,followGLOBAL,(nxg)*(nyg)*(nzg),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+
 !     fluroexit reduce
 call MPI_Barrier(MPI_COMM_WORLD,error)
 call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
 !     fluro_pos reduce
-call MPI_Barrier(MPI_COMM_WORLD,error)
-call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
+!call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 print*,'done all reduces',id
 call MPI_Barrier(MPI_COMM_WORLD,error)
@@ -303,8 +320,7 @@ if(id.eq.0)then
     call writer
     print*,'write done'
 end if
-print*,'t',tcount,id
-print*,'b',bcount,id
+
 !end MPI processes
 call MPI_Finalize(error)
 end program mcpolar

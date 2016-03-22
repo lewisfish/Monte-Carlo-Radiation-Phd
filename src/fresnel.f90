@@ -13,8 +13,9 @@ CONTAINS
    implicit none
         
 
-   real n1,n2,n,tir,cost2,f1,f2,xcur,ycur
-   real ran2,costt,crit,ran,weight,ddx,ddy
+   DOUBLE PRECISION n1,n2,n,tir,cost2,f1,f2,xcur,ycur
+   DOUBLE PRECISION costt,crit,ran,weight,ddx,ddy
+   real ran2
    integer iseed,ix,iy
    logical sflag,tflag
         

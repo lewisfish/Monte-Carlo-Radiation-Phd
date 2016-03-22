@@ -81,7 +81,7 @@ CONTAINS
    subroutine reader1
    
    use iarray,    only : mua_array, mus_array, f_cdf, fluro_array, &
-                         e_cdf, excite_array, noise
+                         e_cdf, excite_array!, noise
    use constants, only : resdir
    
    implicit none
@@ -92,7 +92,7 @@ CONTAINS
    call readfile_array2D(trim(resdir)//'mua.dat', mua_array, 0, 2)
    
    !mus
-   call readfile_array2D(trim(resdir)//'interlipid_scat8.dat', mus_array, 0, 2)
+   call readfile_array2D(trim(resdir)//'intralpid20.dat', mus_array, 0, 2)
   
    !fluro
    call readfile_array2D(trim(resdir)//'fluro_mua_louise.dat', fluro_array, 0, 2)
@@ -109,7 +109,7 @@ CONTAINS
    e_cdf=0.
 
    !noise data
-   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
+!   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
 
    end subroutine reader1
    
@@ -125,7 +125,7 @@ CONTAINS
    ! between using square array and other shapes, colsize is an optional argument that
    ! specifies the size of the 2nd dimension of the array
    !
-   real, allocatable, dimension(:,:), intent(inout) :: array
+   DOUBLE PRECISION, allocatable, dimension(:,:), intent(inout) :: array
    integer,                           intent(in)    :: flag
    integer,                 optional, intent(in)    :: colsize
    character(*),                      intent(in)    :: filename

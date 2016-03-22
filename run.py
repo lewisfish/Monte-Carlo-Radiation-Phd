@@ -7,15 +7,17 @@ import Image
 try:
     subprocess.call("./install.sh", shell = True)
     os.chdir(os.getcwd() + '/bin/')
-    subprocess.call("mpirun -n 2 ./mcgrid", shell = True)
+    subprocess.call("mpirun -n 4 ./mcgrid", shell = True)
 
-    os.chdir('../data')
-    
-    subprocess.call("gnuplot plot.gp", shell = True)
-    try:
-       Image.open('fluro.png').show()
-    except IOError:
-       print "File does not exist!!"
-       pass
+#    os.chdir('../data')
+#    
+#    subprocess.call("gnuplot plot.gp", shell = True)
+#    try:
+#       Image.open('fluro.png').show()
+#    except IOError:
+#       print "File does not exist!!"
+#       pass
+#    os.chdir(os.getcwd() + '/jmean/')
+#    subprocess.call('python gui.py', shell=True)
 except KeyboardInterrupt:
     pass

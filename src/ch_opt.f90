@@ -15,7 +15,10 @@ CONTAINS
    implicit none
    
    integer :: nlow
+   DOUBLE PRECISION    :: conc
 
+   conc = .2
+   
    !set mua_skin
    call search_2D(size(fluro_array,1),fluro_array,nlow,wave)
    call lin_inter_2D(fluro_array,wave,size(fluro_array,1),nlow,mua)
@@ -25,20 +28,21 @@ CONTAINS
 !   call lin_inter_2D(excite_array,wave,size(excite_array,1),nlow,muaf)   
 
 !   set mus
-   if(wave.eq.405.)then
-      mus=26.9 !for .8%
-!      mus=16.7 !for .5%
-!      mus=6.7 !for .2%
-   else
+!   if(wave.eq.405.)then
+!!      mus=26.9 !for .8%
+!!      mus=16.7 !for .5%
+!!      mus=6.7 !for .2%
+!   else
       call search_2D(size(mus_array,1),mus_array,nlow,wave)
       call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)
-   end if
+!   end if
 !   set g and hgg
-   mus=mus/10.
-   mua=mua/10.
+   mus=mus/(6.98*conc**(-.96))
+   mus=mus*.01
+   mua=mua*.01
    hgg=0.7
    g2  = hgg**2.
-   kappa  = mus + mua + ((mus)/999.)
+   kappa  = mus + mua
    albedo = (mus)/kappa
 
    end subroutine init_opt
@@ -50,10 +54,11 @@ CONTAINS
       implicit none
       
       integer, intent(IN)    :: iseed,size_of
-      real,    intent(IN)    :: array(size_of,2),cdf(size_of)
-      real,    intent(OUT)   :: wave
-
-      real :: ran2,value
+      DOUBLE PRECISION,    intent(IN)    :: array(size_of,2),cdf(size_of)
+      DOUBLE PRECISION,    intent(OUT)   :: wave
+      
+      real :: ran2
+      DOUBLE PRECISION :: value
       integer :: nlow
       
       value = ran2(iseed)
@@ -69,9 +74,9 @@ CONTAINS
 !   
       implicit none
    
-      real,    intent(OUT)  :: y
+      DOUBLE PRECISION,    intent(OUT)  :: y
       integer, intent(IN)   :: length
-      real,    intent(IN)   :: value, array(length, 2), cdf(length - 1)
+      DOUBLE PRECISION,    intent(IN)   :: value, array(length, 2), cdf(length - 1)
       integer, intent(IN)   :: nlow
    
       y = array(nlow+1, 1) + (array(nlow+2, 1) - array(nlow + 1, 1)) * (value - cdf(nlow))/(cdf(nlow+1) - cdf(nlow))
@@ -84,9 +89,9 @@ CONTAINS
 !
       implicit none
 
-      real,    intent(OUT)  :: y
+      DOUBLE PRECISION,    intent(OUT)  :: y
       integer, intent(IN)   :: length
-      real,    intent(IN)   :: value, array(length,2)
+      DOUBLE PRECISION,    intent(IN)   :: value, array(length,2)
       integer, intent(IN)   :: nlow
    
       y = array(nlow,2) + (array(nlow+1,2) - array(nlow,2)) * (value - array(nlow,1))/(array(nlow+1,1) - array(nlow,1))
@@ -101,7 +106,7 @@ CONTAINS
       
       integer              :: nup,length,middle
       integer, intent(OUT) :: nlow
-      real,    intent(in)  :: array(length),value
+      DOUBLE PRECISION,    intent(in)  :: array(length),value
       
       nup = length
       nlow = 1
@@ -125,7 +130,7 @@ CONTAINS
       
       integer              :: nup,length,middle
       integer, intent(OUT) :: nlow
-      real,    intent(in)  :: array(length,2),value
+      DOUBLE PRECISION,    intent(in)  :: array(length,2),value
       
       nup = length
       nlow = 1
@@ -148,9 +153,9 @@ CONTAINS
       implicit none
 
       integer, intent(IN)    :: length
-      real,    intent(IN)    :: array(length,2)
-      real,    intent(INOUT) :: cdf(length)
-      real                   :: summ
+      DOUBLE PRECISION,    intent(IN)    :: array(length,2)
+      DOUBLE PRECISION,    intent(INOUT) :: cdf(length)
+      DOUBLE PRECISION                   :: summ
       integer                :: i,j
    
       do j=1,length-1

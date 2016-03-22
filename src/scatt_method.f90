@@ -16,10 +16,11 @@ contains
       implicit none
       
       integer :: iseed
-      real*8 :: nscatt
+      DOUBLE PRECISION :: nscatt
       logical :: tflag
-      real :: ran2, ran, weight, absorb
-   
+      DOUBLE PRECISION :: ran, weight, absorb
+      real :: ran2
+      
       ran = ran2(iseed)
       
       weight = weight * albedo
@@ -50,7 +51,8 @@ contains
       use stokes_mod      
       implicit none
       
-      real :: ran2, ran
+      DOUBLE PRECISION :: ran
+      real :: ran2
       real*8 :: nscatt
       integer :: iseed
       logical :: tflag
@@ -79,8 +81,8 @@ contains
       
       implicit none
       
-      real*8 :: nscatt
-      real :: ran2, ran, hgghold
+      DOUBLE PRECISION :: nscatt, ran, hgghold
+      real :: ran2
       integer :: iseed
       logical :: tflag
       

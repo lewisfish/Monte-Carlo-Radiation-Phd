@@ -4,8 +4,8 @@ use photon_vars, only : nxp,nyp,nzp
 
 implicit none
 
-real xcur,ycur,zcur,dsx,dsy,dsz,delta,smax
-real xmax,ymax,zmax
+DOUBLE PRECISION xcur,ycur,zcur,dsx,dsy,dsz,delta,smax
+DOUBLE PRECISION xmax,ymax,zmax
 logical tflag
 
 dsx=0.

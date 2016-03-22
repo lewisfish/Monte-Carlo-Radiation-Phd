@@ -11,7 +11,7 @@ CONTAINS
    
    implicit none
 
-   real x,y,z,rho
+   DOUBLE PRECISION x,y,z,rho
 
 !***** calculate some distances for use in setting up density 
 !***** structure. Note that distances are in units of xmax, ymax, and zmax 

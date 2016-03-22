@@ -15,11 +15,11 @@ CONTAINS
    !change nxp etc as they ar local here. may cause confusion
 
    integer xcell,ycell,zcell
-   real nxp,nyp,nzp
+   DOUBLE PRECISION nxp,nyp,nzp
 
    integer celli,cellj,cellk
-   real xcur,ycur,zcur,dx,dy,dz,d,dcell,taurun
-   real smax,dsx,dsy,dsz,delta,v(3),taucell,tau1
+   DOUBLE PRECISION xcur,ycur,zcur,dx,dy,dz,d,dcell,taurun
+   DOUBLE PRECISION smax,dsx,dsy,dsz,delta,v(3),taucell,tau1
 
    nxp=v(1)
    nyp=v(2)

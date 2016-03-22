@@ -16,7 +16,7 @@ CONTAINS
    integer xcell,ycell,zcell,cur,iseed,flucount
    logical tauflag
    real ran2
-   real chance,ran,kappa(1),weight,dens(1)
+   DOUBLE PRECISION chance,ran,kappa(1),weight,dens(1)
 
    chance=.50
    ran=ran2(iseed)

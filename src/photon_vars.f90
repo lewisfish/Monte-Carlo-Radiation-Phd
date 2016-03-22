@@ -9,6 +9,6 @@ MODULE photon_vars
 implicit none
 save
 
-real :: xp,yp,zp,nxp,nyp,nzp,sint,cost,sinp,cosp,phi
+DOUBLE PRECISION :: xp,yp,zp,nxp,nyp,nzp,sint,cost,sinp,cosp,phi
 
 end MODULE photon_vars

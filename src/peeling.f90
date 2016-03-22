@@ -9,15 +9,15 @@ CONTAINS
 
    use constants, only   : pi,nbins,xmax,ymax,zmax
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp
-   use iarray, only      : xface,yface,zface,rhokap,image
+   use iarray, only      : xface,yface,zface,rhokap!,image
    use opt_prop, only    : hgg,g2
    use taufind
    
    implicit none
 
-   real xim,yim,tau1,prob,v(3),sinpim
-   real bin_width,hgfact,sintim
-   real delta,cosa,costim,cospim
+   DOUBLE PRECISION xim,yim,tau1,prob,v(3),sinpim
+   DOUBLE PRECISION bin_width,hgfact,sintim
+   DOUBLE PRECISION delta,cosa,costim,cospim
    integer binx,biny,xcell,ycell,zcell
 
    ! set bin width for images
@@ -45,7 +45,7 @@ CONTAINS
    !calc total weight of peeled off photon
    prob=1.*exp(-tau1)
 
-   image(binx,biny,1)=image(binx,biny,1)+prob
+!   image(binx,biny,1)=image(binx,biny,1)+prob
 
 
    end subroutine peelingoff

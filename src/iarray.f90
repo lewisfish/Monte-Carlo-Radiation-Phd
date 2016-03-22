@@ -5,18 +5,18 @@ MODULE iarray
 implicit none
 save
 
-real, allocatable :: xface(:),yface(:),zface(:)
-real, allocatable :: rhokap(:,:,:,:)
-real, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
+DOUBLE PRECISION, allocatable :: xface(:),yface(:),zface(:)
+DOUBLE PRECISION, allocatable :: rhokap(:,:,:,:)
+DOUBLE PRECISION, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
-real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
-real, allocatable :: fluro_pos(:,:,:),fluro_posGLOBAL(:,:,:)
+!real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
+!real, allocatable :: fluro_pos(:,:,:),fluro_posGLOBAL(:,:,:)
 
-real, allocatable :: image(:,:,:),deposit(:,:,:),dep(:)
-real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
-real, allocatable :: depositGLOBAL(:,:,:),depGLOBAL(:)
+!real, allocatable :: image(:,:,:),deposit(:,:,:),dep(:)
+!real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
+!real, allocatable :: depositGLOBAL(:,:,:),depGLOBAL(:)
 
-real, allocatable :: f_cdf(:),mua_array(:,:),excite_array(:,:)
-real, allocatable :: mus_array(:,:),fluro_array(:,:),e_cdf(:)
+DOUBLE PRECISION, allocatable :: f_cdf(:),mua_array(:,:),excite_array(:,:)
+DOUBLE PRECISION, allocatable :: mus_array(:,:),fluro_array(:,:),e_cdf(:)
 integer, allocatable :: fluroexit(:),fluroexitGLOBAL(:)
 end MODULE iarray

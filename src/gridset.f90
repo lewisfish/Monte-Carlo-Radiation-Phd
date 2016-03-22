@@ -14,7 +14,7 @@ CONTAINS
 
 
    integer i,j,k,kflag,id
-   real x,y,z,rho,taueq1,taupole1,taueq2,taupole2
+   DOUBLE PRECISION x,y,z,rho,taueq1,taupole1,taueq2,taupole2
 
    if(id.eq.0.)then
    print*, ' '
