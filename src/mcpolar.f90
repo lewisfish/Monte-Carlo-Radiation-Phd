@@ -148,9 +148,9 @@ do j=1,nphotons
       end if
    end if
    if(id.eq.0)then
-   if (j.eq.100)then
+   if (j.eq.1000)then
       call cpu_time(fleft)
-      time = ((fleft-sleft)/100.d0)*real(nphotons)
+      time = ((fleft-sleft)/1000.d0)*real(nphotons)
       print*,' '
       if(time.ge.60.)then
          print'(A, I3, 1X, A)','Approx time program will take to run: ',floor((time)/60.d0),'mins'
