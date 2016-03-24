@@ -3,5 +3,6 @@
 build/
 ext/
 bin/
+data/
 src/unused/
 *.swp
