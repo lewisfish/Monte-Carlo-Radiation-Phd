@@ -9,7 +9,7 @@ CONTAINS
 !  subroutine to set optical properties
 !
 
-   use iarray, only : mua_array,mus_array,excite_array,fluro_array
+   use iarray, only : mus_array,excite_array,fluro_array
    use opt_prop
    
    implicit none

@@ -7,9 +7,9 @@ CONTAINS
    subroutine peelingoff(xcell,ycell,zcell,delta &
                          ,v,sintim,costim,sinpim,cospim) 
 
-   use constants, only   : pi,nbins,xmax,ymax,zmax
+   use constants, only   : pi,nbins,xmax
    use photon_vars, only : xp,yp,zp,nxp,nyp,nzp
-   use iarray, only      : xface,yface,zface,rhokap!,image
+!   use iarray, only      : image
    use opt_prop, only    : hgg,g2
    use taufind
    

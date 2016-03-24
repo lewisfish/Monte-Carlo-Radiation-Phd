@@ -1,8 +1,6 @@
 #!/bin/bash
 
-cd bin
-rm mcgrid
-cd ..
+
 cd src
 
 make clean && make 
@@ -18,6 +16,7 @@ if [ ! -d "bin" ]; then
    mkdir "bin"
 fi
 cd bin
+rm mcgrid
 bdirc="$(pwd)"
 cd ..
 cd src

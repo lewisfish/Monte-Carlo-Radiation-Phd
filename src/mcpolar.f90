@@ -24,15 +24,12 @@ use writer_mod
 
 implicit none
 
-integer nphotons,iseed,j,xcell,ycell,zcell,celli,cellk
-integer cnt,io,i,flucount,k,nlow
-logical tflag,sflag,fflag
-DOUBLE PRECISION nscatt
-DOUBLE PRECISION :: absorb,ddy,ddx
-DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran
-DOUBLE PRECISION :: n1,n2,weight,hggtmp
+integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount 
+logical :: tflag,sflag,fflag
+DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight
+DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran 
 
-DOUBLE PRECISION :: ddz,ddr,v(3),fluro_prob
+DOUBLE PRECISION :: ddz,ddr,v(3)
 DOUBLE PRECISION :: costim,cospim,sintim,sinpim
 DOUBLE PRECISION :: phiim
 real :: start,finish,ran2,sleft,fleft,time
@@ -76,10 +73,9 @@ call reader1
 acount=0
 fcount=0
 
-
 !****** setup up arrays and bin numbers/dimensions
 
-!     set bin widths for deposit method
+!set bin widths for deposit method
 ddz=(2.*zmax)/cbinsnum
 ddx=(2.*xmax)/cbinsnum
 ddy=(2.*ymax)/cbinsnum
@@ -125,12 +121,15 @@ call gridset(id)
 !***** for roundoff effects when crossing cell walls
 delta=1.e-6*(2.*xmax/nxg)
 nscatt=0
-tcount=0;tcount=0
+tcount=0
+
 call MPI_Barrier(MPI_COMM_WORLD,error)
 call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
 call cpu_time(sleft)
+
+
 !loop over photons   
 do j=1,nphotons
   
@@ -150,7 +149,7 @@ do j=1,nphotons
    if(id.eq.0)then
    if (j.eq.1000)then
       call cpu_time(fleft)
-      time = ((fleft-sleft)/1000.d0)*real(nphotons)
+      time = ((fleft-sleft)/1000.)*real(nphotons)
       print*,' '
       if(time.ge.60.)then
          print'(A, I3, 1X, A)','Approx time program will take to run: ',floor((time)/60.d0),'mins'
@@ -230,17 +229,14 @@ do j=1,nphotons
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
 
-
-!nscatt=nscatt+1
-!      print*,tflag,'bt'
 !************ Find next scattering location
       call tauint2(n1,n2,xcell,ycell,zcell,&
    tflag,iseed,delta,sflag,weight,ddx,ddy)
-!      print*,tflag,'at'
 
 !************ Peel off photon into image
 !      call peelingoff(xcell,ycell,zcell,delta &
 !      ,v,sintim,costim,sinpim,cospim)
+
       xcur=xp+xmax
       ycur=yp+ymax
       zcur=zp+zmax

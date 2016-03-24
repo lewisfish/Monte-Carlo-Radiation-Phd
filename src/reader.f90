@@ -86,7 +86,7 @@ CONTAINS
    
    implicit none
    
-   integer :: cnt, io, i, j
+   integer :: cnt
    
    !mua
    call readfile_array2D(trim(resdir)//'mua.dat', mua_array, 0, 2)

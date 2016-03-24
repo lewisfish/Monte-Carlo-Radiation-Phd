@@ -9,10 +9,10 @@ CONTAINS
    recursive subroutine tauint2(n1,n2,xcell,ycell,zcell,&
                      tflag,iseed,delta,sflag,weight,ddx,ddy)
 
-   use constants,   only : PI,nxg,nyg,nzg,tcount,bcount,xmax,ymax,zmax,OFFSET
-   use photon_vars, only : xp,yp,zp,nxp,nyp,nzp,cost,sint,cosp,sinp
+   use constants,   only : PI,nxg,nyg,nzg,xmax,ymax,zmax,OFFSET
+   use photon_vars, only : xp,yp,zp,nxp,nyp,nzp
    use iarray,      only : jmean,xface,yface,zface,rhokap!,trans,fluroexit
-   use opt_prop,    only : wave,kappa
+   use opt_prop,    only : kappa
    use noisey_mod
 
    implicit none
