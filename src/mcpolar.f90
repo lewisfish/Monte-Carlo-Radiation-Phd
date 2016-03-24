@@ -103,12 +103,14 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=405. ! value used in http://www.photobiology.com/v1/sikorski/ and where the excite and fluro data comes from.
+wave=405. 
 
+! create cdfs to sample from
 call mk_cdf(fluro_array,f_cdf,size(f_cdf))
 call mk_cdf(excite_array,e_cdf,size(e_cdf))
 call init_opt
-   
+
+! calculate number of photons to be run over all cores.  
 if(id.eq.0)then
    print*, ''      
    print*,'# of photons to run',nphotons*numproc
@@ -141,6 +143,7 @@ do j=1,nphotons
    sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
+! code to output progress as program runs also gives an estimate of when program will complete.
    if(mod(j,1000000).eq.0)then
       if(id.eq.0)then
          print *, ' percentage completed: ',real(real(j)/real(nphotons))*100.
@@ -163,8 +166,8 @@ do j=1,nphotons
    
 !***** Release photon from point source *******************************
    call sourceph(xcell,ycell,zcell,iseed)
-!***** Update xcur etc.
 
+!***** Update xcur etc.
    xcur=xp+xmax
    ycur=yp+ymax
    zcur=zp+zmax
@@ -187,21 +190,17 @@ do j=1,nphotons
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
    do while(tflag.eqv..FALSE.) 
 
-!******** Drop weight
+!******** Scatter or absorb/fluro
 
 ! Select albedo based on current photon wavelength
       ran=ran2(iseed)
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-!         print*,mua,mus,kappa,wave
-!      else if(ran.lt.(mua+mus)/kappa)then  !photon fluros
        elseif(fflag.eqv..FALSE.)then
          fflag=.TRUE.
          call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
          call init_opt
-!         fluro_pos(xcell,ycell,zcell)=fluro_pos(xcell,ycell,zcell)+1
-!         fcount=fcount+1
          cost=2.*ran2(iseed)-1.
          sint=(1.-cost*cost)
          if(sint.le.0.)then
@@ -218,9 +217,7 @@ do j=1,nphotons
          nyp=sint*sinp
          nzp=cost
       else !photon absorbs
-!         acount=acount+1
          tflag=.TRUE.
-!         
          
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
@@ -242,6 +239,7 @@ do j=1,nphotons
       zcur=zp+zmax
 
    end do
+!bin photons leaving top surface if they are collected by fibre
    if(int(wave).ne.405..and.zp.ge.zmax*.999)then
       acount=acount+1
       if(xp**2+yp**2.lt.0.3**2.)then
@@ -258,6 +256,7 @@ print*, acount, '1st barrier',id
 print*, fcount, '2nd barrier',id
 print*, flucount,'# photons collected',id
 
+!give time taken to run program
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
