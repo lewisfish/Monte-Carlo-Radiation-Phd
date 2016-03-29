@@ -80,8 +80,9 @@ CONTAINS
    
    subroutine reader1
    
-   use iarray,    only : mua_array, mus_array, f_cdf, fluro_array, &
-                         e_cdf, excite_array!, noise
+   use iarray,    only : mua_array, mus_array,  &
+                         f_cdf_n, fluro_array_n, e_cdf_n, excite_array_n, &
+                         f_cdf_c, fluro_array_c, e_cdf_c, excite_array_c!, noise
    use constants, only : resdir
    
    implicit none
@@ -92,21 +93,35 @@ CONTAINS
    call readfile_array2D(trim(resdir)//'mua.dat', mua_array, 0, 2)
    
    !mus
-   call readfile_array2D(trim(resdir)//'intralpid20.dat', mus_array, 0, 2)
+   call readfile_array2D(trim(resdir)//'mus.dat', mus_array, 0, 2)
   
-   !fluro
-   call readfile_array2D(trim(resdir)//'fluro_mua_louise.dat', fluro_array, 0, 2)
+   !fluro nadh
+   call readfile_array2D(trim(resdir)//'nadh emission.dat', fluro_array_n, 0, 2)
 
-   cnt=int(size(fluro_array))/2
-   allocate(f_cdf(cnt))
-   f_cdf=0.
+   cnt=int(size(fluro_array_n))/2
+   allocate(f_cdf_n(cnt))
+   f_cdf_n=0.
    
-   !excite
-   call readfile_array2D(trim(resdir)//'lousie_response.dat', excite_array, 0, 2)
+   !excite nadh
+   call readfile_array2D(trim(resdir)//'nadh excite.dat', excite_array_n, 0, 2)
 
-   cnt=int(size(excite_array))/2
-   allocate(e_cdf(cnt))
-   e_cdf=0.
+   cnt=int(size(excite_array_n))/2
+   allocate(e_cdf_n(cnt))
+   e_cdf_n=0.
+   
+   !fluro collagen
+   call readfile_array2D(trim(resdir)//'collagen emission.dat', fluro_array_c, 0, 2)
+
+   cnt=int(size(fluro_array_c))/2
+   allocate(f_cdf_c(cnt))
+   f_cdf_c=0.
+   
+   !excite collagen
+   call readfile_array2D(trim(resdir)//'collagen excite.dat', excite_array_c, 0, 2)
+
+   cnt=int(size(excite_array_c))/2
+   allocate(e_cdf_c(cnt))
+   e_cdf_c=0.
 
    !noise data
 !   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)

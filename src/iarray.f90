@@ -16,7 +16,8 @@ DOUBLE PRECISION, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 !real, allocatable :: imageGLOBAL(:,:,:),transGLOBAL(:,:)
 !real, allocatable :: depositGLOBAL(:,:,:),depGLOBAL(:)
 
-DOUBLE PRECISION, allocatable :: f_cdf(:),mua_array(:,:),excite_array(:,:)
-DOUBLE PRECISION, allocatable :: mus_array(:,:),fluro_array(:,:),e_cdf(:)
+DOUBLE PRECISION, allocatable :: mus_array(:,:),mua_array(:,:)
+DOUBLE PRECISION, allocatable :: f_cdf_c(:),e_cdf_c(:),excite_array_c(:,:),fluro_array_c(:,:)
+DOUBLE PRECISION, allocatable :: f_cdf_n(:),e_cdf_n(:),excite_array_n(:,:),fluro_array_n(:,:)
 integer, allocatable :: fluroexit(:),fluroexitGLOBAL(:)
 end MODULE iarray

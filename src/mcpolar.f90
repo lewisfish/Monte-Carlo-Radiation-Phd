@@ -24,9 +24,9 @@ use writer_mod
 
 implicit none
 
-integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount 
+integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount,nlow
 logical :: tflag,sflag,fflag
-DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight
+DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight,val,fluro_prob
 DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran 
 
 DOUBLE PRECISION :: ddz,ddr,v(3)
@@ -103,11 +103,15 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=405. 
+wave=365. 
 
 ! create cdfs to sample from
-call mk_cdf(fluro_array,f_cdf,size(f_cdf))
-call mk_cdf(excite_array,e_cdf,size(e_cdf))
+!collagen
+call mk_cdf(fluro_array_c,f_cdf_c,size(f_cdf_c))
+call mk_cdf(excite_array_c,e_cdf_c,size(e_cdf_c))
+!nadh
+call mk_cdf(fluro_array_n,f_cdf_n,size(f_cdf_n))
+call mk_cdf(excite_array_n,e_cdf_n,size(e_cdf_n))
 call init_opt
 
 ! calculate number of photons to be run over all cores.  
@@ -136,7 +140,7 @@ call cpu_time(sleft)
 do j=1,nphotons
   
 !set init weight and flags
-   wave=405.
+   wave=365.
    call init_opt
    tflag=.FALSE.
    fflag=.FALSE.
@@ -146,7 +150,7 @@ do j=1,nphotons
 ! code to output progress as program runs also gives an estimate of when program will complete.
    if(mod(j,1000000).eq.0)then
       if(id.eq.0)then
-         print *, ' percentage completed: ',real(real(j)/real(nphotons))*100.
+         print *, ' percentage completed: ',real(real(j)/real(nphotons))*100.,flucount
       end if
    end if
    if(id.eq.0)then
@@ -197,32 +201,32 @@ do j=1,nphotons
       if(ran.lt.albedo)then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-       elseif(fflag.eqv..FALSE.)then
-         fflag=.TRUE.
-         call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
-         call init_opt
-         cost=2.*ran2(iseed)-1.
-         sint=(1.-cost*cost)
-         if(sint.le.0.)then
-            sint=0.
-         else
-            sint=sqrt(sint)
-         endif
-
-         phi=twopi*ran2(iseed)
-         cosp=cos(phi)
-         sinp=sin(phi)
-
-         nxp=sint*cosp  
-         nyp=sint*sinp
-         nzp=cost
       else !photon absorbs
-         tflag=.TRUE.
-         
+         if(zp.lt.0.)then
+            call search_2D(size(e_cdf_c),excite_array_c,nlow,wave)
+            call lin_inter_2D(excite_array_c,wave,size(e_cdf_c),nlow,fluro_prob)
+            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
+               call sample(fluro_array_c,size(f_cdf_c),f_cdf_c,wave,iseed)
+               call init_opt
+            else
+               tflag=.TRUE.
+            end if
+!         else if(zp.gt.zmax-.01)then
+!            call search_2D(size(e_cdf_n),excite_array_n,nlow,wave)
+!            call lin_inter_2D(excite_array_n,wave,size(e_cdf_n),nlow,fluro_prob)
+!            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
+!               call sample(fluro_array_n,size(f_cdf_n),f_cdf_n,wave,iseed)
+!               call init_opt
+!            else
+!               tflag=.TRUE.
+!            end if
+         else
+            tflag=.TRUE.
+         end if
+      end if
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
 
-      end if
 !******** Drop weight in appro bin
 !      call binning(ddr,zcur,ddz,absorb)
 
@@ -240,15 +244,9 @@ do j=1,nphotons
 
    end do
 !bin photons leaving top surface if they are collected by fibre
-   if(int(wave).ne.405..and.zp.ge.zmax*.999)then
-      acount=acount+1
-      if(xp**2+yp**2.lt.0.3**2.)then
-         fcount=fcount+1
-!         if(cost.gt.0.944)then
-            flucount=flucount+1
-            fluroexit(int(wave))=fluroexit(int(wave))+1
-!         end if
-      end if
+   if(int(wave).ne.365..and.zp.ge.zmax*.999)then
+      flucount=flucount+1
+      fluroexit(int(wave))=fluroexit(int(wave))+1
    end if
 end do      ! end loop over nph photons
 

@@ -75,7 +75,7 @@ contains
       use opt_prop    
       use stokes_mod
       use binning_mod
-      use iarray, only : e_cdf, excite_array
+      use iarray, only : e_cdf_c, excite_array_c
       use constants, only : acount, fcount
       use ch_opt, only : init_opt, sample
       
@@ -92,7 +92,7 @@ contains
          call stokes(iseed)
          nscatt = nscatt + 1
       elseif(ran .lt. (muaf+mus)/kappa)then
-         call sample(excite_array,size(e_cdf),e_cdf,wave,iseed)
+         call sample(excite_array_c,size(e_cdf_c),e_cdf_c,wave,iseed)
          call init_opt
          fcount = fcount+1
          hgg = 0.

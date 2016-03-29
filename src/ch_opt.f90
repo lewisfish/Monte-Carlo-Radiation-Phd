@@ -9,37 +9,21 @@ CONTAINS
 !  subroutine to set optical properties
 !
 
-   use iarray, only : mus_array,excite_array,fluro_array
+   use iarray, only : mus_array,mua_array
    use opt_prop
    
    implicit none
    
    integer :: nlow
    DOUBLE PRECISION    :: conc
-
-   conc = .2
    
    !set mua_skin
-   call search_2D(size(fluro_array,1),fluro_array,nlow,wave)
-   call lin_inter_2D(fluro_array,wave,size(fluro_array,1),nlow,mua)
-   if(mua.lt.0.)mua=0.
-   !set mua_fluro
-!   call search_2D(size(excite_array,1),excite_array,nlow,wave)
-!   call lin_inter_2D(excite_array,wave,size(excite_array,1),nlow,muaf)   
+   call search_2D(size(mua_array,1),mua_array,nlow,wave)
+   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+   !set mus_skin
+   call search_2D(size(mus_array,1),mus_array,nlow,wave)
+   call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)   
 
-!   set mus
-!   if(wave.eq.405.)then
-!!      mus=26.9 !for .8%
-!!      mus=16.7 !for .5%
-!!      mus=6.7 !for .2%
-!   else
-      call search_2D(size(mus_array,1),mus_array,nlow,wave)
-      call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)
-!   end if
-!   set g and hgg
-   mus=mus/(6.98*conc**(-.96))
-   mus=mus*.01
-   mua=mua*.01
    hgg=0.7
    g2  = hgg**2.
    kappa  = mus + mua
@@ -53,8 +37,8 @@ CONTAINS
 !      
       implicit none
       
-      integer, intent(IN)    :: iseed,size_of
-      DOUBLE PRECISION,    intent(IN)    :: array(size_of,2),cdf(size_of)
+      integer, intent(IN)                :: iseed, size_of
+      DOUBLE PRECISION,    intent(IN)    :: array(size_of,2), cdf(size_of)
       DOUBLE PRECISION,    intent(OUT)   :: wave
       
       real :: ran2
