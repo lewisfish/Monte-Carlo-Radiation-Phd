@@ -31,6 +31,107 @@ CONTAINS
 
    end subroutine init_opt
 
+
+   subroutine opt_set(zmax, wave)
+!
+!
+!
+   use constants, only : nzg,nyg,nxg
+   use iarray,    only : zface, rhokap
+
+   implicit none
+   
+   DOUBLE PRECISION, intent(IN) :: zmax, wave
+   DOUBLE PRECISION :: Stratum_kappa, LiveEpi_kappa, PapDerm_kappa, RetDerm_kappa, HypoDerm_kappa
+   DOUBLE PRECISION :: z, mua, mus
+   integer :: i,j
+   
+   !Strat Corneum sample
+      !set mua
+         call search_2D(size(mua_array,1),mua_array,nlow,wave)
+         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+      !set mus
+         call search_2D(size(mus_array,1),mus_array,nlow,wave)
+         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
+   
+   Stratum_kappa = mua + mus
+   
+   !Living Epidermis sample
+      !set mua
+         call search_2D(size(mua_array,1),mua_array,nlow,wave)
+         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+      !set mus
+         call search_2D(size(mus_array,1),mus_array,nlow,wave)
+         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
+   
+   LiveEpi_kappa = mua + mus
+   
+   !Pap Dermis sample
+      !set mua
+         call search_2D(size(mua_array,1),mua_array,nlow,wave)
+         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+      !set mus
+         call search_2D(size(mus_array,1),mus_array,nlow,wave)
+         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
+   
+   PapDerm_kappa = mua + mus
+   
+   !Ret Dermis Sample
+      !set mua
+         call search_2D(size(mua_array,1),mua_array,nlow,wave)
+         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+      !set mus
+         call search_2D(size(mus_array,1),mus_array,nlow,wave)
+         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
+      
+   RetDerm_kappa = mua + mus
+   
+   !Hypodermis smaple
+      !set mua
+         call search_2D(size(mua_array,1),mua_array,nlow,wave)
+         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+      !set mus
+         call search_2D(size(mus_array,1),mus_array,nlow,wave)
+         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
+   
+   HypoDerm_kappa = mua + mus
+
+!loop to set optical properties  
+   do i=1,nzg
+      z=zface(i)-zmax+zmax/nzg
+      
+      if(z.gt.zmax-0.02)then
+         !Strat corenum
+         rhokap(:,:,i,1) =Stratum _kappa
+      elseif(z.gt.zmax-0.1)then
+         !Living Epidermis
+         rhokap(:,:,i,1) = LiveEpi_kappa
+      elseif(z.gt.zmax-0.28)then
+         !PaPillary Dermis
+         rhokap(:,:,i,1) = PapDerm_kappa
+      elseif(z.gt.zmax-2.1)then
+         !Reticular Dermis
+         rhokap(:,:,i,1) = RetDerm_kappa
+      elseif(z.lt.zmax-2.1)then
+         !Hypodermis
+         rhokap(:,:,i,1) = HypoDerm_kappa
+      end if
+   end do
+
+!   INQUIRE(iolength = i) array
+!   print*,'irec ',i
+!   open(62,file='arraytest.dat',access='direct',form='unformatted',recl=i)
+!   write(62,rec=1) array
+!   close(62)
+   
+!   open(12,file='test.dat')
+!   do i=1,nzg
+!      write(12,*) (array(i,50,j),j=1,nzg)
+!   end do
+   
+   end subroutine
+
+
    subroutine sample(array,size_of,cdf,wave,iseed)
 !      
 !  samples a random value from an array based upon its cdf     
