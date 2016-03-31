@@ -15,7 +15,7 @@ CONTAINS
    implicit none
    
    integer :: nlow
-   DOUBLE PRECISION    :: conc
+   DOUBLE PRECISION :: conc
    
    !set mua_skin
    call search_2D(size(mua_array,1),mua_array,nlow,wave)
@@ -48,51 +48,36 @@ CONTAINS
    
    !Strat Corneum sample
       !set mua
-         call search_2D(size(mua_array,1),mua_array,nlow,wave)
-         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+         
       !set mus
-         call search_2D(size(mus_array,1),mus_array,nlow,wave)
-         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
-   
+         
    Stratum_kappa = mua + mus
    
    !Living Epidermis sample
       !set mua
-         call search_2D(size(mua_array,1),mua_array,nlow,wave)
-         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+         
       !set mus
-         call search_2D(size(mus_array,1),mus_array,nlow,wave)
-         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
-   
+         
    LiveEpi_kappa = mua + mus
    
    !Pap Dermis sample
       !set mua
-         call search_2D(size(mua_array,1),mua_array,nlow,wave)
-         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+         
       !set mus
-         call search_2D(size(mus_array,1),mus_array,nlow,wave)
-         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
-   
+         
    PapDerm_kappa = mua + mus
    
    !Ret Dermis Sample
       !set mua
-         call search_2D(size(mua_array,1),mua_array,nlow,wave)
-         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+         
       !set mus
-         call search_2D(size(mus_array,1),mus_array,nlow,wave)
-         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
       
    RetDerm_kappa = mua + mus
    
    !Hypodermis smaple
       !set mua
-         call search_2D(size(mua_array,1),mua_array,nlow,wave)
-         call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+
       !set mus
-         call search_2D(size(mus_array,1),mus_array,nlow,wave)
-         call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus) 
    
    HypoDerm_kappa = mua + mus
 
@@ -102,7 +87,7 @@ CONTAINS
       
       if(z.gt.zmax-0.02)then
          !Strat corenum
-         rhokap(:,:,i,1) =Stratum _kappa
+         rhokap(:,:,i,1) =Stratum_kappa
       elseif(z.gt.zmax-0.1)then
          !Living Epidermis
          rhokap(:,:,i,1) = LiveEpi_kappa
@@ -253,4 +238,68 @@ CONTAINS
       cdf=cdf/cdf(length-1)
    
    end subroutine mk_cdf
+   
+   DOUBLE PRECISION function Oxy_Hb(conc, wave)
+   
+   use iarray, only : Oxy_Hb_cdf, Oxy_Hb_array
+   
+      DOUBLE PRECISION :: conc, eps, wave
+      integer :: nlow
+         
+      call search_2D(size(Oxy_Hb_cdf),Oxy_Hb_array,nlow,wave)
+      call lin_inter_2D(Oxy_Hb_array,wave,size(Oxy_Hb_cdf),nlow,eps)
+      
+      Oxy_Hb = conc * ((eps)/66500.d0)
+
+   end function Oxy_Hb
+
+   DOUBLE PRECISION function Deoxy_Hb(conc, wave)
+
+   use iarray, only : Deoxy_Hb_cdf, Deoxy_Hb_array
+
+      DOUBLE PRECISION :: conc, eps, wave
+      integer :: nlow
+            
+      call search_2D(size(Deoxy_Hb_cdf),Deoxy_Hb_array,nlow,wave)
+      call lin_inter_2D(Deoxy_Hb_array,wave,size(Deoxy_Hb_cdf),nlow,eps)
+      
+      Deoxy_Hb = conc * ((eps)/66500.d0)
+
+   end function Deoxy_Hb
+
+   DOUBLE PRECISION function Carotene(conc, wave)
+
+   use iarray, only : Carotene_cdf, Carotene_array
+
+      DOUBLE PRECISION :: conc, eps, wave
+      integer :: nlow
+            
+      call search_2D(size(Carotene_cdf),Carotene_array,nlow,wave)
+      call lin_inter_2D(Carotene_array,wave,size(Carotene_cdf),nlow,eps)
+      
+      Carotene = conc * ((eps)/537.d0)
+
+   end function Carotene
+
+   DOUBLE PRECISION function Bilirubin(conc, wave)
+
+   use iarray, only : Bilirubin_cdf, Bilirubin_array
+   
+      DOUBLE PRECISION :: conc, eps, wave
+      integer :: nlow
+      
+      call search_2D(size(Bilirubin_cdf),Bilirubin_array,nlow,wave)
+      call lin_inter_2D(Bilirubin_array,wave,size(Bilirubin_cdf),nlow,eps)
+      
+      Bilirubin = conc * ((eps)/585.d0)
+
+   end function Bilirubin
+   
 end module ch_opt
+
+
+!age 30
+
+!vm=10 ; vHb=5 ; cbil=0.05 ; ccar=2.1e_4
+
+![(.1-.3*10**(-4.)*wave) + .125*(wave/10.) * mua_base] * (1.-frac_H2O) + mua_H2O
