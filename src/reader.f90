@@ -84,8 +84,8 @@ CONTAINS
                          f_cdf_n, fluro_array_n, e_cdf_n, excite_array_n, &
                          f_cdf_c, fluro_array_c, e_cdf_c, excite_array_c, &
                          Carotene_array, Bilirubin_array, Oxy_Hb_array, Deoxy_Hb_array, &
-                         Carotene_cdf, Bilirubin_cdf, Oxy_Hb_cdf, Deoxy_Hb_cdf, &
-                         water_array, water_cdf !, noise
+!                         Carotene_cdf, Bilirubin_cdf, Oxy_Hb_cdf, Deoxy_Hb_cdf, &
+                         water_array!, water_cdf !, noise
    use constants, only : resdir
    
    implicit none
@@ -129,37 +129,37 @@ CONTAINS
    !Oxy-Hb data
    call readfile_array2D(trim(resdir)//'Oxy-Hb.dat', Oxy_Hb_array, 0, 2)
 
-   cnt=int(size(Oxy_Hb_array))/2
-   allocate(Oxy_Hb_cdf(cnt))
-   Oxy_Hb_cdf=0.
+!   cnt=int(size(Oxy_Hb_array))/2
+!   allocate(Oxy_Hb_cdf(cnt))
+!   Oxy_Hb_cdf=0.
 
    !Deoxy-Hb data
    call readfile_array2D(trim(resdir)//'Deoxy-Hb.dat', Deoxy_Hb_array, 0, 2)
 
-   cnt=int(size(Deoxy_Hb_array))/2
-   allocate(Deoxy_Hb_cdf(cnt))
-   Deoxy_Hb_cdf=0.
+!   cnt=int(size(Deoxy_Hb_array))/2
+!   allocate(Deoxy_Hb_cdf(cnt))
+!   Deoxy_Hb_cdf=0.
   
    !B-carotene data
    call readfile_array2D(trim(resdir)//'B-carotene.dat', Carotene_array, 0, 2)
 
-   cnt=int(size(Carotene_array))/2
-   allocate(Carotene_cdf(cnt))
-   Carotene_cdf=0.
+!   cnt=int(size(Carotene_array))/2
+!   allocate(Carotene_cdf(cnt))
+!   Carotene_cdf=0.
       
    !Bilirubin data
    call readfile_array2D(trim(resdir)//'bilirubin.dat', bilirubin_array, 0, 2)
 
-   cnt=int(size(bilirubin_array))/2
-   allocate(bilirubin_cdf(cnt))
-   bilirubin_cdf=0.
+!   cnt=int(size(bilirubin_array,1))
+!   allocate(bilirubin_cdf(cnt))
+!   bilirubin_cdf=0.
    
    !water data
    call readfile_array2D(trim(resdir)//'water absor.dat', water_array, 0, 2)
 
-   cnt=int(size(water_array))/2
-   allocate(water_cdf(cnt))
-   water_cdf=0.
+!   cnt=int(size(water_array))/2
+!   allocate(water_cdf(cnt))
+!   water_cdf=0.
 
    !noise data
 !   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)

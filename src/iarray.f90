@@ -12,10 +12,10 @@ DOUBLE PRECISION, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 DOUBLE PRECISION, allocatable :: Carotene_array(:,:), Bilirubin_array(:,:)
 DOUBLE PRECISION, allocatable :: Deoxy_Hb_array(:,:), Oxy_Hb_array(:,:)
 
-DOUBLE PRECISION, allocatable :: Carotene_cdf(:), Bilirubin_cdf(:)
-DOUBLE PRECISION, allocatable :: Oxy_Hb_cdf(:), Deoxy_Hb_cdf(:)
+!DOUBLE PRECISION, allocatable :: Carotene_cdf(:), Bilirubin_cdf(:)
+!DOUBLE PRECISION, allocatable :: Oxy_Hb_cdf(:), Deoxy_Hb_cdf(:)
 
-DOUBLE PRECISION, allocatable :: water_array(:,:), water_cdf(:)
+DOUBLE PRECISION, allocatable :: water_array(:,:)!, water_cdf(:)
 
 !real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
 !real, allocatable :: fluro_pos(:,:,:),fluro_posGLOBAL(:,:,:)

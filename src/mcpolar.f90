@@ -104,7 +104,7 @@ v(3)=costim
 
 !set optical properties and make cdfs.
 wave=365. 
-
+call opt_set(zmax, wave)
 ! create cdfs to sample from
 !collagen
 call mk_cdf(fluro_array_c,f_cdf_c,size(f_cdf_c))
