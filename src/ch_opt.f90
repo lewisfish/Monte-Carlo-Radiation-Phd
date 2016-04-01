@@ -43,40 +43,43 @@ CONTAINS
    
    DOUBLE PRECISION, intent(IN) :: zmax, wave
    DOUBLE PRECISION :: Stratum_kappa, LiveEpi_kappa, PapDerm_kappa, RetDerm_kappa, HypoDerm_kappa
+   DOUBLE PRECISION :: frac_H2O, nu_m, nu_Pd_Hb, nu_Rd_Hb, conc, car_conc
    DOUBLE PRECISION :: z, mua, mus
    integer :: i,j
    
    !Strat Corneum sample
       !set mua
-         mua = ((0.1 - 0.3*10**-4. * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - frac_H2O) + mua_water(wave)   
+         mua = ((0.1 - 0.3*10**(-4.) * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - frac_H2O) + water(wave)   
       !set mus
          
    Stratum_kappa = mua + mus
    
    !Living Epidermis sample
       !set mua
-         mua = (nu_m * (Eumel(wave) + Pheomel(wave)) + (1. + nu_m) * Carotene(conc, wave)) * (1.-frac_H2O) + mua_water(wave) 
+         mua = (nu_m * (Eumel(wave) + Pheomel(wave)) + (1. + nu_m) * Carotene(conc, wave)) * (1.-frac_H2O) + water(wave) 
       !set mus
          
    LiveEpi_kappa = mua + mus
    
    !Pap Dermis sample
       !set mua
-         (nu_Pd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + mua_water(wave) 
+         mua = (nu_Pd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + &
+               Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + water(wave) 
       !set mus
          
    PapDerm_kappa = mua + mus
    
    !Ret Dermis Sample
       !set mua
-         (nu_Rd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + mua_water(wave)
+         mua = (nu_Rd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + &
+               Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + water(wave)
       !set mus
       
    RetDerm_kappa = mua + mus
    
    !Hypodermis smaple
       !set mua
-         mua_water(wave)
+         mua = water(wave)
       !set mus
    
    HypoDerm_kappa = mua + mus
@@ -238,6 +241,21 @@ CONTAINS
       cdf=cdf/cdf(length-1)
    
    end subroutine mk_cdf
+
+   DOUBLE PRECISION function water(wave)
+
+   use iarray, only : water_cdf, water_array
+
+      DOUBLE PRECISION ::  eps, wave
+      integer :: nlow
+            
+      call search_2D(size(water_cdf),water_array,nlow,wave)
+      call lin_inter_2D(water_array,wave,size(water_cdf),nlow,eps)
+      
+      water = eps
+
+   end function water
+
    
    DOUBLE PRECISION function Oxy_Hb(conc, wave)
    
