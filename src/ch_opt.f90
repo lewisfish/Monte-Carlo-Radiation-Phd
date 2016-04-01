@@ -48,35 +48,35 @@ CONTAINS
    
    !Strat Corneum sample
       !set mua
-         
+         mua = ((0.1 - 0.3*10**-4. * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - frac_H2O) + mua_water(wave)   
       !set mus
          
    Stratum_kappa = mua + mus
    
    !Living Epidermis sample
       !set mua
-         
+         mua = (nu_m * (Eumel(wave) + Pheomel(wave)) + (1. + nu_m) * Carotene(conc, wave)) * (1.-frac_H2O) + mua_water(wave) 
       !set mus
          
    LiveEpi_kappa = mua + mus
    
    !Pap Dermis sample
       !set mua
-         
+         (nu_Pd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + mua_water(wave) 
       !set mus
          
    PapDerm_kappa = mua + mus
    
    !Ret Dermis Sample
       !set mua
-         
+         (nu_Rd_Hb * (Oxy_Hb(conc, wave) + Deoxy_Hb(conc, wave) + Bilirubin(conc, wave) + Carotene(conc, wave) + (1.- Car_conc) * base(wave))) * (1.-frac_H2O) + mua_water(wave)
       !set mus
       
    RetDerm_kappa = mua + mus
    
    !Hypodermis smaple
       !set mua
-
+         mua_water(wave)
       !set mus
    
    HypoDerm_kappa = mua + mus
@@ -295,6 +295,29 @@ CONTAINS
 
    end function Bilirubin
    
+   DOUBLE PRECISION function Base(wave)
+
+      DOUBLE PRECISION :: wave
+
+      Base = 1.78*10.**7. * wave**(-3.255)
+   
+   end function Base
+   
+   DOUBLE PRECISION function Eumel(wave)
+
+      DOUBLE PRECISION :: wave
+
+      Eumel = 6.6*10.**10. * wave**(-3.33)
+   
+   end function Eumel
+   
+   DOUBLE PRECISION function Pheomel(wave)
+
+      DOUBLE PRECISION :: wave
+
+      Pheomel = 2.9*10.**14. * wave**(-4.75)
+   
+   end function Pheomel
 end module ch_opt
 
 
