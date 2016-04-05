@@ -163,7 +163,7 @@ tau=-alog(ran2(iseed))
 
 !***** optical depth to next cell wall is 
 !***** taucell= (distance to cell)*(opacity of current cell)
-   taucell=dcell*kappa!rhokap(celli,cellj,cellk,1)
+   taucell=dcell*rhokap(celli,cellj,cellk,1)
 
 !***** if taurun+taucell>tau then scatter at distance d+d1.  
 !***** update photon position and cell.  
@@ -171,7 +171,7 @@ tau=-alog(ran2(iseed))
 !***** (i.e. ends up on next cell wall) and update photon position
 !***** and cell.
    if((taurun+taucell).ge.tau) then
-   d1=(tau-taurun)/kappa!/rhokap(celli,cellj,cellk,1)
+   d1=(tau-taurun)rhokap(celli,cellj,cellk,1)
    d=d+d1
    jmean(celli,cellj,cellk,1)=jmean(celli,cellj,cellk,1)+d1
    taurun=taurun+taucell

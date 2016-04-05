@@ -8,7 +8,7 @@ MODULE constants
 implicit none
 save
 
-integer, parameter :: nxg=100,nyg=100,nzg=100,Nbins=401,cbinsnum=200
+integer, parameter :: nxg=200,nyg=200,nzg=200,Nbins=401,cbinsnum=200
 DOUBLE PRECISION, parameter    :: PI = 3.141592,TWOPI=6.283185, CHANCE = 0.1, TERMINATE = 0.0001
 DOUBLE PRECISION, PARAMETER    :: OFFSET = 1.e-2*(2.*5./nxg)
 DOUBLE PRECISION :: xmax, ymax, zmax
