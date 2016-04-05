@@ -79,7 +79,8 @@ CONTAINS
    implicit none
    
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
-   allocate(rhokap(nxg+3,nyg+3,nzg+3,4))!,followGLOBAL(nxg,nyg,nzg))
+   allocate(rhokap(nxg+3,nyg+3,nzg+3,1),albedo(nxg+3,nyg+3,nzg+3,1))
+   !,followGLOBAL(nxg,nyg,nzg))
    
 !   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
 !   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))

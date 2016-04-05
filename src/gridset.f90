@@ -4,17 +4,18 @@ implicit none
 save
 
 CONTAINS
-   subroutine gridset(id)
-
+   subroutine gridset(id, wave)
+   
+   use ch_opt
    use density_mod
    use constants, only : nxg,nyg,nzg,xmax,ymax,zmax
-   use iarray, only    : rhokap,xface,yface,zface
+   use iarray, only    : rhokap,xface,yface,zface,albedo
 
    implicit none
 
 
    integer i,j,k,kflag,id
-   DOUBLE PRECISION x,y,z,rho,taueq1,taupole1,taueq2,taupole2
+   DOUBLE PRECISION x,y,z,rho,taueq1,taupole1,taueq2,taupole2, wave
 
    if(id.eq.0.)then
    print*, ' '
@@ -32,25 +33,26 @@ CONTAINS
    end do
     
    !**************  Loop through x, y, and z to set up grid density.  ****
-   do i=1,nxg
-    do j=1,nyg
-     do k=1,nzg
-        x=xface(i)-xmax+xmax/nxg
-        y=yface(j)-ymax+ymax/nyg
-        z=zface(k)-zmax+zmax/nzg
-   !**********************Call density setup subroutine 
-        kflag=1
-        call density(x,y,z,rho)
-        rhokap(i,j,k,kflag)=rho
-     end do
-    end do
-   end do
+!   do i=1,nxg
+!    do j=1,nyg
+!     do k=1,nzg
+!        x=xface(i)-xmax+xmax/nxg
+!        y=yface(j)-ymax+ymax/nyg
+!        z=zface(k)-zmax+zmax/nzg
+!   !**********************Call density setup subroutine 
+!        kflag=1
+!        call density(x,y,z,rho)
+!        rhokap(i,j,k,1)=rho
+!     end do
+!    end do
+!   end do
+   rhokap=0.d0
+   albedo=0.d0
+   call opt_set()
 
    !****************** Calculate equatorial and polar optical depths ****
    taueq1=0.
    taupole1=0.
-   taueq2=0.
-   taupole2=0.
    do i=1,nxg
       taueq1=taueq1+rhokap(i,nyg/2,nzg/2,1)
    end do

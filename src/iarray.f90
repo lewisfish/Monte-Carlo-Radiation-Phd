@@ -6,7 +6,7 @@ implicit none
 save
 
 DOUBLE PRECISION, allocatable :: xface(:),yface(:),zface(:)
-DOUBLE PRECISION, allocatable :: rhokap(:,:,:,:)
+DOUBLE PRECISION, allocatable :: rhokap(:,:,:,:),albedo(:,:,:,:)
 DOUBLE PRECISION, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
 DOUBLE PRECISION, allocatable :: Carotene_array(:,:), Bilirubin_array(:,:)

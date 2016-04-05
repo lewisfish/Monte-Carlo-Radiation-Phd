@@ -104,7 +104,9 @@ v(3)=costim
 
 !set optical properties and make cdfs.
 wave=365. 
-call opt_set(zmax, wave)
+
+
+!call exit(0)
 ! create cdfs to sample from
 !collagen
 call mk_cdf(fluro_array_c,f_cdf_c,size(f_cdf_c))
@@ -121,8 +123,8 @@ if(id.eq.0)then
 end if
 
 !***** Set up density grid *******************************************
-call gridset(id)
-
+call gridset(id, wave)
+!call opt_set()
 !***** Set small distance for use in optical depth integration routines 
 !***** for roundoff effects when crossing cell walls
 delta=1.e-6*(2.*xmax/nxg)
@@ -190,27 +192,30 @@ do j=1,nphotons
 !************ Peel off photon into image
 !   call peelingoff(xcell,ycell,zcell,delta, &
 !   v,sintim,costim,sinpim,cospim)
-
+!   print*,tflag,xp,yp,zp
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
    do while(tflag.eqv..FALSE.) 
-
+   print*,'enter' 
 !******** Scatter or absorb/fluro
 
 ! Select albedo based on current photon wavelength
       ran=ran2(iseed)
-      if(ran.lt.albedo)then !photons scatters
+      print*,ran,albedo(xcell,ycell,zcell,1)
+      if(ran.lt.albedo(xcell,ycell,zcell,1))then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
+         print*,'scat'
       else !photon absorbs
-         if(zp.lt.0.)then
-            call search_2D(size(e_cdf_c),excite_array_c,nlow,wave)
-            call lin_inter_2D(excite_array_c,wave,size(e_cdf_c),nlow,fluro_prob)
-            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
-               call sample(fluro_array_c,size(f_cdf_c),f_cdf_c,wave,iseed)
-               call init_opt
-            else
-               tflag=.TRUE.
-            end if
+         print*,'absorb'
+!         if(zp.lt.0.)then
+!            call search_2D(size(e_cdf_c),excite_array_c,nlow,wave)
+!            call lin_inter_2D(excite_array_c,wave,size(e_cdf_c),nlow,fluro_prob)
+!            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
+!               call sample(fluro_array_c,size(f_cdf_c),f_cdf_c,wave,iseed)
+!               call opt_set(wave)
+!            else
+!               tflag=.TRUE.
+!            end if
 !         else if(zp.gt.zmax-.01)then
 !            call search_2D(size(e_cdf_n),excite_array_n,nlow,wave)
 !            call lin_inter_2D(excite_array_n,wave,size(e_cdf_n),nlow,fluro_prob)
@@ -220,9 +225,9 @@ do j=1,nphotons
 !            else
 !               tflag=.TRUE.
 !            end if
-         else
-            tflag=.TRUE.
-         end if
+!         else
+         tflag=.TRUE.
+!         end if
       end if
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
@@ -244,10 +249,10 @@ do j=1,nphotons
 
    end do
 !bin photons leaving top surface if they are collected by fibre
-   if(int(wave).ne.365..and.zp.ge.zmax*.999)then
-      flucount=flucount+1
-      fluroexit(int(wave))=fluroexit(int(wave))+1
-   end if
+!   if(int(wave).ne.365..and.zp.ge.zmax*.999)then
+!      flucount=flucount+1
+!      fluroexit(int(wave))=fluroexit(int(wave))+1
+!   end if
 end do      ! end loop over nph photons
 
 print*, acount, '1st barrier',id

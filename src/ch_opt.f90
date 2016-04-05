@@ -18,116 +18,141 @@ CONTAINS
    DOUBLE PRECISION :: conc
    
    !set mua_skin
-   call search_2D(size(mua_array,1),mua_array,nlow,wave)
-   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
-   !set mus_skin
-   call search_2D(size(mus_array,1),mus_array,nlow,wave)
-   call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)   
+!   call search_2D(size(mua_array,1),mua_array,nlow,wave)
+!   call lin_inter_2D(mua_array,wave,size(mua_array,1),nlow,mua)
+!   !set mus_skin
+!   call search_2D(size(mus_array,1),mus_array,nlow,wave)
+!   call lin_inter_2D(mus_array,wave,size(mus_array,1),nlow,mus)   
 
-   hgg=0.7
-   g2  = hgg**2.
-   kappa  = mus + mua
-   albedo = (mus)/kappa
+!   hgg=0.7
+!   g2  = hgg**2.
+!   kappa  = mus + mua
+!   albedo = (mus)/kappa
 
    end subroutine init_opt
 
 
-   subroutine opt_set(zmax, wave)
+   subroutine opt_set()
 !
 !
 !
-   use constants, only : nzg,nyg,nxg
-   use iarray,    only : zface, rhokap
+   use constants, only : nzg,nyg,nxg,zmax
+   use iarray,    only : zface, rhokap, albedo
+   use opt_prop
 
    implicit none
    
-   DOUBLE PRECISION, intent(INout) :: zmax, wave
+!   DOUBLE PRECISION, intent(INout) :: wave
    DOUBLE PRECISION :: Stratum_kappa, LiveEpi_kappa, PapDerm_kappa, RetDerm_kappa, HypoDerm_kappa
    DOUBLE PRECISION :: frac_H2O, nu_m, nu_Pd_Hb, nu_Rd_Hb
-   DOUBLE PRECISION :: z, mua, mus
-   integer :: i,j
+   DOUBLE PRECISION :: z, rho, mus_ref_500, mus_r, mus_m, a, f_ray, b, gam
+   DOUBLE PRECISION :: mus1,mus2,mus3,mus4,mus5
+   integer :: i,j,n
+   DOUBLE PRECISION :: array(1:nxg,1:nyg,1:nzg)
+
+   hgg=0.7
+   g2  = hgg**2.
+
    mus=0.
-   nu_m = 3.
+   nu_m = 1.
    nu_Pd_Hb = 6.
    nu_Rd_hb = 4.5
-   open(12,file='abs.dat')
-do i=300,1000
-   wave=dble(i)
+!   open(12,file='scat.dat')
+!do i=300,1000
+!   wave=dble(i)
    !Strat Corneum sample
       !set mua                                                                          !frac_H2O
          mua = ((0.1 - 0.3*10**(-4.) * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - 0.05) + water(wave)   
       !set mus
-         print*,mua,'strat'
-   Stratum_kappa = mua + mus
+         rho = 0.29d0
+         gam = 0.689d0
+         mus_ref_500 = 66.7d0 
+         mus_r = mus_ref_500 * (wave/500.d0)**(-4.d0)
+         mus_m = mus_ref_500 * (wave/500.d0)**(-gam)
+         mus = rho * mus_r + (1.d0 - rho) * mus_m       !in cm-1
+         mus1=mus/(1.-hgg)
+   Stratum_kappa = mua + mus1
          mua=0.
+   
    !Living Epidermis sample
-      !set mua                                                                                        !frac_H2O
+      !set mua                                                                                
          mua = (nu_m * (Eumel(wave) + Pheomel(wave)) + (1. + nu_m) * Carotene(1.d0, wave)) &
                 * (1.-.2) + water(wave) 
       !set mus
-                  print*,mua,'epidemis'
-   LiveEpi_kappa = mua + mus
+         !same as startum corneum
+         mus2=mus/(1.-hgg)
+   LiveEpi_kappa = mua + mus2
+         mus = 0.
    
    !Pap Dermis sample
       !set mua
-         mua = (nu_Pd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(1.5d0, wave) + &
-               Carotene(7.d0*10**(-5), wave) + (1.- .1) * base(wave))) * (1.-.5) + water(wave) 
+         mua = (nu_Pd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(1.d0, wave) + &
+               Carotene(7.d0*10**(-5), wave) + (1.- .15) * base(wave))) * (1.-.5) + water(wave) 
       !set mus                                                                      !frac_H2O
-                  print*,mua,'pap'
-   PapDerm_kappa = mua + mus
+         a = 43.6
+         f_ray = .41
+         b = .562
+         mus= a * (f_ray * (wave/500.d0)**(-4.d0) + (1.d0 - f_ray) * (wave/500.d0)**(-b))
+         mus3=mus/(1.-hgg)
+
+   PapDerm_kappa = mua + mus3
    
    !Ret Dermis Sample
       !set mua
-         mua = (nu_Rd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(1.5d0, wave) + &
-               Carotene(7.d0*10**(-5), wave) + (1.-.1) * base(wave))) * (1.-.7) + water(wave)
+         mua = (nu_Rd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(1.d0, wave) + &
+               Carotene(7.d0*10**(-5), wave) + (1.-.15) * base(wave))) * (1.-.7) + water(wave)
       !set mus
-               print*,mua,'dermis'
-   RetDerm_kappa = mua + mus
-   
+         !mus same as pap dermis
+            mus4 = mus/(1.-hgg)
+   RetDerm_kappa = mua + mus4
+
    !Hypodermis smaple
       !set mua
          mua = water(wave)
       !set mus
-            print*,mua,'hypo'
-               HypoDerm_kappa = mua + mus
-      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
-write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
-end do
+         mus = 1050.6d0 * wave**(-0.68d0) !in cm-1
+         mus5=mus/(1.-hgg)
+      HypoDerm_kappa = mua + mus
+      mus5=mus/(1.-hgg)
+      
+!      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
+!write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
+!end do
 
-         print*,HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa,'total'
 !loop to set optical properties  
    do i=1,nzg
       z=zface(i)-zmax+zmax/nzg
-      
+
       if(z.gt.zmax-0.02)then
          !Strat corenum
-         rhokap(:,:,i,1) =Stratum_kappa
+         rhokap(:,:,i,1) = Stratum_kappa
+         albedo(:,:,i,1) = mus1/Stratum_kappa
       elseif(z.gt.zmax-0.1)then
          !Living Epidermis
          rhokap(:,:,i,1) = LiveEpi_kappa
+         albedo(:,:,i,1) = mus2/LiveEpi_kappa
       elseif(z.gt.zmax-0.28)then
          !PaPillary Dermis
          rhokap(:,:,i,1) = PapDerm_kappa
+         albedo(:,:,i,1) = mus3/PapDerm_kappa
       elseif(z.gt.zmax-2.1)then
          !Reticular Dermis
          rhokap(:,:,i,1) = RetDerm_kappa
+         albedo(:,:,i,1) = mus4/RetDerm_kappa         
       elseif(z.lt.zmax-2.1)then
          !Hypodermis
          rhokap(:,:,i,1) = HypoDerm_kappa
+         albedo(:,:,i,1) = mus5/HypoDerm_kappa
       end if
    end do
 
+
+!   array=rhokap(1:nxg,1:nyg,1:nzg,1)
 !   INQUIRE(iolength = i) array
-!   print*,'irec ',i
-!   open(62,file='arraytest.dat',access='direct',form='unformatted',recl=i)
-!   write(62,rec=1) array
-!   close(62)
-   
-!   open(12,file='test.dat')
-!   do i=1,nzg
-!      write(12,*) (array(i,50,j),j=1,nzg)
-!   end do
-   
+!   open(34,file='array.dat',access='direct',form='unformatted',recl=i)
+!   write(34,rec=1) array
+!   close(34)
+
    end subroutine
 
 
