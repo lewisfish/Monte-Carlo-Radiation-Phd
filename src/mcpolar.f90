@@ -103,7 +103,7 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=365. 
+wave=800. 
 
 
 !call exit(0)
@@ -142,7 +142,7 @@ call cpu_time(sleft)
 do j=1,nphotons
   
 !set init weight and flags
-   wave=365.
+   wave=800.
    call init_opt
    tflag=.FALSE.
    fflag=.FALSE.
@@ -150,9 +150,9 @@ do j=1,nphotons
                        ! are treated diffrently to outgoing ones
 
 ! code to output progress as program runs also gives an estimate of when program will complete.
-   if(mod(j,1000000).eq.0)then
+   if(mod(j,100000).eq.0)then
       if(id.eq.0)then
-         print *, ' percentage completed: ',real(real(j)/real(nphotons))*100.,flucount
+         print'(T40 ,A, 1X , F6.2)', ' percentage completed:',real(real(j)/real(nphotons))*100.
       end if
    end if
    if(id.eq.0)then
@@ -311,7 +311,7 @@ if(id.eq.0)then
 
     !write out files
 
-    call writer
+    call writer(nphotons, numproc)
     print*,'write done'
 end if
 
