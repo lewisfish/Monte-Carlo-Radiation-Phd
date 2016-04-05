@@ -171,7 +171,7 @@ tau=-alog(ran2(iseed))
 !***** (i.e. ends up on next cell wall) and update photon position
 !***** and cell.
    if((taurun+taucell).ge.tau) then
-   d1=(tau-taurun)rhokap(celli,cellj,cellk,1)
+   d1=(tau-taurun)/rhokap(celli,cellj,cellk,1)
    d=d+d1
    jmean(celli,cellj,cellk,1)=jmean(celli,cellj,cellk,1)+d1
    taurun=taurun+taucell

@@ -195,18 +195,14 @@ do j=1,nphotons
 !   print*,tflag,xp,yp,zp
 !******** Photon scatters in grid until it exits (tflag=TRUE) 
    do while(tflag.eqv..FALSE.) 
-   print*,'enter' 
 !******** Scatter or absorb/fluro
 
 ! Select albedo based on current photon wavelength
       ran=ran2(iseed)
-      print*,ran,albedo(xcell,ycell,zcell,1)
       if(ran.lt.albedo(xcell,ycell,zcell,1))then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
-         print*,'scat'
       else !photon absorbs
-         print*,'absorb'
 !         if(zp.lt.0.)then
 !            call search_2D(size(e_cdf_c),excite_array_c,nlow,wave)
 !            call lin_inter_2D(excite_array_c,wave,size(e_cdf_c),nlow,fluro_prob)
