@@ -60,9 +60,9 @@ CONTAINS
    nu_Rd_hb = 4.5
    
    
-   open(12,file='abs.dat')
-do i=300,1000
-   wave=dble(i)
+!   open(12,file='abs.dat')
+!do i=300,1000
+!   wave=dble(i)
    !Strat Corneum sample
       !set mua                                                                          !frac_H2O
          mua = ((0.1 - 0.3*10**(-4.) * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - 0.05) + water(wave)   
@@ -125,11 +125,11 @@ do i=300,1000
       HypoDerm_kappa = mua*.1d0 !+ mus
       mus5=mus/(1.-hgg)
       
-      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
-write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
-!print*,HypoDerm_kappa
-end do
-call exit(0)
+!      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
+!write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
+!!print*,HypoDerm_kappa
+!end do
+!call exit(0)
 !loop to set optical properties  
    do i=1,nzg
       z=zface(i)-zmax+zmax/nzg
