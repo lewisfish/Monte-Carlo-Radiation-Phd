@@ -103,7 +103,7 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=532. 
+wave=635. 
 
 
 !call exit(0)
@@ -142,7 +142,7 @@ call cpu_time(sleft)
 do j=1,nphotons
   
 !set init weight and flags
-   wave=532.
+   wave=635.
    call init_opt
    tflag=.FALSE.
    fflag=.FALSE.

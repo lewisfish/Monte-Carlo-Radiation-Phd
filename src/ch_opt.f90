@@ -60,9 +60,9 @@ CONTAINS
    nu_Rd_hb = 4.5
    
    
-!   open(12,file='abs.dat')
-!do i=300,1000
-!   wave=dble(i)
+   open(12,file='abs.dat')
+do i=300,1000
+   wave=dble(i)
    !Strat Corneum sample
       !set mua                                                                          !frac_H2O
          mua = ((0.1 - 0.3*10**(-4.) * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - 0.05) + water(wave)   
@@ -74,7 +74,7 @@ CONTAINS
          mus_m = mus_ref_500 * (wave/500.d0)**(-gam)
          mus = rho * mus_r + (1.d0 - rho) * mus_m       !in cm-1
          mus1=mus/(1.-hgg)
-   Stratum_kappa = mua*.1d0 + mus1
+   Stratum_kappa = mua*.1d0! + mus1
          mua=0.
    
    !Living Epidermis sample
@@ -84,7 +84,7 @@ CONTAINS
       !set mus
          !same as startum corneum
          mus2=mus/(1.-hgg)
-   LiveEpi_kappa = mua*.1d0 + mus2
+   LiveEpi_kappa = mua*.1d0 !+ mus2
          mus = 0.
    
    !Pap Dermis sample
@@ -98,7 +98,7 @@ CONTAINS
          mus= a * (f_ray * (wave/500.d0)**(-4.d0) + (1.d0 - f_ray) * (wave/500.d0)**(-b))
          mus3=mus/(1.-hgg)
 
-   PapDerm_kappa = mua*.1d0 + mus3
+   PapDerm_kappa = mua*.1d0! + mus3
    
    !Ret Dermis Sample
       !set mua
@@ -107,7 +107,7 @@ CONTAINS
       !set mus
          !mus same as pap dermis
             mus4 = mus/(1.-hgg)
-   RetDerm_kappa = mua*.1d0 + mus4
+   RetDerm_kappa = mua*.1d0 !+ mus4
 
    !Hypodermis smaple
       !set mua
@@ -122,14 +122,14 @@ CONTAINS
       !set mus
          mus = 1050.6d0 * wave**(-0.68d0) !in cm-1
          mus5=mus/(1.-hgg)
-      HypoDerm_kappa = mua*.1d0 + mus
+      HypoDerm_kappa = mua*.1d0 !+ mus
       mus5=mus/(1.-hgg)
       
-!      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
-!write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
+      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
+write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
 !print*,HypoDerm_kappa
-!end do
-
+end do
+call exit(0)
 !loop to set optical properties  
    do i=1,nzg
       z=zface(i)-zmax+zmax/nzg

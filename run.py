@@ -1,4 +1,4 @@
-#!/usr/bin python
+#!/usr/bin/python
 
 import subprocess
 import os
@@ -7,7 +7,7 @@ import Image
 try:
     subprocess.call("./install.sh", shell = True)
     os.chdir(os.getcwd() + '/bin/')
-    subprocess.call("./mcgrid", shell = True)
+    subprocess.call("mpirun -n 2 ./mcgrid", shell = True)
 
     os.chdir('../data')
 #    
