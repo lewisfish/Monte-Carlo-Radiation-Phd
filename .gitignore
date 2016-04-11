@@ -5,6 +5,7 @@ data/
 build/
 ext/
 bin/
+res/*.dat
 src/unused/
 *.png
 *.swp
