@@ -8,8 +8,6 @@ CONTAINS
 !
 !  subroutine to set optical properties
 !
-
-   use iarray, only : mus_array,mua_array
    use opt_prop
    
    implicit none
@@ -42,14 +40,12 @@ CONTAINS
 
    implicit none
    
-!   DOUBLE PRECISION, intent(INout) :: wave
    DOUBLE PRECISION :: Stratum_kappa, LiveEpi_kappa, PapDerm_kappa, RetDerm_kappa, HypoDerm_kappa
    DOUBLE PRECISION :: frac_H2O, nu_m, nu_Pd_Hb, nu_Rd_Hb
    DOUBLE PRECISION :: z, rho, mus_ref_500, mus_r, mus_m, a, f_ray, b, gam
    DOUBLE PRECISION :: nu_H2O ,nu_b, S, b_frac
    DOUBLE PRECISION :: mus1,mus2,mus3,mus4,mus5
    integer :: i,j,n
-   DOUBLE PRECISION :: array(1:nxg,1:nyg,1:nzg)
 
    hgg=0.7
    g2  = hgg**2.
@@ -127,7 +123,7 @@ CONTAINS
       
 !      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
 !write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
-!!print*,HypoDerm_kappa
+
 !end do
 !call exit(0)
 !loop to set optical properties  
@@ -156,13 +152,6 @@ CONTAINS
          albedo(:,:,i,1) = mus5/HypoDerm_kappa
       end if
    end do
-
-
-!   array=rhokap(1:nxg,1:nyg,1:nzg,1)
-!   INQUIRE(iolength = i) array
-!   open(34,file='array.dat',access='direct',form='unformatted',recl=i)
-!   write(34,rec=1) array
-!   close(34)
 
    end subroutine
 

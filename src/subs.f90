@@ -62,8 +62,8 @@ CONTAINS
    yface=0.
    zface=0.
    rhokap=0.
-   fluroexit=0
-   fluroexitGLOBAL=0
+!   fluroexit=0
+!   fluroexitGLOBAL=0
 !   fluro_pos=0.
 !   fluro_posGLOBAL=0.
    
@@ -80,7 +80,6 @@ CONTAINS
    
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
    allocate(rhokap(nxg+3,nyg+3,nzg+3,1),albedo(nxg+3,nyg+3,nzg+3,1))
-   !,followGLOBAL(nxg,nyg,nzg))
    
 !   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
 !   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
@@ -89,9 +88,9 @@ CONTAINS
 !   allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
 !   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
 !   allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
-   allocate(jmean(nxg+3,nyg+3,nzg+3,4))!,follow(nxg,nyg,nzg),ftmp(nxg,nyg,nzg)) 
+   allocate(jmean(nxg+3,nyg+3,nzg+3,4))
    allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))
-   allocate(fluroexit(1000),fluroexitGLOBAL(1000))
+!   allocate(fluroexit(1000),fluroexitGLOBAL(1000))
    
    
    end SUBROUTINE alloc_array

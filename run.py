@@ -7,7 +7,7 @@ import Image
 try:
     subprocess.call("./install.sh", shell = True)
     os.chdir(os.getcwd() + '/bin/')
-    subprocess.call("mpirun -n 2 ./mcgrid", shell = True)
+    subprocess.call("./mcgrid", shell = True)
 
     os.chdir('../data')
 #    

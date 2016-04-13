@@ -80,86 +80,28 @@ CONTAINS
    
    subroutine reader1
    
-   use iarray,    only : mua_array, mus_array,  &
-                         f_cdf_n, fluro_array_n, e_cdf_n, excite_array_n, &
-                         f_cdf_c, fluro_array_c, e_cdf_c, excite_array_c, &
-                         Carotene_array, Bilirubin_array, Oxy_Hb_array, Deoxy_Hb_array, &
-!                         Carotene_cdf, Bilirubin_cdf, Oxy_Hb_cdf, Deoxy_Hb_cdf, &
-                         water_array!, water_cdf !, noise
+   use iarray,    only : Carotene_array, Bilirubin_array, Oxy_Hb_array, Deoxy_Hb_array, &
+                         water_array !, noise
    use constants, only : resdir
    
    implicit none
    
    integer :: cnt
-   
-   !mua
-   call readfile_array2D(trim(resdir)//'mua.dat', mua_array, 0, 2)
-   
-   !mus
-   call readfile_array2D(trim(resdir)//'mus.dat', mus_array, 0, 2)
-  
-   !fluro nadh
-   call readfile_array2D(trim(resdir)//'nadh emission.dat', fluro_array_n, 0, 2)
-
-   cnt=int(size(fluro_array_n))/2
-   allocate(f_cdf_n(cnt))
-   f_cdf_n=0.
-   
-   !excite nadh
-   call readfile_array2D(trim(resdir)//'nadh excite.dat', excite_array_n, 0, 2)
-
-   cnt=int(size(excite_array_n))/2
-   allocate(e_cdf_n(cnt))
-   e_cdf_n=0.
-   
-   !fluro collagen
-   call readfile_array2D(trim(resdir)//'collagen emission.dat', fluro_array_c, 0, 2)
-
-   cnt=int(size(fluro_array_c))/2
-   allocate(f_cdf_c(cnt))
-   f_cdf_c=0.
-   
-   !excite collagen
-   call readfile_array2D(trim(resdir)//'collagen excite.dat', excite_array_c, 0, 2)
-
-   cnt=int(size(excite_array_c))/2
-   allocate(e_cdf_c(cnt))
-   e_cdf_c=0.
 
    !Oxy-Hb data
    call readfile_array2D(trim(resdir)//'Oxy-Hb.dat', Oxy_Hb_array, 0, 2)
 
-!   cnt=int(size(Oxy_Hb_array))/2
-!   allocate(Oxy_Hb_cdf(cnt))
-!   Oxy_Hb_cdf=0.
-
    !Deoxy-Hb data
    call readfile_array2D(trim(resdir)//'Deoxy-Hb.dat', Deoxy_Hb_array, 0, 2)
 
-!   cnt=int(size(Deoxy_Hb_array))/2
-!   allocate(Deoxy_Hb_cdf(cnt))
-!   Deoxy_Hb_cdf=0.
-  
    !B-carotene data
    call readfile_array2D(trim(resdir)//'B-carotene.dat', Carotene_array, 0, 2)
 
-!   cnt=int(size(Carotene_array))/2
-!   allocate(Carotene_cdf(cnt))
-!   Carotene_cdf=0.
-      
    !Bilirubin data
    call readfile_array2D(trim(resdir)//'bilirubin.dat', bilirubin_array, 0, 2)
 
-!   cnt=int(size(bilirubin_array,1))
-!   allocate(bilirubin_cdf(cnt))
-!   bilirubin_cdf=0.
-   
    !water data
    call readfile_array2D(trim(resdir)//'water absor.dat', water_array, 0, 2)
-
-!   cnt=int(size(water_array))/2
-!   allocate(water_cdf(cnt))
-!   water_cdf=0.
 
    !noise data
 !   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)

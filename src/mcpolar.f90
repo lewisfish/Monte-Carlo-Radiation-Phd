@@ -105,15 +105,6 @@ v(3)=costim
 !set optical properties and make cdfs.
 wave=635. 
 
-
-!call exit(0)
-! create cdfs to sample from
-!collagen
-call mk_cdf(fluro_array_c,f_cdf_c,size(f_cdf_c))
-call mk_cdf(excite_array_c,e_cdf_c,size(e_cdf_c))
-!nadh
-call mk_cdf(fluro_array_n,f_cdf_n,size(f_cdf_n))
-call mk_cdf(excite_array_n,e_cdf_n,size(e_cdf_n))
 call init_opt
 
 ! calculate number of photons to be run over all cores.  
@@ -203,28 +194,11 @@ do j=1,nphotons
          call stokes(iseed)
          nscatt=nscatt+1
       else !photon absorbs
-!         if(zp.lt.0.)then
-!            call search_2D(size(e_cdf_c),excite_array_c,nlow,wave)
-!            call lin_inter_2D(excite_array_c,wave,size(e_cdf_c),nlow,fluro_prob)
-!            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
-!               call sample(fluro_array_c,size(f_cdf_c),f_cdf_c,wave,iseed)
-!               call opt_set(wave)
-!            else
-!               tflag=.TRUE.
-!            end if
-!         else if(zp.gt.zmax-.01)then
-!            call search_2D(size(e_cdf_n),excite_array_n,nlow,wave)
-!            call lin_inter_2D(excite_array_n,wave,size(e_cdf_n),nlow,fluro_prob)
-!            if(ran2(iseed).lt.fluro_prob)then      !see if photon fluros or not
-!               call sample(fluro_array_n,size(f_cdf_n),f_cdf_n,wave,iseed)
-!               call init_opt
-!            else
-!               tflag=.TRUE.
-!            end if
-!         else
+
          tflag=.TRUE.
-!         end if
+
       end if
+
 !maxval(excite_array,2) gives wavelength col
 !minval(maxval(excite_array,2)) gives min in wavelength col
 
@@ -298,8 +272,8 @@ print*,'done trans'
 !call MPI_REDUCE(follow,followGLOBAL,(nxg)*(nyg)*(nzg),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 !     fluroexit reduce
-call MPI_Barrier(MPI_COMM_WORLD,error)
-call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+!call MPI_Barrier(MPI_COMM_WORLD,error)
+!call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
 !     fluro_pos reduce
 !call MPI_Barrier(MPI_COMM_WORLD,error)
 !call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
