@@ -17,23 +17,23 @@ CONTAINS
    CALL getcwd(cwd)
 
    !get 'home' dir from cwd
-   homedir=trim(cwd(1:index(trim(cwd),'/bin')))
+   homedir=trim(cwd(1:len(trim(cwd))-3))
    !get data dir
    fileplace=trim(homedir)//'data/'
    
    !checks to see if data folder exists, if not creates it.
-   call chdir(fileplace,io)
-   
-   if(io.ne.0.and.id.eq.0)then
-      print*,'data directory does not exist...',id
-      print*, 'creating directory...'
-      call system("mkdir "//fileplace)
-      call chdir(fileplace,io)
-      call system("mkdir jmean/")
-      call system("mkdir deposit/")
-      call system("mkdir im/")
-      print*, 'created directory ',trim(fileplace)
-   end if
+!   call chdir(fileplace,io)
+!   
+!   if(io.ne.0.and.id.eq.0)then
+!      print*,'data directory does not exist...',id
+!      print*, 'creating directory...'
+!      call system("mkdir "//fileplace)
+!      call chdir(fileplace,io)
+!      call system("mkdir jmean/")
+!      call system("mkdir deposit/")
+!      call system("mkdir im/")
+!      print*, 'created directory ',trim(fileplace)
+!   end if
    
    !get res dir
    resdir=trim(homedir)//'res/'
