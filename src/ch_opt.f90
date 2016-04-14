@@ -59,67 +59,7 @@ CONTAINS
 !   open(12,file='abs.dat')
 !do i=300,1000
 !   wave=dble(i)
-   !Strat Corneum sample
-      !set mua                                                                          !frac_H2O
-         mua = ((0.1 - 0.3*10**(-4.) * wave) + 0.125 * (wave/10.) * Base(wave)) * (1. - 0.05) + water(wave)   
-      !set mus
-         rho = 0.29d0
-         gam = 0.689d0
-         mus_ref_500 = 66.7d0 
-         mus_r = mus_ref_500 * (wave/500.d0)**(-4.d0)
-         mus_m = mus_ref_500 * (wave/500.d0)**(-gam)
-         mus = rho * mus_r + (1.d0 - rho) * mus_m       !in cm-1
-         mus1=mus/(1.-hgg)
-   Stratum_kappa = mua*.1d0! + mus1
-         mua=0.
-   
-   !Living Epidermis sample
-      !set mua                                                                                
-         mua = (nu_m * (Eumel(wave) + Pheomel(wave)) + (1.d0 - nu_m) * (Carotene(2.1d-4, wave) &
-               + (1.d0 - 2.1d-4) * base(wave))) * (1.d0- .2) + water(wave)             
-      !set mus
-         !same as startum corneum
-         mus2=mus/(1.-hgg)
-   LiveEpi_kappa = mua*.1d0 !+ mus2
-         mus = 0.
-   
-   !Pap Dermis sample
-      !set mua
-         mua = (nu_Pd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(7.d0*10**(-5), wave) + &
-               Carotene(7.d0*10**(-5), wave) + (1.- .15) * base(wave))) * (1.-.5) + water(wave) 
-      !set mus                                                                      !frac_H2O
-         a = 43.6
-         f_ray = .41
-         b = .562
-         mus= a * (f_ray * (wave/500.d0)**(-4.d0) + (1.d0 - f_ray) * (wave/500.d0)**(-b))
-         mus3=mus/(1.-hgg)
-
-   PapDerm_kappa = mua*.1d0! + mus3
-   
-   !Ret Dermis Sample
-      !set mua
-         mua = (nu_Rd_Hb * (Oxy_Hb(1.d0, wave) + Deoxy_Hb(1.d0, wave) + Bilirubin(7.d0*10**(-5), wave) + &
-               Carotene(7.d0*10**(-5), wave) + (1.-.15) * base(wave))) * (1.-.7) + water(wave)
-      !set mus
-         !mus same as pap dermis
-            mus4 = mus/(1.-hgg)
-   RetDerm_kappa = mua*.1d0 !+ mus4
-
-   !Hypodermis smaple
-      !set mua
-      nu_H2O = .7d0
-      nu_b = 0.05d0
-      S = .75d0
-      b_frac = 0.002d0/nu_b
-      mua = (1.d0-S) * b_frac * Deoxy_Hb(1.d0, wave) + S * b_frac * nu_b * Oxy_Hb(1.d0, wave) &
-             + (1.d0 - b_frac * nu_b) * nu_H2O * water(wave) + (1.d0 - b_frac * nu_b) * &
-               (1.d0 - nu_H2O) * base(wave)
   
-      !set mus
-         mus = 1050.6d0 * wave**(-0.68d0) !in cm-1
-         mus5=mus/(1.-hgg)
-      HypoDerm_kappa = mua*.1d0 !+ mus
-      mus5=mus/(1.-hgg)
       
 !      wave = HypoDerm_kappa+RetDerm_kappa+PapDerm_kappa+LiveEpi_kappa+Stratum_kappa
 !write(12,*) i,HypoDerm_kappa, RetDerm_kappa, PapDerm_kappa, LiveEpi_kappa, Stratum_kappa, wave
@@ -382,6 +322,7 @@ CONTAINS
       Pheomel = 2.9*10.**15. * wave**(-4.75) !in cm-1
    
    end function Pheomel
+   
 end module ch_opt
 
 
