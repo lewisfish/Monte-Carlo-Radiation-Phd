@@ -8,5 +8,8 @@ ext/
 bin/
 res/*.dat
 src/unused/
+src/*.dat
+src/*.py
+res/*.py
 *.png
 *.swp

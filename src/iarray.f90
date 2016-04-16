@@ -11,7 +11,7 @@ DOUBLE PRECISION, allocatable :: jmean(:,:,:,:), jmeanGLOBAL(:,:,:,:)
 
 DOUBLE PRECISION, allocatable :: Carotene_array(:,:), Bilirubin_array(:,:)
 DOUBLE PRECISION, allocatable :: Deoxy_Hb_array(:,:), Oxy_Hb_array(:,:)
-DOUBLE PRECISION, allocatable :: water_array(:,:)
+DOUBLE PRECISION, allocatable :: water_array(:,:), fat_array(:,:)
 
 !real, allocatable :: noise(:,:),reflc(:,:),trans(:,:)
 !real, allocatable :: fluro_pos(:,:,:),fluro_posGLOBAL(:,:,:)

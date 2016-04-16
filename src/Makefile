@@ -12,8 +12,10 @@ SRCS =      ran2.f \
             constants.f90 \
             photon_vars.f90 \
             iarray.f90 \
-            opt_prop.f90 \
             subs.f90 \
+            absorbers_mod.f90 \
+            opt_prop.f90 \
+				skin_prop.f90 \
             ch_opt.f90 \
             density.f90 \
             gridset.f90 \
@@ -24,7 +26,6 @@ SRCS =      ran2.f \
             sourceph.f90 \
             peeling.f90 \
             binning.f90 \
-            scatt_method.f90 \
             reader.f90 \
             writer.f90 \
             findsmax.f90 \

@@ -81,7 +81,7 @@ CONTAINS
    subroutine reader1
    
    use iarray,    only : Carotene_array, Bilirubin_array, Oxy_Hb_array, Deoxy_Hb_array, &
-                         water_array !, noise
+                         water_array, fat_array !, noise
    use constants, only : resdir
    
    implicit none
@@ -102,6 +102,9 @@ CONTAINS
 
    !water data
    call readfile_array2D(trim(resdir)//'water absor.dat', water_array, 0, 2)
+   
+   !fat data
+   call readfile_array2D(trim(resdir)//'fatty.dat', fat_array, 0, 2)
 
    !noise data
 !   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
