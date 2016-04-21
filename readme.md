@@ -2,10 +2,10 @@
 
 This repository contains the source codes for the 3D grid Cartesian monte carlo radiation transfer codes developed as part of my phd.
 The codes simulate the transfer of light through tissue of various types and optical properties.
-Currently there are two codes, the master and the spain branches. The spain branch has a cuboid of Nd:yag under tissue that fluoresces at three diffrent wavelengths.
-The master branch is more general and can be adapted for purpose.
+Currently there are three branches with diffrent version of the code. The master branch which will (eventually) be a generic code sutiable for nearly any tissue trasfer problem. The spain branche is the code for the work done with Universidad Autonoma de Madrid. The spain branch has a cuboid of Nd:yag under tissue that fluoresces at three diffrent wavelengths. Finally is the validaition branch which will slowly follow the master branch but for certain problems for which the code is being matched against.
+
 At the end of the simulation the code outputs to the screen the average number of scatterings 
-per Monte Carlo photon packet, and fluences into the data folder.
+per Monte Carlo photon packet, and fluences into the data folder, with options for tracking other quantities available.
 
 #### The FORTRAN source files are:
 
