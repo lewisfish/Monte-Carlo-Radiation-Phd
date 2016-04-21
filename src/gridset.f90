@@ -9,7 +9,7 @@ CONTAINS
    use ch_opt
    use density_mod
    use constants, only : nxg,nyg,nzg,xmax,ymax,zmax
-   use iarray, only    : rhokap,xface,yface,zface,albedo
+   use iarray, only    : rhokap,xface,yface,zface,albedo,conc
 
    implicit none
 
@@ -48,6 +48,51 @@ CONTAINS
 !   end do
    rhokap=0.d0
    albedo=0.d0
+   do i=1,nzg
+      z=zface(i)-zmax+zmax/nzg
+
+      if(z.gt.zmax-0.02)then
+         !Strat corenum
+         conc(i, 1) = 1.d-6 !nad
+         conc(i, 2) = 1.d-4 !nadh
+         conc(i, 3) = 0.d0 !fad
+         conc(i, 4) = 0.d0 !riboflavin
+         conc(i, 5) = 0.d0 !tyrosine
+         conc(i, 6) = 0.d0 !trytophan
+      elseif(z.gt.zmax-0.1)then
+         !Living Epidermis
+         conc(i, 1) = 1.d-3 !nad
+         conc(i, 2) = 1.d-4 !nadh
+         conc(i, 3) = 0.d0 !fad
+         conc(i, 4) = 0.d0 !riboflavin
+         conc(i, 5) = 1.d-3 !tyrosine
+         conc(i, 6) = 0.d0 !trytophan 
+      elseif(z.gt.zmax-0.28)then
+         !PaPillary Dermis
+         conc(i, 1) = 0.d0 !nad
+         conc(i, 2) = 0.d0 !nadh
+         conc(i, 3) = 0.d0 !fad
+         conc(i, 4) = 5.d-4 !riboflavin
+         conc(i, 5) = 0.d0 !tyrosine
+         conc(i, 6) = 1.d-5 !trytophan
+      elseif(z.gt.zmax-2.1)then
+         !Reticular Dermis    
+         conc(i, 1) = 0.d0 !nad
+         conc(i, 2) = 0.d0 !nadh
+         conc(i, 3) = 0.d0 !fad
+         conc(i, 4) = 0.d0 !riboflavin
+         conc(i, 5) = 0.d0 !tyrosine
+         conc(i, 6) = 0.d0 !trytophan     
+      elseif(z.lt.zmax-2.1)then
+         !Hypodermis
+         conc(i, 1) = 0.d0 !nad
+         conc(i, 2) = 0.d0 !nadh
+         conc(i, 3) = 0.d0 !fad
+         conc(i, 4) = 0.d0 !riboflavin
+         conc(i, 5) = 0.d0 !tyrosine
+         conc(i, 6) = 0.d0 !trytophan
+      end if
+   end do
    call opt_set()
 
    !****************** Calculate equatorial and polar optical depths ****

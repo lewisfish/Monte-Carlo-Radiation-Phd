@@ -15,6 +15,7 @@ SRCS =      ran2.f \
             subs.f90 \
             absorbers_mod.f90 \
             opt_prop.f90 \
+				fluorophores.f90 \
 				skin_prop.f90 \
             ch_opt.f90 \
             density.f90 \
@@ -29,6 +30,7 @@ SRCS =      ran2.f \
             reader.f90 \
             writer.f90 \
             findsmax.f90 \
+            ppm.f90 \
             mcpolar.f90 
             
 OBJECTS = $(SRCS:.f90=.o)
@@ -36,10 +38,10 @@ OBJECTS = $(SRCS:.f90=.o)
 all:	$(PROGRAM)
 
 $(PROGRAM):	$(OBJECTS)
-	$(FCOMP) $(FCFLAGS) -o $@ $^ 
+	$(FCOMP) $(FCFLAGS) -o $@ $^
 
 %.o:  %.f90
-	$(FCOMP)  $(FCFLAGS) -c $<
+	$(FCOMP) $(FCFLAGS) -c $<
 
 .PHONY:	clean
 

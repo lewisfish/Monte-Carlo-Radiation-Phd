@@ -11,8 +11,9 @@ CONTAINS
                     ! ,fluro_posGLOBAL,followGLOBAL
 
    implicit none
-
-   integer j,irec,i,nphotons, numproc
+   
+   character(len=1) :: fn
+   integer :: j,irec,i,nphotons, numproc
    
    jmeanGLOBAL=jmeanGLOBAL * (1.d0/(numproc*nphotons*(2.*xmax/nxg)*(2.*ymax/nyg)*(2.*zmax/nzg)))
    
@@ -46,11 +47,15 @@ CONTAINS
 !   write(70,rec=1) transGLOBAL
 !   close(70)
 
-!   open(71,file=trim(fileplace)//'practice.dat')
-!   do j=1,1000
-!      write(71,*) fluroexitGLOBAL(j)!/real(maxval(fluroexitGLOBAL))
-!   end do
-!   close(71)
+   do i=1,6
+   write(fn,'(i0)')i
+   open(71,file=trim(fileplace)//fn//'fluro.dat')
+   do j=1,1000
+      write(71,*) fluroexitGLOBAL(j,i)!/real(maxval(fluroexitGLOBAL))
+   end do
+      close(71)
+   end do
+
    
 !   open(72,file=trim(fileplace)//'fluro_pos.dat',access='direct',form='unformatted',recl=((nxg)*(nyg)*(nzg))*4)
 !   write(72,rec=1) fluro_posGLOBAL

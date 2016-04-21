@@ -38,45 +38,47 @@ CONTAINS
    use iarray,    only : zface, rhokap, albedo
    use opt_prop
    use skin_prop
+   use photon_vars, only : zp
 
    implicit none
    
-   DOUBLE PRECISION :: z
+   DOUBLE PRECISION :: z, kappa_tmp
    integer :: i,j
-   wave=500.d0
+!   wave=500.d0
 !loop to set optical properties in z dir. uniform in x,y 
-   do i=1,nzg
-      z=zface(i)-zmax+zmax/nzg
+!   do i=1,nzg
+!      z=zface(i)-zmax+zmax/nzg
 
-      if(z.gt.zmax-0.02)then
-         !Strat corenum
-         rhokap(:,:,i,1) = Stratum(wave)
-!         albedo(:,:,i,1) = mus1/Stratum_kappa
-      elseif(z.gt.zmax-0.1)then
+!      if(z.gt.zmax-0.02)then
+         !Strat corenum                                  ! 0 means mua + mus  |  1 means mus
+         kappa_tmp = Stratum(wave, 200, 0)
+         rhokap(:,:,200,1) = kappa_tmp
+         albedo(:,:,200,1) = Stratum(wave, 200, 1) / kappa_tmp
+!      elseif(z.gt.zmax-0.1)then
          !Living Epidermis
-         rhokap(:,:,i,1) = Epidermis(wave)
-!         albedo(:,:,i,1) = mus2/LiveEpi_kappa
-      elseif(z.gt.zmax-0.28)then
+         kappa_tmp = Epidermis(wave, 198, 0)
+         rhokap(:,:,197:199,1) = kappa_tmp
+         albedo(:,:,197:199,1) = Epidermis(wave, 198, 1) / kappa_tmp
+!      elseif(z.gt.zmax-0.28)then
+         if(zp .lt. zmax-0.05)then
          !PaPillary Dermis
-         rhokap(:,:,i,1) = Pap_Dermis(wave)
-!         albedo(:,:,i,1) = mus3/PapDerm_kappa
-      elseif(z.gt.zmax-2.1)then
+         kappa_tmp = Pap_Dermis(wave, 194, 0)
+         rhokap(:,:,190:196,1) = kappa_tmp
+         albedo(:,:,190:196,1) = Pap_Dermis(wave, 194, 1) / kappa_tmp
+!      elseif(z.gt.zmax-2.1)then
+         elseif(zp .lt. zmax-.1d0)then
          !Reticular Dermis
-         rhokap(:,:,i,1) = Ret_Dermis(wave)
-!         albedo(:,:,i,1) = mus4/RetDerm_kappa         
-      elseif(z.lt.zmax-2.1)then
+         kappa_tmp = Ret_Dermis(wave, 140, 0)
+         rhokap(:,:,117:189,1) = kappa_tmp
+         albedo(:,:,117:189,1) = Ret_Dermis(wave, 140, 1) / kappa_tmp         
+!      elseif(z.lt.zmax-2.1)then
+         elseif(zp .lt. zmax-1.0d0)then
          !Hypodermis
-         rhokap(:,:,i,1) = Hypo_Dermis(wave)
-!         albedo(:,:,i,1) = mus5/HypoDerm_kappa
+         kappa_tmp = Hypo_Dermis(wave, 50, 0)
+         rhokap(:,:,1:116,1) = kappa_tmp
+         albedo(:,:,1:116,1) = Hypo_Dermis(wave, 50, 1) / kappa_tmp 
       end if
-   end do
+!   end do
 
-   inquire(iolength=i)rhokap(:,:,:,1)
-   open(62,file='skintest.dat')
-   do i=1,nxg
-   write(62,*)(rhokap(i,100,j,1),j=1,nzg)
-   end do
-   close(62)
-   call exit(0)
-   end subroutine
+   end subroutine opt_set
 end module ch_opt

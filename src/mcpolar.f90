@@ -11,6 +11,7 @@ use opt_prop
 
 !subroutines
 use subs
+use ppm
 use reader_mod
 use gridset_mod
 use sourceph_mod
@@ -26,6 +27,7 @@ implicit none
 
 integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount,nlow
 logical :: tflag,sflag,fflag
+logical :: fad_bool, nad_bool, nadh_bool, ribo_bool, try_bool, tyro_bool
 DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight,val,fluro_prob
 DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran 
 
@@ -44,7 +46,7 @@ integer          :: error,numproc,id
 !set directory paths
 call directory(id)
 
-call alloc_array
+call alloc_array(0)
 call zarray
 
 !      !init mpi
@@ -103,9 +105,9 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=635. 
+wave=532.d0 
 
-call init_opt
+call opt_set
 
 ! calculate number of photons to be run over all cores.  
 if(id.eq.0)then
@@ -127,23 +129,30 @@ call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
 call cpu_time(sleft)
-
+ call mk_cdf(nadh_fluro,nadh_cdf,size(nadh_fluro,1))
+!  call mk_cdf(fad_fluro,nadh_cdf,size(fad_fluro,1)) 
+call mk_cdf(ribo_fluro,ribo_cdf,size(ribo_fluro,1)) 
+call mk_cdf(try_fluro,try_cdf,size(try_fluro,1)) 
+call mk_cdf(tyro_fluro,tyro_cdf,size(tyro_fluro,1)) 
 
 !loop over photons   
 do j=1,nphotons
   
 !set init weight and flags
-   wave=635.
-   call init_opt
+   wave=260.d0!*ran2(iseed)+380.d0
+   fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
+   try_bool=.FALSE.; tyro_bool=.FALSE.
+   call opt_set
    tflag=.FALSE.
    fflag=.FALSE.
    sflag=.TRUE.     ! flag for fresnel subroutine. so that incoming photons
                        ! are treated diffrently to outgoing ones
 
 ! code to output progress as program runs also gives an estimate of when program will complete.
-   if(mod(j,100000).eq.0)then
+   if(mod(j,int(0.02d0*nphotons)).eq.0)then
       if(id.eq.0)then
-         print'(T40 ,A, 1X , F6.2)', ' percentage completed:',real(real(j)/real(nphotons))*100.
+          write(*,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
+                " Percent Complete: ", (real(j)/real(nphotons))*100.0, "%"
       end if
    end if
    if(id.eq.0)then
@@ -159,8 +168,6 @@ do j=1,nphotons
          print*,' '
    end if
    end if
-
-   
 !***** Release photon from point source *******************************
    call sourceph(xcell,ycell,zcell,iseed)
 
@@ -190,13 +197,42 @@ do j=1,nphotons
 
 ! Select albedo based on current photon wavelength
       ran=ran2(iseed)
+!      print*,zcell,albedo(xcell,ycell,zcell,1)
       if(ran.lt.albedo(xcell,ycell,zcell,1))then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
       else !photon absorbs
-
-         tflag=.TRUE.
-
+         if( ran .lt. mu_nadh/rhokap(xcell, ycell, zcell , 1) + albedo(zcell, ycell, zcell, 1))then
+!                        print*,wave,'nadh1'
+            call sample(nadh_fluro,nadh_cdf,wave,iseed)
+            call opt_set()
+            nadh_bool=.TRUE.
+            fad_bool=.FALSE.; nad_bool=.FALSE.; ribo_bool=.FALSE.; 
+            try_bool=.FALSE.; tyro_bool=.FALSE.
+         elseif( ran .lt. (mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
+                                          + albedo(zcell, ycell, zcell, 1))then
+            call sample(ribo_fluro,ribo_cdf,wave,iseed)
+            call opt_set()
+            ribo_bool=.TRUE.
+            fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; 
+            try_bool=.FALSE.; tyro_bool=.FALSE.
+         elseif( ran .lt. (mu_try+mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
+                                                + albedo(zcell, ycell, zcell, 1))then
+            call sample(try_fluro,try_cdf,wave,iseed)
+            call opt_set()
+            try_bool=.TRUE.
+            fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
+            tyro_bool=.FALSE.
+         elseif( ran .lt. (mu_tyro+mu_try+mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
+                                                + albedo(zcell, ycell, zcell, 1))then
+            call sample(tyro_fluro,tyro_cdf,wave,iseed)
+            call opt_set()
+            tyro_bool=.TRUE.
+            fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
+            try_bool=.FALSE.
+         else
+            tflag=.TRUE.
+         end if
       end if
 
 !maxval(excite_array,2) gives wavelength col
@@ -218,13 +254,34 @@ do j=1,nphotons
       zcur=zp+zmax
 
    end do
+   if(zp.ge.zmax*.999)then
+   flucount=flucount+1
+      call wave_to_RGB(wave, xcell, ycell , rgb, 0.8d0)
+   end if
 !bin photons leaving top surface if they are collected by fibre
-!   if(int(wave).ne.365..and.zp.ge.zmax*.999)then
-!      flucount=flucount+1
-!      fluroexit(int(wave))=fluroexit(int(wave))+1
-!   end if
+   if(int(wave).ne. 260.d0 .and.nxp.gt. 0.d0)then
+      fluroexit(int(wave),7)=fluroexit(int(wave),7)+1
+      if(nadh_bool)then
+         fluroexit(int(wave),1)=fluroexit(int(wave),1)+1
+!         print*,'nadh'
+      elseif(ribo_bool)then
+         fluroexit(int(wave),2)=fluroexit(int(wave),2)+1
+!         print*,'ribo'
+      elseif(try_bool)then
+         fluroexit(int(wave),3)=fluroexit(int(wave),3)+1
+!         print*,'try'   
+      elseif(tyro_bool)then
+         fluroexit(int(wave),4)=fluroexit(int(wave),4)+1
+!         print*,'tyro'
+      elseif(fad_bool)then
+         fluroexit(int(wave),5)=fluroexit(int(wave),5)+1
+         print*,'fad'
+      end if
+      flucount=flucount+1
+   end if
 end do      ! end loop over nph photons
 
+print*,' ' 
 print*, acount, '1st barrier',id
 print*, fcount, '2nd barrier',id
 print*, flucount,'# photons collected',id
@@ -239,6 +296,16 @@ end if
 
 !force syncro
 call MPI_Barrier(MPI_COMM_WORLD,error)
+call alloc_array(1)
+rgb(:,:,1)=rgb(:,:,1)/maxval(rgb(:,:,1))
+rgb(:,:,2)=rgb(:,:,2)/maxval(rgb(:,:,2))
+rgb(:,:,3)=rgb(:,:,3)/maxval(rgb(:,:,3))
+rgb=rgb*256.d0
+call MPI_REDUCE(rgb,rgbGLOBAL,nxg*nyg*3,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
+
+if(id.eq.0)then
+call write_ppm(trim(fileplace)//'render.ppm', rgbGLOBAL)
+end if
 
 !      path length reduce     
 call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4,MPI_DOUBLE_PRECISION &
@@ -272,8 +339,9 @@ print*,'done trans'
 !call MPI_REDUCE(follow,followGLOBAL,(nxg)*(nyg)*(nzg),MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 !     fluroexit reduce
-!call MPI_Barrier(MPI_COMM_WORLD,error)
-!call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+call MPI_Barrier(MPI_COMM_WORLD,error)
+call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000*6,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+
 !     fluro_pos reduce
 !call MPI_Barrier(MPI_COMM_WORLD,error)
 !call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)

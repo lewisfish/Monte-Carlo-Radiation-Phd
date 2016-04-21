@@ -54,7 +54,7 @@ CONTAINS
 !   dep=0.
    jmean=0.
 !   transGLOBAL=0.
-   jmeanGLOBAL=0.
+!   jmeanGLOBAL=0.
 !   imageGLOBAL=0.
 !   depositGLOBAL=0.
 !   depGLOBAL=0.
@@ -62,14 +62,17 @@ CONTAINS
    yface=0.
    zface=0.
    rhokap=0.
-!   fluroexit=0
+   rgb=0.d0
+!   rgbGLOBAL = 0.0d0
+   conc = 0.d0
+   fluroexit=0
 !   fluroexitGLOBAL=0
 !   fluro_pos=0.
 !   fluro_posGLOBAL=0.
    
    end SUBROUTINE zarray
 
-   SUBROUTINE alloc_array
+   SUBROUTINE alloc_array(flag)
 !  subroutine allocates allocatable arrays
 !   
 !   
@@ -78,8 +81,13 @@ CONTAINS
    
    implicit none
    
+   integer :: flag
+   
+   if(flag .eq. 0)then!allocate local arrays
+   
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
    allocate(rhokap(nxg+3,nyg+3,nzg+3,1),albedo(nxg+3,nyg+3,nzg+3,1))
+   allocate(rgb(nxg,nyg,3), conc(nzg, 6))
    
 !   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
 !   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
@@ -89,21 +97,27 @@ CONTAINS
 !   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
 !   allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
    allocate(jmean(nxg+3,nyg+3,nzg+3,4))
-   allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))
-!   allocate(fluroexit(1000),fluroexitGLOBAL(1000))
-   
+      allocate(fluroexit(1000,7))
+   else!deallocate local arrays and allocate GLOBAL
+      allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4), rgbGLOBAL(nxg,nyg,3),fluroexitGLOBAL(1000,7))
+         rgbGLOBAL = 0.0d0
+         jmeanGLOBAL = 0.0d0
+            fluroexitGLOBAL=0
+      deallocate(conc,xface,yface,albedo,rhokap)
+
+   end if
    
    end SUBROUTINE alloc_array
    
    
-   subroutine sample(array,size_of,cdf,wave,iseed)
+   subroutine sample(array,cdf,wave,iseed)
 !      
 !  samples a random value from an array based upon its cdf     
 !      
       implicit none
       
-      integer, intent(IN)                :: iseed, size_of
-      DOUBLE PRECISION,    intent(IN)    :: array(size_of,2), cdf(size_of)
+      integer, intent(IN)                :: iseed
+      DOUBLE PRECISION,    intent(IN)    :: array(:, :), cdf(:)
       DOUBLE PRECISION,    intent(OUT)   :: wave
       
       real :: ran2
@@ -112,20 +126,19 @@ CONTAINS
       
       value = ran2(iseed)
       
-      call search_1D(size(cdf),cdf,nlow,value)
-      call lin_inter_1D(array,cdf,value,size(cdf),nlow,wave)
+      call search_1D(cdf,nlow,value)
+      call lin_inter_1D(array,cdf,value,nlow,wave)
    
    end subroutine sample
    
-   subroutine lin_inter_1D(array,cdf,value,length,nlow,y)
+   subroutine lin_inter_1D(array,cdf,value,nlow,y)
 !
 !  linear interpolates between values for an array and its cdf
 !   
       implicit none
    
       DOUBLE PRECISION,    intent(OUT)  :: y
-      integer, intent(IN)   :: length
-      DOUBLE PRECISION,    intent(IN)   :: value, array(length, 2), cdf(length - 1)
+      DOUBLE PRECISION,    intent(IN)   :: value, array(:, :), cdf(:)
       integer, intent(IN)   :: nlow
    
       y = array(nlow+1, 1) + (array(nlow+2, 1) - array(nlow + 1, 1)) * (value - cdf(nlow))/(cdf(nlow+1) - cdf(nlow))
@@ -143,27 +156,28 @@ CONTAINS
       DOUBLE PRECISION,    intent(IN)   :: value, array(length,2)
       integer, intent(IN)   :: nlow
    
-      y = array(nlow,2) + (array(nlow+1,2) - array(nlow,2)) * (value - array(nlow,1))/(array(nlow+1,1) - array(nlow,1))
+      y = array(nlow, 2) + (array(nlow + 1, 2) - array(nlow, 2)) * (value - array(nlow, 1)) / &
+                                                         (array(nlow + 1, 1) - array(nlow, 1))
    
    end subroutine lin_inter_2D
    
-   subroutine search_1D(length,array,nlow,value)
+   subroutine search_1D(array,nlow,value)
 !
 !  search by bisection for 1D array
 !
       implicit none
       
-      integer              :: nup,length,middle
-      integer, intent(OUT) :: nlow
-      DOUBLE PRECISION,    intent(in)  :: array(length),value
+      integer                          :: nup,middle
+      integer,             intent(OUT) :: nlow
+      DOUBLE PRECISION,    intent(in)  :: array(:), value
       
-      nup = length
+      nup = size(array)
       nlow = 1
-      middle = int((nup+nlow)/2.)
+      middle = int((nup + nlow) / 2.d0)
 
-      do while((nup - nlow).gt.1)
-         middle = int((nup + nlow)/2.)
-         if(value.gt.array(middle))then
+      do while((nup - nlow) .gt. 1)
+         middle = int((nup + nlow) / 2.d0)
+         if(value .gt. array(middle))then
             nlow = middle
          else
             nup = middle   

@@ -20,7 +20,6 @@ CONTAINS
 
    end function water
 
-   
    DOUBLE PRECISION function Oxy_Hb(wave)
    
    use iarray, only : Oxy_Hb_array
