@@ -28,6 +28,12 @@ per Monte Carlo photon packet, and fluences into the data folder, with options f
             findsmax.f95         finds smax need for tauint calculation
             mcpolar.f95          main program
             ran2.f               random number generator
+            absorbers_mod.f90 	 functions to calculate absorption coefficients for absorbers
+            opt_prop.f90 	 	 tracks optical properties of the system
+            fluorophores.f90 	 functions to calculate absorption coefficients for fluorophores
+            skin_prop.f90 		 sets optical properties for each layer in the skin
+            ch_opt.f90 			 sets rhokap and albedo arrays with correct values
+            ppm.f90 		 	 function to convert wavelength to RGB, subroutine to write ppm image 
 
 #### Input parameters are in:
 
@@ -52,9 +58,7 @@ per Monte Carlo photon packet, and fluences into the data folder, with options f
    - Sort fresnel so can differ between transmission on diffrent faces not just top and bottom/ tidy code up
    - Investigate +1 in celli,j,k calc in tauint2
    - Fix up fluro stuff i.e. give options for what type of fluro being done
-   - Change opt arrays to allocatble (as part of above point)
    - Test bump map, set cross as noise shape then look at diffrent slices/ do calculations manualy
    - Add proper treatment of peeling off for noisy surface
-   - Add colours/render as option
    - Proper formatting
    - Parallize-done but not 100% happy with. change makefile so that mpi is an option.
