@@ -12,8 +12,10 @@ CONTAINS
 
    implicit none
    
-   character(len=1) :: fn
+   character(len=4), dimension(7) :: fn
    integer :: j,irec,i,nphotons, numproc
+   
+   fn=(/'nadh','ribo','try ','tyro','fad ','nad ','tot '/)
    
    jmeanGLOBAL=jmeanGLOBAL * (1.d0/(numproc*nphotons*(2.*xmax/nxg)*(2.*ymax/nyg)*(2.*zmax/nzg)))
    
@@ -47,9 +49,8 @@ CONTAINS
 !   write(70,rec=1) transGLOBAL
 !   close(70)
 
-   do i=1,6
-   write(fn,'(i0)')i
-   open(71,file=trim(fileplace)//fn//'fluro.dat')
+   do i=1,7
+   open(71,file=trim(fileplace)//trim(fn(i))//'fluro.dat')
    do j=1,1000
       write(71,*) fluroexitGLOBAL(j,i)!/real(maxval(fluroexitGLOBAL))
    end do
