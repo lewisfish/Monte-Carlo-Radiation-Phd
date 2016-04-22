@@ -12,5 +12,5 @@ src/unused/
 src/*.dat
 src/*.py
 res/*.py
-*.png
+data/*.png
 *.swp
