@@ -65,21 +65,21 @@ CONTAINS
          conc(i, 2) = 1.d-4 !nadh
          conc(i, 3) = 0.d0 !fad
          conc(i, 4) = 0.d0 !riboflavin
-         conc(i, 5) = 1.d-3 !tyrosine
+         conc(i, 5) = 0.d0 !tyrosine
          conc(i, 6) = 0.d0 !trytophan 
       elseif(z.gt.zmax-0.28)then
          !PaPillary Dermis
          conc(i, 1) = 0.d0 !nad
-         conc(i, 2) = 0.d0 !nadh
-         conc(i, 3) = 0.d0 !fad
-         conc(i, 4) = 5.d-4 !riboflavin
+         conc(i, 2) = 1.d-4 !nadh
+         conc(i, 3) = 1.d-4 !fad
+         conc(i, 4) = 0.d-0 !riboflavin
          conc(i, 5) = 0.d0 !tyrosine
-         conc(i, 6) = 1.d-5 !trytophan
+         conc(i, 6) = 0.d-0 !trytophan
       elseif(z.gt.zmax-2.1)then
          !Reticular Dermis    
          conc(i, 1) = 0.d0 !nad
-         conc(i, 2) = 0.d0 !nadh
-         conc(i, 3) = 0.d0 !fad
+         conc(i, 2) = 1.d-3 !nadh
+         conc(i, 3) = 1.d-3 !fad
          conc(i, 4) = 0.d0 !riboflavin
          conc(i, 5) = 0.d0 !tyrosine
          conc(i, 6) = 0.d0 !trytophan     
@@ -94,7 +94,6 @@ CONTAINS
       end if
    end do
    call opt_set()
-
    !****************** Calculate equatorial and polar optical depths ****
    taueq1=0.
    taupole1=0.

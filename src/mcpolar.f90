@@ -29,7 +29,7 @@ integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount,nlow
 logical :: tflag,sflag,fflag
 logical :: fad_bool, nad_bool, nadh_bool, ribo_bool, try_bool, tyro_bool
 DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight,val,fluro_prob
-DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran 
+DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran, wave_in
 
 DOUBLE PRECISION :: ddz,ddr,v(3)
 DOUBLE PRECISION :: costim,cospim,sintim,sinpim
@@ -105,8 +105,8 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave=532.d0 
-
+wave_in = 260.d0 
+wave    = wave_in
 call opt_set
 
 ! calculate number of photons to be run over all cores.  
@@ -129,8 +129,8 @@ call cpu_time(start)
 print*, ' '
 print*, 'Photons now running on core:',id
 call cpu_time(sleft)
- call mk_cdf(nadh_fluro,nadh_cdf,size(nadh_fluro,1))
-!  call mk_cdf(fad_fluro,nadh_cdf,size(fad_fluro,1)) 
+call mk_cdf(nadh_fluro,nadh_cdf,size(nadh_fluro,1))
+call mk_cdf(fad_fluro,fad_cdf,size(fad_fluro,1)) 
 call mk_cdf(ribo_fluro,ribo_cdf,size(ribo_fluro,1)) 
 call mk_cdf(try_fluro,try_cdf,size(try_fluro,1)) 
 call mk_cdf(tyro_fluro,tyro_cdf,size(tyro_fluro,1)) 
@@ -139,7 +139,7 @@ call mk_cdf(tyro_fluro,tyro_cdf,size(tyro_fluro,1))
 do j=1,nphotons
   
 !set init weight and flags
-   wave=260.d0!*ran2(iseed)+380.d0
+   wave=wave_in
    fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
    try_bool=.FALSE.; tyro_bool=.FALSE.
    call opt_set
@@ -203,33 +203,49 @@ do j=1,nphotons
          nscatt=nscatt+1
       else !photon absorbs
          if( ran .lt. mu_nadh/rhokap(xcell, ycell, zcell , 1) + albedo(zcell, ycell, zcell, 1))then
-!                        print*,wave,'nadh1'
+!           if(wave.lt.100)print*,'nadh1',wave
             call sample(nadh_fluro,nadh_cdf,wave,iseed)
             call opt_set()
             nadh_bool=.TRUE.
             fad_bool=.FALSE.; nad_bool=.FALSE.; ribo_bool=.FALSE.; 
             try_bool=.FALSE.; tyro_bool=.FALSE.
+!            if(wave.lt.100)print*,'nadh2',wave
          elseif( ran .lt. (mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
                                           + albedo(zcell, ycell, zcell, 1))then
+!            if(wave.lt.100)print*,'ribo1',wave
             call sample(ribo_fluro,ribo_cdf,wave,iseed)
             call opt_set()
             ribo_bool=.TRUE.
             fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; 
             try_bool=.FALSE.; tyro_bool=.FALSE.
-         elseif( ran .lt. (mu_try+mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
+!            if(wave.lt.100)print*,'ribo2',wave
+          elseif( ran .lt. (mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
+                                          + albedo(zcell, ycell, zcell, 1))then
+!            print*,'fad1',wave
+            call sample(fad_fluro,fad_cdf,wave,iseed)
+            call opt_set()
+            fad_bool=.TRUE.
+            ribo_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; 
+            try_bool=.FALSE.; tyro_bool=.FALSE.
+!            if(wave.lt.100)print*,'fad2',wave
+         elseif( ran .lt. (mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
                                                 + albedo(zcell, ycell, zcell, 1))then
+!            if(wave.lt.100)print*,'try1',wave
             call sample(try_fluro,try_cdf,wave,iseed)
             call opt_set()
             try_bool=.TRUE.
             fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
             tyro_bool=.FALSE.
-         elseif( ran .lt. (mu_tyro+mu_try+mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
+!           if(wave.lt.100) print*,'try2',wave
+         elseif( ran .lt. (mu_tyro+mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
                                                 + albedo(zcell, ycell, zcell, 1))then
+!            if(wave.lt.100)print*,'tyro',wave
             call sample(tyro_fluro,tyro_cdf,wave,iseed)
             call opt_set()
             tyro_bool=.TRUE.
             fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
             try_bool=.FALSE.
+!            if(wave.lt.100)print*,'tyro2',wave
          else
             tflag=.TRUE.
          end if
@@ -275,12 +291,12 @@ do j=1,nphotons
 !         print*,'tyro'
       elseif(fad_bool)then
          fluroexit(int(wave),5)=fluroexit(int(wave),5)+1
-         print*,'fad'
+!         print*,'fad'
       end if
       flucount=flucount+1
    end if
 end do      ! end loop over nph photons
-
+print*,sum(fluroexit(:,7))
 print*,' ' 
 print*, acount, '1st barrier',id
 print*, fcount, '2nd barrier',id
@@ -340,7 +356,7 @@ print*,'done trans'
 
 !     fluroexit reduce
 call MPI_Barrier(MPI_COMM_WORLD,error)
-call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000*6,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000*7,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 !     fluro_pos reduce
 !call MPI_Barrier(MPI_COMM_WORLD,error)

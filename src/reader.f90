@@ -119,7 +119,7 @@ CONTAINS
    allocate(nadh_cdf(size(nadh_fluro,1)))
    
    !fad data
-   call readfile_array2D(trim(resdir)//'fad.dat', fad_array, 0, 2)
+   call readfile_array2D(trim(resdir)//'faduv.dat', fad_array, 0, 2)
    call readfile_array2D(trim(resdir)//'fad_fluro.dat', fad_fluro, 0, 2)  
    allocate(fad_cdf(size(fad_fluro,1)))
       

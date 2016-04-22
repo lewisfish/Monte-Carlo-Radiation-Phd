@@ -40,7 +40,7 @@ CONTAINS
             Stratum = mus
          end if
       else
-         print*,'Wavelength out of range!'
+         print*,wave,'Wavelength out of range!'
          print*,'Setting Stratum mua = 0!!!'
          Stratum = 0.d0
       end if
@@ -92,7 +92,7 @@ CONTAINS
             Epidermis = mus
          end if
       else
-         print*,'Wavelength out of range!'
+         print*,wave,'Wavelength out of range!'
          print*,'Setting Epidermis mua = 0!!!'
          Epidermis = 0.d0
       end if
@@ -124,6 +124,7 @@ CONTAINS
       mu_try   = ln10 * (tryptophan(wave) * conc(z, 6)) 
       mu_ribo  = ln10 * (riboflavin(wave) * conc(z, 4))
       mu_fad   = ln10 * (fad(wave) * conc(z, 3))
+      mu_nadh  = ln10 * (nadh(wave) * conc(z, 2))
       !set mus
       ! formula from Jac13                                                                 
          a     = 43.6d0
@@ -135,12 +136,12 @@ CONTAINS
       
 
          if(flag .eq. 0)then
-            Pap_dermis = mua + mus + mu_try + mu_ribo + mu_fad
+      Pap_dermis = mua + mus + mu_try + mu_ribo + mu_fad + mu_nadh
          elseif(flag .eq. 1)then
             Pap_dermis = mus
          end if
       else
-         print*,'Wavelength out of range!'
+         print*,wave,'Wavelength out of range!'
          print*,'Setting Pap_dermis mua = 0!!!'
          Pap_dermis = 0.d0
       end if
@@ -151,7 +152,9 @@ CONTAINS
       DOUBLE PRECISION, intent(in) :: wave
       integer,          intent(in) :: flag, z
       DOUBLE PRECISION             :: mua, mus, a, f_ray, bcoeff,  W, S, B, baseline
-      DOUBLE PRECISION             :: C_bili, C_caro, nu_m   
+      DOUBLE PRECISION             :: C_bili, C_caro, nu_m, ln10  
+      
+      ln10 = log(10.d0)
       
       if(wave .ge. 100.d0)then
       !set mua
@@ -167,6 +170,13 @@ CONTAINS
             (7.0d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
             2.3d0 * C_bili * bilirubin(wave) + 2.3d0 * C_caro * carotene(wave) + &
             (1.d0 - Baseline) * base(wave)   !in cm-1
+     
+      !set fluorophores
+!      mu_try   = ln10 * (tryptophan(wave) * conc(z, 6)) 
+!      mu_ribo  = ln10 * (riboflavin(wave) * conc(z, 4))
+      mu_fad   = ln10 * (fad(wave) * conc(z, 3))
+      mu_nadh  = ln10 * (nadh(wave) * conc(z, 2))
+     
       !set mus
       ! formula from Jac13                                                                 
          a     = 43.6d0
@@ -177,7 +187,7 @@ CONTAINS
             
 
          if(flag .eq. 0)then
-            Ret_dermis = mua + mus
+            Ret_dermis = mua + mus + mu_nadh + mu_fad
          elseif(flag .eq. 1)then
             Ret_dermis = mus
          end if
