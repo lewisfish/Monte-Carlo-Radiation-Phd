@@ -20,7 +20,6 @@ CONTAINS
    jmeanGLOBAL=jmeanGLOBAL * (1.d0/(numproc*nphotons*(2.*xmax/nxg)*(2.*ymax/nyg)*(2.*zmax/nzg)))
    
    INQUIRE(iolength = irec) jmeanGLOBAL
-   print*,'irec ',irec
    open(62,file=trim(fileplace)//'jmean/jmean 635.dat',access='direct',form='unformatted',recl=irec)
    write(62,rec=1) jmeanGLOBAL
    close(62)
