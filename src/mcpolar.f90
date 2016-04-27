@@ -105,7 +105,7 @@ v(2)=sintim*sinpim
 v(3)=costim  
 
 !set optical properties and make cdfs.
-wave_in = 260.d0 
+wave_in = 365.d0 
 wave    = wave_in
 call opt_set
 
@@ -135,6 +135,7 @@ call mk_cdf(ribo_fluro,ribo_cdf,size(ribo_fluro,1))
 call mk_cdf(try_fluro,try_cdf,size(try_fluro,1)) 
 call mk_cdf(tyro_fluro,tyro_cdf,size(tyro_fluro,1)) 
 
+
 !loop over photons   
 do j=1,nphotons
   
@@ -151,7 +152,7 @@ do j=1,nphotons
 ! code to output progress as program runs also gives an estimate of when program will complete.
    if(mod(j,int(0.02d0*nphotons)).eq.0)then
       if(id.eq.0)then
-          write(*,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
+          write(*,FMT="(A1,A,t21,F6.2,A,$)") achar(13), &
                 " Percent Complete: ", (real(j)/real(nphotons))*100.0, "%"
       end if
    end if
@@ -296,13 +297,14 @@ do j=1,nphotons
       flucount=flucount+1
    end if
 end do      ! end loop over nph photons
+call MPI_BARRIER(MPI_COMM_WORLD, error)
+print*,' '
 print*,sum(fluroexit(:,7))
-print*,' ' 
-print*, acount, '1st barrier',id
-print*, fcount, '2nd barrier',id
+
 print*, flucount,'# photons collected',id
 
 !give time taken to run program
+call MPI_BARRIER(MPI_COMM_WORLD, error)
 call cpu_time(finish)
 if(finish-start.ge.60.)then
  print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
@@ -316,18 +318,29 @@ call alloc_array(1)
 rgb(:,:,1)=rgb(:,:,1)/maxval(rgb(:,:,1))
 rgb(:,:,2)=rgb(:,:,2)/maxval(rgb(:,:,2))
 rgb(:,:,3)=rgb(:,:,3)/maxval(rgb(:,:,3))
-rgb=rgb*256.d0
-call MPI_REDUCE(rgb,rgbGLOBAL,nxg*nyg*3,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,error)
 
-if(id.eq.0)then
-call write_ppm(trim(fileplace)//'render.ppm', rgbGLOBAL)
-end if
+!if(id.eq.0)then
+!call write_ppm(trim(fileplace)//'render.ppm', rgbGLOBAL)
+!end if
 
 !      path length reduce     
 call MPI_REDUCE(jmean,jmeanGLOBAL,((nxg+3)*(nyg+3)*(nzg+3))*4,MPI_DOUBLE_PRECISION &
                ,MPI_SUM,0,MPI_COMM_WORLD,error)
 call MPI_Barrier(MPI_COMM_WORLD,error)
 print*,'done jmean'
+
+rgb=rgb*256.d0
+!call MPI_Allreduce(rgb, rgbGLOBAL, size(rgbGLOBAL), MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD,error)
+print*,'done'
+
+                  
+!call MPI_REDUCE(rgb,rgbGLOBAL,size(rgbGLOBAL),MPI_DOUBLE_PRECISION,MPI_SUM,0, &
+!               MPI_COMM_WORLD,error)
+
+
+
+
+
 
 !call MPI_REDUCE(dep,depGLOBAL,cbinsnum,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 !call MPI_Barrier(MPI_COMM_WORLD,error)
@@ -363,6 +376,7 @@ call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000*7,MPI_INTEGER,MPI_SUM,0,MPI_COMM_
 !call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 print*,'done all reduces',id
+
 call MPI_Barrier(MPI_COMM_WORLD,error)
 if(id.eq.0)then
     print*,'Average # of scatters per photon:',sngl(nscattGLOBAL/(nphotons*numproc))
