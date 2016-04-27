@@ -1,8 +1,17 @@
-FCOMP = mpifort
-FCFLAGS = -O2 
+#intel
+FCOMP = mpiifort
+FCFLAGS = -O2 -cpp -Dintel
+#FCFLAGS = -cpp -Dintel -traceback -check -g
+#-gen-interfaces -warn
+
+#gnu
+#FCOMP = mpifort
+#FCFLAGS = -O2 -cpp 
 #FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace 
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
+
+
 #LDFLAGS = 
 #goes after $^ -pg 
 #-pg goes between fcomp and fcflags
