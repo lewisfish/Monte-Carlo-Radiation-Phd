@@ -46,6 +46,10 @@ CONTAINS
       integer,          intent(IN) :: xcell, ycell
       DOUBLE PRECISION             :: SSS, gamm, R, G, B
             
+            r = 0.0d0
+            g = 0.0d0
+            b = 0.0d0
+            
             if((wave .lt. 380.d0) .and. (wave .gt. 780.0d0))then
                R = 0.0d0
                G = 0.0d0

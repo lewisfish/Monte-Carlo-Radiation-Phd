@@ -127,11 +127,11 @@ CONTAINS
       mu_nadh  = ln10 * (nadh(wave) * conc(z, 2))
       !set mus
       ! formula from Jac13                                                                 
-         a     = 43.6d0
-         f_ray = 0.41d0
-         b     = 0.562
-         mus   = a * (f_ray * (wave / 500.d0)**(-4.d0) + (1.d0 - f_ray) * (wave / 500.d0)**(-bcoeff))   !in cm-1
-         mus   = mus / (1.0d0 - hgg)
+         a      = 43.6d0
+         f_ray  = 0.41d0
+         bcoeff = 0.562
+         mus    = a * (f_ray * (wave / 500.d0)**(-4.d0) + (1.d0 - f_ray) * (wave / 500.d0)**(-bcoeff))   !in cm-1
+         mus    = mus / (1.0d0 - hgg)
 
       
 
