@@ -276,7 +276,7 @@ do j=1,nphotons
       call wave_to_RGB(wave, xcell, ycell , rgb, 0.8d0)
    end if
 !bin photons leaving top surface if they are collected by fibre
-   if(int(wave).ne. 260.d0 .and.nxp.gt. 0.d0)then
+   if(int(wave).ne. wave_in .and.nxp.gt. 0.d0)then
       fluroexit(int(wave),7)=fluroexit(int(wave),7)+1
       if(nadh_bool)then
          fluroexit(int(wave),1)=fluroexit(int(wave),1)+1

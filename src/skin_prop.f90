@@ -58,7 +58,7 @@ CONTAINS
       if(wave .ge. 100.d0)then
       !set mua
       nu_m     = 0.01d0
-      W        = 2.0d0      !water level
+      W        = 0.20d0      !water level
       S        = 0.75d0     !Blood oxygenation
       B        = 0.0d0      !blood fraction
       C_caro   = 2.1d-4
@@ -66,7 +66,7 @@ CONTAINS
       Baseline = 0.3d0 
                                                                                     
       mua = B * S * Oxy_Hb(wave) + B * (1.d0 - S) * Deoxy_Hb(wave) + W * water(wave) + &
-            (7.0d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
+            (0.7d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
             2.3d0 * C_bili * bilirubin(wave) + 2.3d0 * C_caro * carotene(wave) + &
             (1.d0 - Baseline) * base(wave)   !in cm-1   
       
@@ -109,7 +109,7 @@ CONTAINS
       if(wave .ge. 100.d0)then
       !set mua
       nu_m     = 0.0d0
-      W        = 5.0d0      !water level
+      W        = 0.5d0      !water level
       S        = 0.75d0     !Blood oxygenation
       B        = 6.0d0     !blood fraction
       C_caro   = 7.0d-5
@@ -117,7 +117,7 @@ CONTAINS
       Baseline = 0.3d0
       
       mua = B * S * Oxy_Hb(wave) + B * (1.d0 - S) * Deoxy_Hb(wave) + W * water(wave) + &
-            (7.0d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
+            (0.7d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
             2.3d0 * C_bili * bilirubin(wave) + 2.3d0 * C_caro * carotene(wave) + &
             (1.d0 - Baseline) * base(wave)   !in cm-1
       !set fluorophores
@@ -159,7 +159,7 @@ CONTAINS
       if(wave .ge. 100.d0)then
       !set mua
       nu_m     = 0.0d0
-      W        = 7.0d0      !water level
+      W        = 0.7d0      !water level
       S        = 0.75d0     !Blood oxygenation
       B        = 4.5d0     !blood fraction
       C_caro   = 7.0d-5
@@ -167,7 +167,7 @@ CONTAINS
       Baseline = 0.3d0
       
       mua = B * S * Oxy_Hb(wave) + B * (1.d0 - S) * Deoxy_Hb(wave) + W * water(wave) + &
-            (7.0d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
+            (0.7d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
             2.3d0 * C_bili * bilirubin(wave) + 2.3d0 * C_caro * carotene(wave) + &
             (1.d0 - Baseline) * base(wave)   !in cm-1
      
@@ -208,7 +208,7 @@ CONTAINS
       if(wave .ge. 100.d0)then
       !set mua
       nu_m     = 0.0d0
-      W        = 7.d0      !water level
+      W        = 0.7d0      !water level
       S        = 0.75d0     !Blood oxygenation
       B        = 5.0d0     !blood fraction
       C_caro   = 0.0d0
@@ -216,7 +216,7 @@ CONTAINS
       Baseline = 0.3d0
       
       mua = B * S * Oxy_Hb(wave) + B * (1.d0 - S) * Deoxy_Hb(wave) + W * water(wave) + &
-            (7.d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
+            (0.7d0 - W) * fat(wave) + 2.3d0 * nu_m * (Eumel(wave) + Pheomel(wave)) + &
             2.3d0 * C_bili * bilirubin(wave) + 2.3d0 * C_caro * carotene(wave) + &
             (1.d0 - Baseline) * base(wave)   !in cm-1       
       !set mus
