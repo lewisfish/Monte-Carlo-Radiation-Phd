@@ -264,7 +264,7 @@ do j=1,nphotons
 !************ Peel off photon into image
 !      call peelingoff(xcell,ycell,zcell,delta &
 !      ,v,sintim,costim,sinpim,cospim)
-
+print*,'test'
       xcur=xp+xmax
       ycur=yp+ymax
       zcur=zp+zmax
