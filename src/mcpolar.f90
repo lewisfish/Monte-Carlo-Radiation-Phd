@@ -199,11 +199,11 @@ do j=1,nphotons
 ! Select albedo based on current photon wavelength
       ran=ran2(iseed)
 !      print*,zcell,albedo(xcell,ycell,zcell,1)
-      if(ran.lt.albedo(xcell,ycell,zcell,1))then !photons scatters
+      if(ran.lt.albedo(1,1,zcell,1))then !photons scatters
          call stokes(iseed)
          nscatt=nscatt+1
       else !photon absorbs
-         if( ran .lt. mu_nadh/rhokap(xcell, ycell, zcell , 1) + albedo(zcell, ycell, zcell, 1))then
+         if( ran .lt. mu_nadh/rhokap(1, 1, zcell , 1) + albedo(1, 1, zcell, 1))then
 !           if(wave.lt.100)print*,'nadh1',wave
             call sample(nadh_fluro,nadh_cdf,wave,iseed)
             call opt_set()
@@ -211,8 +211,8 @@ do j=1,nphotons
             fad_bool=.FALSE.; nad_bool=.FALSE.; ribo_bool=.FALSE.; 
             try_bool=.FALSE.; tyro_bool=.FALSE.
 !            if(wave.lt.100)print*,'nadh2',wave
-         elseif( ran .lt. (mu_ribo+mu_nadh)/rhokap(xcell, ycell, zcell , 1) &
-                                          + albedo(zcell, ycell, zcell, 1))then
+         elseif( ran .lt. (mu_ribo+mu_nadh)/rhokap(1, 1, zcell , 1) &
+                                          + albedo(1, 1, zcell, 1))then
 !            if(wave.lt.100)print*,'ribo1',wave
             call sample(ribo_fluro,ribo_cdf,wave,iseed)
             call opt_set()
@@ -220,8 +220,8 @@ do j=1,nphotons
             fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; 
             try_bool=.FALSE.; tyro_bool=.FALSE.
 !            if(wave.lt.100)print*,'ribo2',wave
-          elseif( ran .lt. (mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
-                                          + albedo(zcell, ycell, zcell, 1))then
+          elseif( ran .lt. (mu_ribo+mu_nadh+mu_fad)/rhokap(1, 1, zcell , 1) &
+                                          + albedo(1, 1, zcell, 1))then
 !            print*,'fad1',wave
             call sample(fad_fluro,fad_cdf,wave,iseed)
             call opt_set()
@@ -229,8 +229,8 @@ do j=1,nphotons
             ribo_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; 
             try_bool=.FALSE.; tyro_bool=.FALSE.
 !            if(wave.lt.100)print*,'fad2',wave
-         elseif( ran .lt. (mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
-                                                + albedo(zcell, ycell, zcell, 1))then
+         elseif( ran .lt. (mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(1, 1, zcell , 1) &
+                                                + albedo(1, 1, zcell, 1))then
 !            if(wave.lt.100)print*,'try1',wave
             call sample(try_fluro,try_cdf,wave,iseed)
             call opt_set()
@@ -238,8 +238,8 @@ do j=1,nphotons
             fad_bool=.FALSE.; nad_bool=.FALSE.; nadh_bool=.FALSE.; ribo_bool=.FALSE.; 
             tyro_bool=.FALSE.
 !           if(wave.lt.100) print*,'try2',wave
-         elseif( ran .lt. (mu_tyro+mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(xcell, ycell, zcell , 1) &
-                                                + albedo(zcell, ycell, zcell, 1))then
+         elseif( ran .lt. (mu_tyro+mu_try+mu_ribo+mu_nadh+mu_fad)/rhokap(1, 1, zcell , 1) &
+                                                + albedo(1, 1, zcell, 1))then
 !            if(wave.lt.100)print*,'tyro',wave
             call sample(tyro_fluro,tyro_cdf,wave,iseed)
             call opt_set()

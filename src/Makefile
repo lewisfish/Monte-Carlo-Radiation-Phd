@@ -1,12 +1,12 @@
 #intel
-FCOMP = mpiifort
-FCFLAGS = -O2 -cpp -Dintel
+#FCOMP = mpiifort
+#FCFLAGS = -O2 -cpp -Dintel
 #FCFLAGS = -cpp -Dintel -traceback -check -g
 #-gen-interfaces -warn
 
 #gnu
-#FCOMP = mpifort
-#FCFLAGS = -O2 -cpp 
+FCOMP = mpifort
+FCFLAGS = -O2 -cpp 
 #FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace 
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
@@ -24,8 +24,8 @@ SRCS =      ran2.f \
             subs.f90 \
             absorbers_mod.f90 \
             opt_prop.f90 \
-				fluorophores.f90 \
-				skin_prop.f90 \
+            fluorophores.f90 \
+	    skin_prop.f90 \
             ch_opt.f90 \
             density.f90 \
             gridset.f90 \

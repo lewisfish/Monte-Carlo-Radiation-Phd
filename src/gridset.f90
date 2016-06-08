@@ -98,10 +98,10 @@ CONTAINS
    taueq1=0.
    taupole1=0.
    do i=1,nxg
-      taueq1=taueq1+rhokap(i,nyg/2,nzg/2,1)
+      taueq1=taueq1+rhokap(1,1,nzg/2,1)
    end do
    do i=1,nzg
-      taupole1=taupole1+rhokap(nxg/2,nyg/2,i,1)
+      taupole1=taupole1+rhokap(1,1,i,1)
    end do
    taueq1=taueq1*2.*xmax/nxg
    taupole1=taupole1*2.*zmax/nzg

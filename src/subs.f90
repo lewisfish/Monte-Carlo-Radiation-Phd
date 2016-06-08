@@ -103,7 +103,7 @@ CONTAINS
    if(flag .eq. 0)then!allocate local arrays
    
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
-   allocate(rhokap(nxg+3,nyg+3,nzg+3,1),albedo(nxg+3,nyg+3,nzg+3,1))
+   allocate(rhokap(1,1,nzg+3,1),albedo(1,1,nzg+3,1))
    allocate(rgb(nxg,nyg,3), conc(nzg, 6))
    
 !   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
