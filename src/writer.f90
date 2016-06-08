@@ -4,26 +4,22 @@ implicit none
 save
 
 CONTAINS
-   subroutine writer(nphotons, numproc)
+   subroutine writer(id1, id2, id3)
 
-   use constants,only : nxg,nyg,nzg,fileplace,Nbins,cbinsnum,xmax,ymax,zmax
+   use constants,only : nxg,nyg,nzg,fileplace,Nbins,cbinsnum
    use iarray,only : jmeanGLOBAL,fluroexitGLOBAL!,imageGLOBAL,depGLOBAL,depositGLOBAL,transGLOBAL &
                     ! ,fluro_posGLOBAL,followGLOBAL
 
    implicit none
+
+   integer      :: j,irec,i,id1, id2, id3
+   character(len=20) :: fn
+
    
-   character(len=4), dimension(7) :: fn
-   integer :: j,irec,i,nphotons, numproc
-   
-   fn=(/'nadh','ribo','try ','tyro','fad ','nad ','tot '/)
-   
-   jmeanGLOBAL=jmeanGLOBAL * (1.d0/(numproc*nphotons*(2.*xmax/nxg)*(2.*ymax/nyg)*(2.*zmax/nzg)))
-   
-   INQUIRE(iolength = irec) jmeanGLOBAL
-   print*,'irec ',irec
-   open(62,file=trim(fileplace)//'jmean/jmean 635.dat',access='direct',form='unformatted',recl=irec)
-   write(62,rec=1) jmeanGLOBAL
-   close(62)
+!   INQUIRE(iolength = irec) jmeanGLOBAL
+!   open(62,file=trim(fileplace)//'jmean/jmean.dat',access='direct',form='unformatted',recl=irec)
+!   write(62,rec=1) jmeanGLOBAL
+!   close(62)
 
 !   open(78,file=trim(fileplace)//'jmean/test.dat')
 !   do i=1,nxg
@@ -49,14 +45,12 @@ CONTAINS
 !   write(70,rec=1) transGLOBAL
 !   close(70)
 
-   do i=1,7
-   open(71,file=trim(fileplace)//trim(fn(i))//'fluro.dat')
+   write(fn,"(3(I3.3,1X))") id1, id2, id3
+   open(56,file=trim(fileplace)//'run/'//trim(fn)//'.dat')
    do j=1,1000
-      write(71,*) fluroexitGLOBAL(j,i)!/real(maxval(fluroexitGLOBAL))
+      write(56,*) fluroexitGLOBAL(j)/real(maxval(fluroexitGLOBAL))
    end do
-      close(71)
-   end do
-
+   close(56)
    
 !   open(72,file=trim(fileplace)//'fluro_pos.dat',access='direct',form='unformatted',recl=((nxg)*(nyg)*(nzg))*4)
 !   write(72,rec=1) fluro_posGLOBAL

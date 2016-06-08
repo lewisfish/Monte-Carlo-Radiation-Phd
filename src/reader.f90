@@ -80,66 +80,35 @@ CONTAINS
    
    subroutine reader1
    
-   use iarray,    only : Carotene_array, Bilirubin_array, Oxy_Hb_array, Deoxy_Hb_array, &
-                         water_array, fat_array, nad_array, nadh_array, fad_array, &
-                         tyrosine_array, tryptophan_array, riboflavin_array, &
-                         nadh_fluro, tyro_fluro, try_fluro, ribo_fluro, fad_fluro, &
-                         nadh_cdf, tyro_cdf, try_cdf, ribo_cdf, fad_cdf !, noise
+   use iarray,    only : mua_array, mus_array,  &
+                         nadh_array, nadh_fluro, riboflavin_array, ribo_fluro, &
+                         tyrosine_array, tyro_fluro, nadh_cdf, ribo_cdf, tyro_cdf
    use constants, only : resdir
    
    implicit none
    
    integer :: cnt
-
-   !Oxy-Hb data
-   call readfile_array2D(trim(resdir)//'Oxy-Hb.dat', Oxy_Hb_array, 0, 2)
-
-   !Deoxy-Hb data
-   call readfile_array2D(trim(resdir)//'Deoxy-Hb.dat', Deoxy_Hb_array, 0, 2)
-
-   !B-carotene data
-   call readfile_array2D(trim(resdir)//'B-carotene.dat', Carotene_array, 0, 2)
-
-   !Bilirubin data
-   call readfile_array2D(trim(resdir)//'bilirubin.dat', bilirubin_array, 0, 2)
-
-   !water data
-   call readfile_array2D(trim(resdir)//'water absor.dat', water_array, 0, 2)
    
-   !fat data
-   call readfile_array2D(trim(resdir)//'fatty.dat', fat_array, 0, 2)
+   !mua
+   call readfile_array2D(trim(resdir)//'mua.dat', mua_array, 0, 2)
    
-   !nad+ data
-   call readfile_array2D(trim(resdir)//'nad+.dat', nad_array, 0, 2)
-!   call readfile_array2D(trim(resdir)//'nad+fluro.dat', nad_fluro ,0, 2)
-   
+   !mus
+   call readfile_array2D(trim(resdir)//'mus.dat', mus_array, 0, 2)
+  
    !nadh data
    call readfile_array2D(trim(resdir)//'nadh.dat', nadh_array, 0, 2)
    call readfile_array2D(trim(resdir)//'nadh_fluro.dat', nadh_fluro, 0, 2)   
-   allocate(nadh_cdf(size(nadh_fluro,1)))
-   
-   !fad data
-   call readfile_array2D(trim(resdir)//'faduv.dat', fad_array, 0, 2)
-   call readfile_array2D(trim(resdir)//'fad_fluro.dat', fad_fluro, 0, 2)  
-   allocate(fad_cdf(size(fad_fluro,1)))
-      
+   allocate(nadh_cdf(size(nadh_fluro, 1)))
+
    !riboflavin data
    call readfile_array2D(trim(resdir)//'Riboflavin.dat', riboflavin_array, 0, 2)
    call readfile_array2D(trim(resdir)//'Riboflavin_fluro.dat', ribo_fluro, 0, 2)
-   allocate(ribo_cdf(size(ribo_fluro,1)))
+   allocate(ribo_cdf(size(ribo_fluro, 1)))
       
    !tyrosine data
    call readfile_array2D(trim(resdir)//'tyrosine.dat', tyrosine_array, 0, 2)
    call readfile_array2D(trim(resdir)//'tyrosine_fluro.dat', tyro_fluro, 0, 2)
-   allocate(tyro_cdf(size(tyro_fluro,1)))
-      
-   !tryptophan data
-   call readfile_array2D(trim(resdir)//'tryptophan.dat', tryptophan_array, 0, 2)
-   call readfile_array2D(trim(resdir)//'tryptophan_fluro.dat', try_fluro, 0, 2)
-   allocate(try_cdf(size(try_fluro,1)))
-      
-   !noise data
-!   call readfile_array2D(trim(resdir)//'noisedots.dat', noise, 1)
+   allocate(tyro_cdf(size(tyro_fluro, 1)))
 
    end subroutine reader1
    

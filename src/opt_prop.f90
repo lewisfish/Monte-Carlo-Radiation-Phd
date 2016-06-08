@@ -3,7 +3,7 @@ MODULE opt_prop
 implicit none
 save
 
-DOUBLE PRECISION :: mua,mus,g2,hgg,kappa,wave!,albedo
-DOUBLE PRECISION :: mu_ribo, mu_fad, mu_nad, mu_nadh, mu_tyro, mu_try
+DOUBLE PRECISION :: mua,muaf,mus,g2,hgg,kappa,albedo,wave
+DOUBLE PRECISION :: mua_ribo, mua_nadh, mua_tyro
 
 end MODULE opt_prop

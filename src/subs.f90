@@ -9,32 +9,49 @@ CONTAINS
 !   
 !   
    use constants,only : cwd,homedir,fileplace,resdir
+
+#ifdef intel
+   use ifport
+#endif
    implicit none
 
    integer :: io, id
 
    !get current working directory
+#ifdef intel
+   io = getcwd(cwd)
+#else
    CALL getcwd(cwd)
-
+#endif
    !get 'home' dir from cwd
    homedir=trim(cwd(1:len(trim(cwd))-3))
    !get data dir
    fileplace=trim(homedir)//'data/'
    
    !checks to see if data folder exists, if not creates it.
+#ifdef intel
+   io = chdir(fileplace)
+#else
    call chdir(fileplace,io)
-   
+#endif
    if(io.ne.0.and.id.eq.0)then
       print*,'data directory does not exist...',id
       print*, 'creating directory...'
+#ifdef intel
+      io = system("mkdir "//fileplace)
+      io = chdir(fileplace)
+      io = system("mkdir jmean/")
+      io = system("mkdir deposit/")
+      io = system("mkdir im/")
+#else
       call system("mkdir "//fileplace)
       call chdir(fileplace,io)
       call system("mkdir jmean/")
       call system("mkdir deposit/")
       call system("mkdir im/")
+#endif
       print*, 'created directory ',trim(fileplace)
    end if
-   
    !get res dir
    resdir=trim(homedir)//'res/'
    
@@ -54,7 +71,7 @@ CONTAINS
 !   dep=0.
    jmean=0.
 !   transGLOBAL=0.
-!   jmeanGLOBAL=0.
+   jmeanGLOBAL=0.
 !   imageGLOBAL=0.
 !   depositGLOBAL=0.
 !   depGLOBAL=0.
@@ -62,17 +79,14 @@ CONTAINS
    yface=0.
    zface=0.
    rhokap=0.
-   rgb=0.d0
-!   rgbGLOBAL = 0.0d0
-   conc = 0.d0
    fluroexit=0
-!   fluroexitGLOBAL=0
+   fluroexitGLOBAL=0
 !   fluro_pos=0.
 !   fluro_posGLOBAL=0.
    
    end SUBROUTINE zarray
 
-   SUBROUTINE alloc_array(flag)
+   SUBROUTINE alloc_array
 !  subroutine allocates allocatable arrays
 !   
 !   
@@ -81,13 +95,8 @@ CONTAINS
    
    implicit none
    
-   integer :: flag
-   
-   if(flag .eq. 0)then!allocate local arrays
-   
    allocate(xface(nxg+3),yface(nyg+3),zface(nzg+3))
-   allocate(rhokap(nxg+3,nyg+3,nzg+3,1),albedo(nxg+3,nyg+3,nzg+3,1))
-   allocate(rgb(nxg,nyg,3), conc(nzg, 6))
+   allocate(rhokap(nxg+3,nyg+3,nzg+3,4))!,followGLOBAL(nxg,nyg,nzg))
    
 !   allocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
 !   allocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
@@ -96,20 +105,39 @@ CONTAINS
 !   allocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
 !   allocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
 !   allocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
-   allocate(jmean(nxg+3,nyg+3,nzg+3,4))
-      allocate(fluroexit(1000,7))
-   else!deallocate local arrays and allocate GLOBAL
-      allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4), rgbGLOBAL(nxg,nyg,3),fluroexitGLOBAL(1000,7))
-         rgbGLOBAL = 0.0d0
-         jmeanGLOBAL = 0.0d0
-            fluroexitGLOBAL=0
-      deallocate(conc,xface,yface,albedo,rhokap)
-
-   end if
+   allocate(jmean(nxg+3,nyg+3,nzg+3,4))!,follow(nxg,nyg,nzg),ftmp(nxg,nyg,nzg)) 
+   allocate(jmeanGLOBAL(nxg+3,nyg+3,nzg+3,4))
+   allocate(fluroexit(1000),fluroexitGLOBAL(1000))!,conc(3))
+   
    
    end SUBROUTINE alloc_array
    
+ SUBROUTINE dealloc_array
+!  subroutine allocates allocatable arrays
+!   
+!   
+   use iarray
+   use constants,only : nxg,nyg,nzg,Nbins,cbinsnum
    
+   implicit none
+   
+   deallocate(xface,yface,zface)
+   deallocate(rhokap)!,followGLOBAL(nxg,nyg,nzg))
+   
+!   deallocate(image(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4))
+!   deallocate(reflc(cbinsnum,cbinsnum),dep(cbinsnum))
+!   deallocate(fluro_pos(nxg,nyg,nzg),fluro_posGLOBAL(nxg,nyg,nzg))
+   
+!   deallocate(imageGLOBAL(-((Nbins-1)/2):((Nbins-1)/2),-((Nbins-1)/2):((Nbins-1)/2),4),depGLOBAL(cbinsnum))
+!   deallocate(deposit(cbinsnum,cbinsnum,cbinsnum),depositGLOBAL(cbinsnum,cbinsnum,cbinsnum))
+!   deallocate(transGLOBAL(cbinsnum,cbinsnum),trans(cbinsnum,cbinsnum))
+   deallocate(jmean)
+   deallocate(jmeanGLOBAL)
+   deallocate(fluroexit,fluroexitGLOBAL)
+   
+   
+   end SUBROUTINE dealloc_array  
+    
    subroutine sample(array,cdf,wave,iseed)
 !      
 !  samples a random value from an array based upon its cdf     
@@ -231,5 +259,4 @@ CONTAINS
       cdf=cdf/cdf(length-1)
    
    end subroutine mk_cdf
-   
 end MODULE subs

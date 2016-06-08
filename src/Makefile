@@ -1,6 +1,13 @@
-FCOMP = mpifort
-FCFLAGS = -O2 
-#FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace 
+#intel
+FCOMP = mpiifort
+FCFLAGS = -O2 -cpp -Dintel 
+#-qopenmp
+FCFLAGS = -cpp -Dintel -O2 -traceback -check -g
+#-gen-interfaces -warn
+#gnu
+#FCOMP = mpifort -cpp 
+#FCFLAGS = -O2 
+#FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace -fopenmp
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
 #LDFLAGS = 
@@ -12,11 +19,9 @@ SRCS =      ran2.f \
             constants.f90 \
             photon_vars.f90 \
             iarray.f90 \
-            subs.f90 \
-            absorbers_mod.f90 \
             opt_prop.f90 \
-				fluorophores.f90 \
-				skin_prop.f90 \
+            subs.f90 \
+            fluorophores.f90 \
             ch_opt.f90 \
             density.f90 \
             gridset.f90 \
@@ -30,18 +35,18 @@ SRCS =      ran2.f \
             reader.f90 \
             writer.f90 \
             findsmax.f90 \
-            ppm.f90 \
-            mcpolar.f90 
+            mcpolar.f90 \
+            Adv_GA_old.f90 \
             
 OBJECTS = $(SRCS:.f90=.o)
 
 all:	$(PROGRAM)
 
 $(PROGRAM):	$(OBJECTS)
-	$(FCOMP) $(FCFLAGS) -o $@ $^
+	$(FCOMP) $(FCFLAGS) -o $@ $^ 
 
 %.o:  %.f90
-	$(FCOMP) $(FCFLAGS) -c $<
+	$(FCOMP)  $(FCFLAGS) -c $<
 
 .PHONY:	clean
 
