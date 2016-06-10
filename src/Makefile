@@ -2,7 +2,7 @@
 FCOMP = mpiifort
 FCFLAGS = -O2 -cpp -Dintel 
 #-qopenmp
-FCFLAGS = -cpp -Dintel -O2 -traceback -check -g
+#FCFLAGS = -cpp -Dintel -O2 -traceback -check -g
 #-gen-interfaces -warn
 #gnu
 #FCOMP = mpifort -cpp 

@@ -22,71 +22,72 @@ call MPI_Comm_size(MPI_COMM_WORLD,numproc,error)
 call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
    
    if(id.eq.0)print*,'Starting N-Models on',numproc,'cores'
-!   filen = '/home/lewis/Desktop/Ga-simple-monte/N-models/data/'
+   filen = '/home/lewis/Desktop/Ga-simple-monte/N-models/data/'
 
    call directory(id)
    call reader1
 
 
-   N = 80   !number of grid points => N**3 points to be run
+   N = 10   !number of grid points => N**3 points to be run
    
    !black magic i will never remember
    !bascically splits up the loop over all points on to 2 processors each with even amount of points to be run on each
    !i.e running double the amount of photons for each point
    !up is the upper limit for the loop for that core and low is the lower bound
    !dosent hold for all N and numproc :(
-   num = int(2.*real(n)/real(numproc) - 1)
-   
-   do i = 0, numproc,2
-      if(id==i)then
-         if(i==0)then
-            low = i*(real(num)+1./2.)+1
-            up = (num+1)
-         else if(i.gt.2)then
-            low = i*int((real(num)+1.)/2.)+1
-            up = (i-((real(i)/2.)-1))*(num+1)
-         else
-            low = i*int((real(num)+1.)/2.)+1
-            up = (num+1)*i
-         end if
-         call MPI_SEND(up, 1, MPI_INTEGER, i+1,1,MPI_COMM_WORLD,error)
-         call MPI_SEND(low, 1, MPI_INTEGER, i+1,1,MPI_COMM_WORLD,error)
-      end if
-   end do
-   
-   do i=1,numproc,2
-      if(id==i)then
-         call MPI_RECV(up, 1, MPI_INTEGER, i-1, 1,MPI_COMM_WORLD,status,error)
-         call MPI_RECV(low, 1, MPI_INTEGER, i-1, 1,MPI_COMM_WORLD,status,error)
-      end if
-   end do
+!   num = int(2.*real(n)/real(numproc) - 1)
+!   
+!   do i = 0, numproc,2
+!      if(id==i)then
+!         if(i==0)then
+!            low = i*(real(num)+1./2.)+1
+!            up = (num+1)
+!         else if(i.gt.2)then
+!            low = i*int((real(num)+1.)/2.)+1
+!            up = (i-((real(i)/2.)-1))*(num+1)
+!         else
+!            low = i*int((real(num)+1.)/2.)+1
+!            up = (num+1)*i
+!         end if
+!         call MPI_SEND(up, 1, MPI_INTEGER, i+1,1,MPI_COMM_WORLD,error)
+!         call MPI_SEND(low, 1, MPI_INTEGER, i+1,1,MPI_COMM_WORLD,error)
+!      end if
+!   end do
+!   
+!   do i=1,numproc,2
+!      if(id==i)then
+!         call MPI_RECV(up, 1, MPI_INTEGER, i-1, 1,MPI_COMM_WORLD,status,error)
+!         call MPI_RECV(low, 1, MPI_INTEGER, i-1, 1,MPI_COMM_WORLD,status,error)
+!      end if
+!   end do
 !   print*,id,low,up
    call MPI_Barrier(MPI_COMM_WORLD,error)
    
    
    allocate(conc(3,N,N,N))
    
-!   if(id==0)then   
-!      open(45,file='run/rosetta.txt')
-!   end if
+   if(id==0)then   
+      open(45,file='rosetta_no_noise.txt')
+   end if
    call cpu_time(start)
    call MPI_Barrier(MPI_COMM_WORLD, error)
-   do i = low, up
+   do i = 1, n
    
       f = dble(i)*((1d-2-1d-4)/dble(N))-1d-4
-      do j = low, up
+      do j = 1, n
             g = dble(j)*((1d-3-1d-5)/dble(N))-1d-5
-         do k = low, up
+         do k = 1, n
                h = dble(k)*((1d-4-1d-6)/dble(N))-1d-6
                conc(:,i,j,k) = (/ f, g, h/)
-               if(id==0)then
-!                  write(45,"(3(I3.3,1X),3E15.8)") i,j,k,conc(:,i,j,k)
-!                  print*,i,j,k
-               end if
+
 
                call MPI_Barrier(MPI_COMM_WORLD, error)
-!!               call mcpolar(conc(:,i,j,k), i, j, k, error, numproc, id, .false.)
+               call mcpolar(conc(:,i,j,k), i, j, k, error, numproc, id, .false.)
                call MPI_Barrier(MPI_COMM_WORLD, error)
+               if(id==0)then
+                  write(45,"(3(I3.3,1X),3E15.8)") i,j,k,conc(:,i,j,k)
+                  print*,i,j,k
+               end if
          end do
       end do
       if(id.eq.0)then
