@@ -46,7 +46,7 @@ CONTAINS
 !   close(70)
 
    write(fn,"(3(I3.3,1X))") id1, id2, id3
-   open(56,file=trim(fileplace)//'run/'//trim(fn)//'.dat')
+   open(56,file=trim(fileplace)//'run_test/'//trim(fn)//'.dat',status='unknown')
    do j=1,1000
       write(56,*) fluroexitGLOBAL(j)/real(maxval(fluroexitGLOBAL))
    end do

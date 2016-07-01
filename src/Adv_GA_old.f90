@@ -9,9 +9,9 @@ program simple_GA
    real                          :: ran2
    double precision              :: f, g, h, start, finish
    double precision, allocatable :: conc(:,:,:,:)
-   integer                       :: i, j, k, N, low, up, num
+   integer                       :: i, j, k, N, low, up, num,l
    character(len=255)            :: filen 
-   integer                       :: id,error,numproc
+   integer                       :: id,error,numproc,io
    integer status(MPI_STATUS_SIZE) 
 
 ! init mpi
@@ -28,7 +28,7 @@ call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
    call reader1
 
 
-   N = 10   !number of grid points => N**3 points to be run
+   N = 20   !number of grid points => N**3 points to be run
    
    !black magic i will never remember
    !bascically splits up the loop over all points on to 2 processors each with even amount of points to be run on each
@@ -60,52 +60,60 @@ call MPI_Comm_rank(MPI_COMM_WORLD,id,error)
 !         call MPI_RECV(low, 1, MPI_INTEGER, i-1, 1,MPI_COMM_WORLD,status,error)
 !      end if
 !   end do
-!   print*,id,low,up
-   call MPI_Barrier(MPI_COMM_WORLD,error)
-   
+!!   print*,id,low,up
+!   call MPI_Barrier(MPI_COMM_WORLD,error)
+
    
    allocate(conc(3,N,N,N))
    
-   if(id==0)then   
-      open(45,file='rosetta_no_noise.txt')
-   end if
-   call cpu_time(start)
-   call MPI_Barrier(MPI_COMM_WORLD, error)
-   do i = 1, n
-   
-      f = dble(i)*((1d-2-1d-4)/dble(N))-1d-4
-      do j = 1, n
-            g = dble(j)*((1d-3-1d-5)/dble(N))-1d-5
-         do k = 1, n
-               h = dble(k)*((1d-4-1d-6)/dble(N))-1d-6
-               conc(:,i,j,k) = (/ f, g, h/)
+!   if(mod(id,2)==0)then   
+!    l = id + 11
+!      open(l,file='test-'//achar(id+48)//'.pat',iostat=io)
+!   end if
+!   call cpu_time(start)
+!   call MPI_Barrier(MPI_COMM_WORLD, error)
+!   do i = low, up
+!   
+!      f = dble(i)*((1d-2-1d-4)/dble(N))-1d-4
+!      do j = 1, n
+!            g = dble(j)*((1d-3-1d-5)/dble(N))-1d-5
+!         do k = 1, n
+!               h = dble(k)*((1d-4-1d-6)/dble(N))-1d-6
+!               conc(:,i,j,k) = (/ f, g, h/)
 
 
-               call MPI_Barrier(MPI_COMM_WORLD, error)
-               call mcpolar(conc(:,i,j,k), i, j, k, error, numproc, id, .false.)
-               call MPI_Barrier(MPI_COMM_WORLD, error)
-               if(id==0)then
-                  write(45,"(3(I3.3,1X),3E15.8)") i,j,k,conc(:,i,j,k)
-                  print*,i,j,k
-               end if
-         end do
-      end do
-      if(id.eq.0)then
-         write(*,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
-                " Percent Complete: ", (((numproc/2d0)*dble(i)/dble(N)))*100.0, "%"
-      end if
-      call MPI_Barrier(MPI_COMM_WORLD, error)
-   end do
-   
-   call MPI_Barrier(MPI_COMM_WORLD, error)
-   if(id==0)print*,' '
-   call cpu_time(finish)
-   if(finish-start.ge.60..and.id==0)then
-    print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
-   elseif(id==0)then
-         print*, 'time taken ~',floor(finish-start/60.),'s'
-   end if
-     
+!               call MPI_Barrier(MPI_COMM_WORLD, error)
+!               call mcpolar(conc(:,i,j,k), i, j, k, error, numproc, id, .false.)
+!               call MPI_Barrier(MPI_COMM_WORLD, error)
+!               if(mod(id,2)==0)then
+!                  write(l,"(3(I3.3,1X),3E15.8)") i,j,k,conc(:,i,j,k)
+!                  print*,i,j,k,id
+!               end if
+!         end do
+!      end do
+!      if(id.eq.0)then
+!         write(*,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
+!                " Percent Complete: ", (((numproc/2d0)*dble(i)/dble(N)))*100.0, "%"
+!      end if
+!      call MPI_Barrier(MPI_COMM_WORLD, error)
+!   end do
+!   
+!   call MPI_Barrier(MPI_COMM_WORLD, error)
+!   if(id==0)print*,' '
+!   call cpu_time(finish)
+!   if(finish-start.ge.60..and.id==0)then
+!      print*,floor((finish-start)/60.)+mod(finish-start,60.)/100.
+!   elseif(id==0)then
+!      print*, 'time taken ~',floor(finish-start/60.),'s'
+!   end if
+!   
+!   if(id==0)then
+!   
+!      call system('zip -j /home/lewis/phdshizz/grid/data/test.zip /home/lewis/phdshizz/grid/data/run_test/*.dat')
+!   end if
+!   call MPI_Barrier(MPI_COMM_WORLD, error)
+   conc(:,1,1,1) = (/1.d-3,1.d-4,1.d-5/)
+   call mcpolar(conc(:,1,1,1), 111, 111, 111, error, numproc, id, .false.) 
    call MPI_Finalize(error)
    Contains 
            

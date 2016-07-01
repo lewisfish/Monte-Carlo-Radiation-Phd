@@ -1,12 +1,12 @@
 #intel
-FCOMP = mpiifort
-FCFLAGS = -O2 -cpp -Dintel 
+#FCOMP = mpiifort
+#FCFLAGS = -O2 -cpp -Dintel 
 #-qopenmp
 #FCFLAGS = -cpp -Dintel -O2 -traceback -check -g
 #-gen-interfaces -warn
 #gnu
-#FCOMP = mpifort -cpp 
-#FCFLAGS = -O2 
+FCOMP = mpifort 
+FCFLAGS = -O2 -cpp 
 #FCFLAGS = -O2 -g -fcheck=all -fbounds-check -fbacktrace -fopenmp
 #-ffpe-trap=zero,overflow,underflow 
 #FCFLAGS = -Wall -Wextra -pedantic
@@ -36,7 +36,7 @@ SRCS =      ran2.f \
             writer.f90 \
             findsmax.f90 \
             mcpolar.f90 \
-            Adv_GA_old.f90 \
+            data_sort.f90 \
             
 OBJECTS = $(SRCS:.f90=.o)
 

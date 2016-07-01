@@ -27,7 +27,7 @@ use writer_mod
 
 implicit none
 
-integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount,nlow,id1, id2, id3
+integer :: nphotons,iseed,j,xcell,ycell,zcell,flucount,nlow,id1, id2, id3,i
 logical :: tflag,sflag,fflag,pflag
 DOUBLE PRECISION :: ddy,ddx,nscatt,n1,n2,weight,val,fluro_prob
 DOUBLE PRECISION :: delta,xcur,ycur,zcur,thetaim,ran 
@@ -44,6 +44,7 @@ real :: start,finish,ran2,sleft,fleft,time
 DOUBLE PRECISION :: nscattGLOBAL
 integer          :: error,numproc,id
 character(len=1) :: fn
+integer status(MPI_STATUS_SIZE) 
 
 !print*,conc
 
@@ -314,13 +315,24 @@ call MPI_REDUCE(nscatt,nscattGLOBAL,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WO
 !end do
 
 call MPI_Barrier(MPI_COMM_WORLD,error)
-call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
+do i = 1, numproc,2
+   if(id==i)then
+      call MPI_SEND(fluroexit, 1000, MPI_INTEGER, i-1,1,MPI_COMM_WORLD,error)
+   end if
+end do
+do i=0,numproc,2
+   if(id==i)then
+      call MPI_RECV(fluroexitGLOBAL, 1000, MPI_INTEGER, i+1, 1,MPI_COMM_WORLD,status,error)
+      fluroexitGLOBAL = fluroexitGLOBAL + fluroexit
+   end if
+end do
+!call MPI_REDUCE(fluroexit,fluroexitGLOBAL,1000,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,error)
 !     fluro_pos reduce
 !call MPI_Barrier(MPI_COMM_WORLD,error)
 !call MPI_REDUCE(fluro_pos,fluro_posGLOBAL,nxg*nyg*nzg,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD,error)
 
 call MPI_Barrier(MPI_COMM_WORLD,error)
-if(id.eq.0)then
+if(mod(id,2)==0)then
 !    print*,'Average # of scatters per photon:',sngl(nscattGLOBAL/(nphotons*numproc))
 !    write out files
     call writer(id1, id2, id3)
